@@ -77,7 +77,7 @@ const main = async () => {
   }
 
   for (let depth = 1; depth <= 5; depth++) {
-    const pathPrefixStr = Array.from({ length: depth }, (_) => `1`).join(".")
+    const pathPrefixStr = Array.from({ length: depth }, (_) => "1").join(".")
     for (let j = 1; j <= 20; j++) {
       commentData.push({
         userId: uList[faker.number.int({ min: 0, max: uList.length - 1 })],

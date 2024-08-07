@@ -1,13 +1,17 @@
 import { Sort } from "@chatfall/server"
+import React from "react"
 import { useCallback } from "react"
 import { useCommentsStore } from "../shared/comments.store"
 
 export default function CommentList() {
   const { comments, users, fetchComments, sort } = useCommentsStore()
 
-  const handleSortChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
-    fetchComments(event.target.value as Sort)
-  }, [])
+  const handleSortChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      fetchComments(event.target.value as Sort)
+    },
+    [fetchComments],
+  )
 
   return (
     <section className="flex flex-col gap-2">
@@ -30,11 +34,14 @@ export default function CommentList() {
             <li key={c.id} className="block">
               <div className="flex flex-row">
                 <h3 className="font-bold">{users[c.userId].username}</h3>
-                <span className="text-gray-400 ml-2">{`${c.createdAt}`}</span> {/* Display the selected sorting parameter */}
+                <span className="text-gray-400 ml-2">{`${c.createdAt}`}</span>{" "}
+                {/* Display the selected sorting parameter */}
                 <span className="text-gray-800 ml-2">{`Rating: ${c.rating}`}</span>
               </div>
               <div>{c.body}</div>
-              {c.reply_count > 0 && <div className="mt-4">{`Replies: ${c.reply_count}`}</div>}
+              {c.reply_count > 0 && (
+                <div className="mt-4">{`Replies: ${c.reply_count}`}</div>
+              )}
             </li>
           ))}
         </ul>

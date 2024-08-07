@@ -1,8 +1,8 @@
-import type Elysia from "elysia";
+import type Elysia from "elysia"
 
 export function pluginConditionally<Plugin = never>(
-	condition: boolean,
-	plugin: Plugin,
+  condition: boolean,
+  plugin: Plugin,
 ) {
-	return (app: Elysia) => (condition ? plugin : app);
+  return (app: Elysia) => (condition ? plugin : app)
 }

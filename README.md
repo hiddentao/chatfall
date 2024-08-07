@@ -1,3 +1,9 @@
+
+
+## Acknowledgements
+
+* [ElysiaJS template by Tanishq Manuja](https://github.com/tanishqmanuja/todos-react-elysia)
+
 Coming soon...
 
 ## License

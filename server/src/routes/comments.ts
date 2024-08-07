@@ -34,12 +34,12 @@ export const commentsRoutes = new Elysia({ prefix: "/comments" }).get(
       comments: list.map((c) => c.comments),
     }
 
-    list.forEach((c) => {
+    for (const c of list) {
       ret.users[c.users.id] = {
         id: c.users.id,
         username: c.users.name,
       }
-    })
+    }
 
     return ret
   },
