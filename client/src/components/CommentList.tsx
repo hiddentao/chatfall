@@ -1,10 +1,18 @@
 import { Sort } from "@chatfall/server"
-import React from "react"
+import React, { FC } from "react"
 import { useCallback } from "react"
-import { useCommentsStore } from "../shared/comments.store"
+import { CommentStore } from "../shared/comments.store"
+import { ConfigProps } from "../types"
 
-export default function CommentList() {
-  const { comments, users, fetchComments, sort } = useCommentsStore()
+export type CommentListProps = ConfigProps & {
+  store: CommentStore
+}
+
+export const CommentList: FC<CommentListProps> = ({
+  store,
+  title = "Comments",
+}) => {
+  const { comments, users, fetchComments, sort } = store.useStore()
 
   const handleSortChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -15,18 +23,21 @@ export default function CommentList() {
 
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex justify-end">
-        <label htmlFor="sort-select" className="mr-2">
-          Sort By:
-        </label>
-        <select id="sort-select" value={sort} onChange={handleSortChange}>
-          <option value={Sort.newest_first}>Newest first</option>
-          <option value={Sort.oldest_first}>Oldest first</option>
-          <option value={Sort.highest_score}>Highest rated</option>
-          <option value={Sort.lowest_score}>Lowest rated</option>
-          <option value={Sort.most_replies}>Most replies</option>
-          <option value={Sort.least_replies}>Least replies</option>
-        </select>
+      <div className="flex flex-row justify-between">
+        <div>{title}</div>
+        <div className="flex flex-row">
+          <label htmlFor="sort-select" className="mr-2">
+            Sort:
+          </label>
+          <select id="sort-select" value={sort} onChange={handleSortChange}>
+            <option value={Sort.newest_first}>Newest first</option>
+            <option value={Sort.oldest_first}>Oldest first</option>
+            <option value={Sort.highest_score}>Highest rated</option>
+            <option value={Sort.lowest_score}>Lowest rated</option>
+            <option value={Sort.most_replies}>Most replies</option>
+            <option value={Sort.least_replies}>Least replies</option>
+          </select>
+        </div>
       </div>
       {comments.length > 0 ? (
         <ul className="flex flex-col gap-2">

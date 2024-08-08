@@ -1,4 +1,3 @@
-import { Omit, type TObject } from "@sinclair/typebox"
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm"
 import {
   index,

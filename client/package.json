@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite",
-    "build": "tsc -b && vite build",
+    "dev": "bunx --bun vite -c vite.dev.config.ts",
+    "build-lib": "tsc -b && vite build -c vite.build-standalone.config.ts",
     "format": "biome format",
     "format:write": "biome format --write",
     "lint": "biome lint",
@@ -29,7 +29,8 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.5.3",
-    "vite": "^5.3.3"
+    "vite": "^5.3.3",
+    "vite-plugin-dts": "^4.0.1"
   },
   "trustedDependencies": ["@biomejs/biome"]
 }
