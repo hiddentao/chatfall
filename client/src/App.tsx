@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { CommentList } from "./components/CommentList"
 import { createStore } from "./shared/comments.store"
-import "./App.css"
+import "./global.css"
 import { ConfigProps } from "./types"
 
 export const createApp = (props: ConfigProps) => {
