@@ -25,6 +25,8 @@ export const createStore = (props: CommentStoreProps) => {
     users: {},
     comments: [],
     fetchComments: async (sort = get().sort) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
       const { data, error } = await app.api.comments.index.get({
         query: {
           url: "test",

@@ -1,8 +1,9 @@
 import { Sort } from "@chatfall/server"
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { useCallback } from "react"
 import { CommentStore } from "../shared/comments.store"
 import { ConfigProps } from "../types"
+import { Loading } from "./Loading"
 
 export type CommentListProps = ConfigProps & {
   store: CommentStore
@@ -12,24 +13,52 @@ export const CommentList: FC<CommentListProps> = ({
   store,
   title = "Comments",
 }) => {
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
+
   const { comments, users, fetchComments, sort } = store.useStore()
 
-  const handleSortChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      fetchComments(event.target.value as Sort)
+  const refetch = useCallback(
+    async (s?: Sort) => {
+      setIsLoading(true)
+      setIsError(false)
+
+      try {
+        await fetchComments(s)
+      } catch (error) {
+        setIsError(true)
+      } finally {
+        setIsLoading(false)
+      }
     },
     [fetchComments],
   )
 
+  const handleSortChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      refetch(event.target.value as Sort)
+    },
+    [fetchComments],
+  )
+
+  useEffect(() => {
+    refetch()
+  }, [refetch])
+
   return (
-    <section className="flex flex-col gap-2">
-      <div className="flex flex-row justify-between">
-        <div>{title}</div>
-        <div className="flex flex-row">
+    <section className="flex flex-col">
+      <div className="flex flex-row justify-between font-heading bg-pal1 p-4 rounded-md">
+        <div className="text-xl">{title}</div>
+        <div className="flex flex-row items-center justify-end">
           <label htmlFor="sort-select" className="mr-2">
             Sort:
           </label>
-          <select id="sort-select" value={sort} onChange={handleSortChange}>
+          <select
+            id="sort-select"
+            value={sort}
+            onChange={handleSortChange}
+            className="rounded-md p-1 "
+          >
             <option value={Sort.newest_first}>Newest first</option>
             <option value={Sort.oldest_first}>Oldest first</option>
             <option value={Sort.highest_score}>Highest rated</option>
@@ -39,7 +68,12 @@ export const CommentList: FC<CommentListProps> = ({
           </select>
         </div>
       </div>
-      {comments.length > 0 ? (
+      {isLoading ? <Loading className="mx-auto mt-4" /> : null}
+      {isError ? <p>Error fetching comments</p> : null}
+      {!isLoading && !isError && comments.length === 0 ? (
+        <p>No comments</p>
+      ) : null}
+      {!isLoading && !isError && comments.length ? (
         <ul className="flex flex-col gap-2">
           {comments.map((c) => (
             <li key={c.id} className="block">
@@ -56,11 +90,7 @@ export const CommentList: FC<CommentListProps> = ({
             </li>
           ))}
         </ul>
-      ) : (
-        <p className="text-slate-500 text-center rounded-xl border-slate-400/40 border-2 p-3">
-          No comments
-        </p>
-      )}
+      ) : null}
     </section>
   )
 }
