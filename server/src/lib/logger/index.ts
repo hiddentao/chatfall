@@ -38,4 +38,6 @@ export const logger = new Elysia({
     ]
 
     console.log(components.join(" "))
+
+    console.error(error)
   })

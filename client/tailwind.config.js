@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       colors: {
         pal1: "#DFEFF8",
+        pal2: "#FFFEDD",
         anchor: "#1a73e8",
       },
       borderRadius: {

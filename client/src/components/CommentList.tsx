@@ -1,35 +1,34 @@
 import { Sort } from "@chatfall/server"
 import React, { FC, useEffect, useState } from "react"
 import { useCallback } from "react"
-import { CommentStore } from "../shared/comments.store"
+import { useStoreContext } from "../contexts/store"
 import { ConfigProps } from "../types"
 import { Button } from "./Button"
+import { CommentInputForm } from "./CommentInputForm"
 import { CommentListItem } from "./CommentListItem"
+import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { RefreshSvg } from "./Svg"
 
-export type CommentListProps = ConfigProps & {
-  store: CommentStore
-}
+export type CommentListProps = ConfigProps & {}
 
-export const CommentList: FC<CommentListProps> = ({
-  store,
-  title = "Comments",
-}) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
+export const CommentList: FC<CommentListProps> = ({ title = "Comments" }) => {
+  const { store } = useStoreContext()
+
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string>("")
 
   const { comments, users, fetchComments, sort } = store.useStore()
 
   const refetch = useCallback(
     async (s?: Sort) => {
       setIsLoading(true)
-      setIsError(false)
+      setError("")
 
       try {
         await fetchComments(s)
-      } catch (error) {
-        setIsError(true)
+      } catch (error: any) {
+        setError(error.toString())
       } finally {
         setIsLoading(false)
       }
@@ -54,13 +53,14 @@ export const CommentList: FC<CommentListProps> = ({
 
   return (
     <section className="flex flex-col">
-      <div className="flex flex-row justify-between font-heading bg-pal1 p-4 rounded-md mb-6">
+      <div className="flex flex-row justify-between font-heading bg-pal1 px-4 py-3 rounded-md">
         <div className="text-xl flex flex-row items-center">
           {title}
           <Button
             className="w-6 h-6 ml-2"
             title="Reload"
             onClick={handleReload}
+            variant="icon"
           >
             <RefreshSvg />
           </Button>
@@ -86,22 +86,25 @@ export const CommentList: FC<CommentListProps> = ({
           </select>
         </div>
       </div>
-      {isError ? <p>Error fetching comments</p> : null}
-      {!isLoading && !isError && comments.length === 0 ? (
-        <p>No comments</p>
-      ) : null}
-      {!isError && comments.length ? (
-        <ul className="flex flex-col px-1">
-          {comments.map((c) => (
-            <CommentListItem
-              key={c.id}
-              className="mb-8"
-              comment={c}
-              user={users[c.userId]}
-            />
-          ))}
-        </ul>
-      ) : null}
+      <div className="px-1">
+        <CommentInputForm className="my-4" />
+        {error ? <ErrorBox>{error}</ErrorBox> : null}
+        {!isLoading && !error && comments.length === 0 ? (
+          <p>No comments</p>
+        ) : null}
+        {!error && comments.length ? (
+          <ul className="flex flex-col">
+            {comments.map((c) => (
+              <CommentListItem
+                key={c.id}
+                className="mb-8"
+                comment={c}
+                user={users[c.userId]}
+              />
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </section>
   )
 }

@@ -5,20 +5,17 @@ import { Loading } from "./Loading"
 import { Tooltip } from "./Tooltip"
 
 export const buttonVariants = cva(
-  "inline-flex text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex rounded-sm text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        icon: "svg-container border border-anchor rounded-sm",
-        iconMeta: "svg-container rounded-sm",
-      },
-      size: {
-        icon: "p-[0.1em]",
+        default: "p-2 border border-anchor",
+        icon: "svg-container border border-anchor p-[0.1em]",
+        iconMeta: "svg-container p-[0.1em]",
       },
     },
     defaultVariants: {
-      variant: "icon",
-      size: "icon",
+      variant: "default",
     },
   },
 )
@@ -31,7 +28,7 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { children, className, variant, size, inProgress = false, title, ...props },
+    { children, className, variant, inProgress = false, title, ...props },
     ref,
   ) => {
     const content = React.useMemo(
@@ -41,7 +38,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const btn = (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, className }))}
         ref={ref}
         {...props}
       >
