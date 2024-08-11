@@ -30,7 +30,7 @@ export const Tooltip: FC<TooltipProps> = (props) => {
   return (
     <span
       className={cn(
-        "inline-flex flex-col justify-center items-center",
+        "cf-inline-flex cf-flex-col cf-justify-center cf-items-center",
         className,
       )}
       style={style}

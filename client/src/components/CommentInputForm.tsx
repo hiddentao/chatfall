@@ -1,6 +1,6 @@
 import { FC, useCallback, useState } from "react"
 import TextareaAutoresize from "react-textarea-autosize"
-import { useStoreContext } from "../contexts/store"
+import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
@@ -9,7 +9,7 @@ import { ErrorBox } from "./ErrorBox"
 export type CommentInputFormProps = PropsWithClassname & {}
 
 export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
-  const { store } = useStoreContext()
+  const { store } = useGlobalContext()
   const { addComment, fetchComments } = store.useStore()
 
   const [input, setInput] = useState<string>("")
@@ -58,16 +58,16 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
 
   return (
     <form className={className} onSubmit={handleSubmit}>
-      <div className="flex flex-col mx-4 p-4 bg-pal2 border border-gray-400 rounded-md">
+      <div className="cf-flex cf-flex-col cf-p-4 cf-bg-yellow-100 cf-border cf-border-yellow-500 cf-rounded-md">
         <TextareaAutoresize
           minRows={1}
           disabled={isPosting}
           placeholder="Add comment..."
           className={cn(
-            "bg-transparent border-b border-b-transparent focus:border-b-gray-700 focus:outline-none",
+            "cf-bg-transparent cf-border-b cf-border-b-transparent focus:cf-border-b-gray-700 focus:cf-outline-none",
             {
-              "border-b-gray-700": input.length,
-              "text-gray-400": isPosting,
+              "cf-border-b-gray-700": input.length,
+              "cf-text-gray-400": isPosting,
             },
           )}
           onChange={onInputChange}
@@ -76,17 +76,17 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           value={input}
         />
         <div
-          className="mt-3"
+          className="cf-mt-3"
           style={{
             display: inputInFocus ? "block" : "none",
           }}
         >
-          <Button inProgress={isPosting} className="inline-block">
+          <Button inProgress={isPosting} className="cf-inline-block">
             Submit
           </Button>
         </div>
         {error && (
-          <ErrorBox className="mt-2" hideError={onHideError}>
+          <ErrorBox className="cf-mt-2" hideError={onHideError}>
             {error}
           </ErrorBox>
         )}

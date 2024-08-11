@@ -1,11 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  prefix: "cf-",
   content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
   theme: {
     extend: {
       colors: {
-        pal1: "#DFEFF8",
-        pal2: "#FFFEDD",
         anchor: "#1a73e8",
       },
       borderRadius: {

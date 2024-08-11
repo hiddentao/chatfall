@@ -1,4 +1,4 @@
-export type ConfigProps = {
+export type Config = {
   server: string
   title?: string
 }

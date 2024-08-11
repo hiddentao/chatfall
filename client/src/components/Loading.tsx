@@ -5,7 +5,12 @@ import { WaterfallSvg } from "./Svg"
 
 export const Loading: FC<PropsWithClassname> = ({ className }) => {
   return (
-    <div className={cn("svg-container animate-bounce w-14 h-14", className)}>
+    <div
+      className={cn(
+        "cf-svg-container cf-animate-bounce cf-w-14 cf-h-14",
+        className,
+      )}
+    >
       <WaterfallSvg />
     </div>
   )

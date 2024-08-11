@@ -17,26 +17,29 @@ export const CommentListItem: FC<CommentProps> = ({
   user,
 }) => {
   return (
-    <li className={cn("block", className)}>
-      <div className="text-sm flex flex-row items-center mb-2">
-        <h3 className="font-bold">{user.username}</h3>
-        <span className="mx-2">·</span>
+    <li className={cn("cf-block", className)}>
+      <div className="cf-text-sm cf-flex cf-flex-row cf-items-center cf-mb-2">
+        <h3 className="cf-font-bold">{user.username}</h3>
+        <span className="cf-mx-2">·</span>
         <span
           title={`${c.createdAt}`}
-          className="text-gray-400 text-xs"
+          className="cf-text-gray-400 cf-text-xs"
         >{`${formatCommentTime(c.createdAt)}`}</span>{" "}
-        <span className="mx-2">·</span>
       </div>
-      <div className="mb-2">{c.body}</div>
-      <div className="mt-2 flex flex-row items-center text-xs">
-        <span className="inline-flex flex-row items-center text-gray-500 mr-2">
+      <div className="cf-mb-2">{c.body}</div>
+      <div className="cf-mt-2 cf-flex cf-flex-row cf-items-center cf-text-xs">
+        <span className="cf-inline-flex cf-flex-row cf-items-center cf-text-gray-500 cf-mr-2">
           <span>{c.rating}</span>
-          <Button className="w-6 h-6 ml-1 p-1" variant="iconMeta" title="Rate">
+          <Button
+            className="cf-w-6 cf-h-6 cf-ml-1 cf-p-[0.3em]"
+            variant="iconMeta"
+            title="Rate"
+          >
             <LikeSvg />
           </Button>
         </span>
         {c.reply_count > 0 ? (
-          <div className="text-anchor cursor-pointer">
+          <div className="cf-text-anchor cf-cursor-pointer">
             + {`${c.reply_count} replies`}
           </div>
         ) : null}

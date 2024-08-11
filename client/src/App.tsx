@@ -1,18 +1,18 @@
 import { FC } from "react"
 import { CommentList } from "./components/CommentList"
-import { createStore } from "./shared/comments.store"
 import "./global.css"
-import { StoreProvider } from "./contexts/store"
-import { ConfigProps } from "./types"
+import { GlobalProvider } from "./contexts/global"
+import { createStore } from "./shared/comments.store"
+import { Config } from "./types"
 
-export const createApp = (props: ConfigProps) => {
-  const store = createStore(props)
+export const createApp = (config: Config) => {
+  const store = createStore(config)
 
   const App: FC = () => {
     return (
-      <StoreProvider store={store}>
-        <CommentList {...props} />
-      </StoreProvider>
+      <GlobalProvider store={store} config={config}>
+        <CommentList />
+      </GlobalProvider>
     )
   }
 
