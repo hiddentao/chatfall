@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @layer utilities {
-  .cf-svg-container {
+  .svg-container {
     svg {
-      @apply cf-fill-current cf-w-full cf-h-full cf-m-auto;
+      @apply fill-current w-full h-full m-auto;
     }    
   }
 }

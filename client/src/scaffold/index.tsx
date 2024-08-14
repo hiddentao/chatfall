@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
-import { createApp } from "../src/App"
-import { Config } from "../src/types"
+import { createApp } from "../App"
+import { Config } from "../types"
 
 export type ChatfallProps = Config & {
   elem: HTMLElement

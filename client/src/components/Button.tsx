@@ -2,16 +2,15 @@ import { type VariantProps, cva } from "class-variance-authority"
 import * as React from "react"
 import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
-import { Tooltip } from "./Tooltip"
 
 export const buttonVariants = cva(
-  "cf-inline-flex cf-text-anchor hover:cf-text-white hover:cf-bg-anchor cf-items-center cf-rounded-md cf-justify-center cf-text-sm cf-ring-offset-anchor cf-transition-colors focus-visible:cf-outline-none focus-visible:cf-ring-2 focus-visible:cf-ring-slate-950 focus-visible:cf-ring-offset-2 disabled:cf-pointer-events-none disabled:cf-opacity-50",
+  "inline-flex text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "cf-p-2 cf-border cf-border-anchor",
-        icon: "cf-svg-container cf-border cf-border-anchor cf-p-[0.1em]",
-        iconMeta: "cf-svg-container cf-p-[0.1em]",
+        default: "p-2 border border-anchor",
+        icon: "svg-container border border-anchor p-[0.1em]",
+        iconMeta: "svg-container p-[0.1em]",
       },
     },
     defaultVariants: {
@@ -27,10 +26,7 @@ export interface ButtonProps
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { children, className, variant, inProgress = false, title, ...props },
-    ref,
-  ) => {
+  ({ children, className, variant, inProgress = false, ...props }, ref) => {
     const content = React.useMemo(
       () => (inProgress ? <Loading className="w-4 h-4" /> : children),
       [inProgress, children],
@@ -46,10 +42,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </button>
     )
 
-    if (title) {
-      return <Tooltip triggerContent={btn}>{title}</Tooltip>
-    } else {
-      return btn
-    }
+    return btn
   },
 )

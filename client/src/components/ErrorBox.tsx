@@ -30,7 +30,7 @@ export const ErrorBox: FC<
   return (
     <div
       className={cn(
-        "cf-relative cf-bg-red-100 cf-border cf-border-red-500 cf-text-black cf-p-2 cf-pr-4 cf-rounded-md",
+        "relative bg-red-100 border border-red-500 text-black p-2 pr-4 rounded-md",
         className,
       )}
     >
@@ -38,7 +38,7 @@ export const ErrorBox: FC<
         <Button
           onClick={hide}
           variant="iconMeta"
-          className="cf-absolute cf-right-[3px] cf-top-[5px] cf-w-4 cf-h-4 cf-p-1"
+          className="absolute right-[3px] top-[5px] w-4 h-4 p-1"
         >
           <CrossSvg />
         </Button>
