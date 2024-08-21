@@ -29,7 +29,7 @@ const EnvDTO = Type.Object({
   HOSTNAME: Type.String({ default: "localhost" }),
   DATABASE_URL: Type.String({ default: "file:./local.db" }),
   MAILGUN_API_KEY: Type.String({ default: "" }),
-  MAILGUN_SENDER: Type.String({ default: "", format: "email" }),
+  MAILGUN_SENDER: Type.String({ default: "" }),
   LOG_LEVEL: Type.Enum(LogLevel, { default: "info" }),
   ENC_KEY: Type.String({ minLength: 48 }),
 })

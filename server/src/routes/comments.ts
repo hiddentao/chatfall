@@ -4,6 +4,7 @@ import Elysia, { t } from "elysia"
 import { db } from "../db"
 import { type Comment, type Post, comments, posts, users } from "../db/schema"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
+import { dateNow } from "../utils/date"
 import { testDelay } from "./utils"
 
 export const createCommentRoutes = (ctx: GlobalContext) => {
@@ -47,13 +48,15 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         const [id] = await db
           .insert(comments)
           .values({
-            userId: 310,
+            userId: 340,
             postId: postId,
             body: comment,
             depth: parent ? parent.depth + 1 : 0,
             path: parent
               ? `${parent.path}.${newCommentIndex}`
               : `${newCommentIndex}`,
+            createdAt: dateNow(),
+            updatedAt: dateNow(),
           })
           .returning()
 

@@ -4,7 +4,6 @@ import { env } from "./src/env"
 
 const dbCredentials = {
   url: env.DATABASE_URL,
-  authToken: env.DATABASE_AUTH_TOKEN,
 }
 
 export default {

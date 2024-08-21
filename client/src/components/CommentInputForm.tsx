@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
@@ -183,6 +183,10 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     setError("")
   }, [])
 
+  const formIncomplete = useMemo(() => {
+    return (isEmailVerified ? commentText.valid : valid) === false
+  }, [valid, email.value, isEmailVerified])
+
   return (
     <div
       className={cn(
@@ -237,7 +241,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
                 hideValidationIndicator={true}
               />
               <Button
-                disabled={!valid}
+                disabled={formIncomplete}
                 inProgress={isPosting}
                 className="inline-block mt-8"
               >

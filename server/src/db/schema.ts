@@ -15,8 +15,12 @@ export const users = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull().unique(),
     email: text("email").notNull().unique(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -38,8 +42,12 @@ export const posts = pgTable(
     id: serial("id").primaryKey(),
     url: text("url").notNull().unique(),
     title: text("title").notNull(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -66,8 +74,12 @@ export const comments = pgTable(
     path: text("path").notNull(),
     rating: integer("rating").notNull().default(0),
     reply_count: integer("reply_count").notNull().default(0),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -95,8 +107,12 @@ export const commentRatings = pgTable(
       .notNull()
       .references(() => comments.id),
     rating: integer("rating").notNull(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
