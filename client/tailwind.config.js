@@ -23,7 +23,8 @@ module.exports = {
         heading: ["'Lucida Grande', sans-serif"],
       },
       transitionProperty: {
-        props: "opacity, background-color, color, border-color",
+        "max-height": "max-height",
+        props: "opacity, background-color, color, border-color, height",
       },
     },
   },

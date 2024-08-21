@@ -51,16 +51,11 @@ export const FieldLabel = ({
   return label ? (
     <label
       className={cn(
-        "flex flex-row justify-between items-end mb-1 text-slate-300",
+        "flex flex-row justify-between items-end mb-1 text-slate-600",
       )}
       onClick={dummyOnClick}
     >
-      <span className="flex flex-row italic">
-        {label}
-        {required ? (
-          <span className="text-red-500 font-bold ml-1">*</span>
-        ) : null}
-      </span>
+      <span className="flex flex-row text-xs">{label}</span>
       {children}
     </label>
   ) : null
@@ -94,7 +89,7 @@ export interface TextFieldProps extends FieldProps {
 }
 
 export const standardInputStyle =
-  "bg-white focus:ring-4 focus:ring-offset-1 focus:ring-blue-500 focus:outline-none text-black border border-gray-300 py-1 relative placeholder-opacity-50 placeholder-gray-400"
+  "bg-white focus:ring-0 focus:outline-none text-black border border-gray-300 p-2 relative placeholder-opacity-50 placeholder-gray-400"
 
 const TextFieldLabel = (props: TextFieldProps) => {
   const { field, maxChars, showCharCount, labelRight } = props

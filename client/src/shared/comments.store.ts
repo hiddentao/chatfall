@@ -4,6 +4,7 @@ import {
   CommentUser,
   type Post,
   Sort,
+  VerifyEmailCodeBlob,
 } from "@chatfall/server"
 import { treaty } from "@elysiajs/eden"
 import { produce } from "immer"
@@ -19,6 +20,8 @@ type State = {
 type Actions = {
   addComment: (comment: string) => Promise<void>
   fetchComments: (sort?: Sort) => Promise<void>
+  loginEmail: (email: string) => Promise<{ blob: string }>
+  verifyEmail: (blob: string, code: string) => Promise<void>
 }
 
 export type CommentStoreProps = {
@@ -33,6 +36,16 @@ export const createStore = (props: CommentStoreProps) => {
     post: null,
     users: {},
     comments: [],
+    verifyEmail: async (blob: string, code: string) => {},
+    loginEmail: async (email: string) => {
+      const { data, error } = await app.api.users.login_email.post({ email })
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
     addComment: async (comment: string) => {
       const { error } = await app.api.comments.index.post({
         comment,

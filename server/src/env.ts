@@ -1,5 +1,6 @@
 import { type Static, type TSchema, Type } from "@sinclair/typebox"
 import { Value } from "@sinclair/typebox/value"
+import { LogLevel } from "./lib/logger/types"
 
 function parseEnv<T extends TSchema>(schema: T, env: unknown): Static<T> {
   const converted = Value.Convert(schema, Value.Default(schema, env))
@@ -27,7 +28,10 @@ const EnvDTO = Type.Object({
   PORT: Type.Number({ default: 3000 }),
   HOSTNAME: Type.String({ default: "localhost" }),
   DATABASE_URL: Type.String({ default: "file:./local.db" }),
-  DATABASE_AUTH_TOKEN: Type.Optional(Type.String()),
+  MAILGUN_API_KEY: Type.String({ default: "" }),
+  MAILGUN_SENDER: Type.String({ default: "", format: "email" }),
+  LOG_LEVEL: Type.Enum(LogLevel, { default: "info" }),
+  ENC_KEY: Type.String({ minLength: 48 }),
 })
 
 export const isProd = process.env.NODE_ENV === "production"

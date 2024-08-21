@@ -1,7 +1,6 @@
-import { Comment, CommentUser } from "@chatfall/server"
+import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
 import { FC } from "react"
 import { PropsWithClassname } from "../types"
-import { formatCommentTime } from "../utils/date"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { LikeSvg } from "./Svg"

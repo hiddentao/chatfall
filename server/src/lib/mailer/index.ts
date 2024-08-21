@@ -2,7 +2,7 @@ import formData from "form-data"
 import get from "lodash.get"
 import Mailgun from "mailgun.js"
 import type { IMailgunClient } from "mailgun.js/Interfaces"
-import { LogInterface } from "../logging"
+import { type LogInterface } from "../logger"
 
 const mailgun = new Mailgun(formData)
 
@@ -23,17 +23,15 @@ export class Mailer {
   constructor(params: {
     log: LogInterface
     apiKey: string
-    endpoint: string
     fromAddress: string
   }) {
-    const { log, apiKey, endpoint, fromAddress } = params
+    const { log, apiKey, fromAddress } = params
 
     this.fromAddress = fromAddress
     this.domain = fromAddress.split("@")[1]
     this.log = log.create("mailer")
     this.mailClient = mailgun.client({
       username: "api",
-      url: endpoint,
       key: apiKey,
     })
   }

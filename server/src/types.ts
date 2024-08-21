@@ -1,13 +1,10 @@
-export enum Sort {
-  newest_first = "nf",
-  oldest_first = "of",
-  highest_score = "hs",
-  lowest_score = "ls",
-  most_replies = "mr",
-  least_replies = "lr",
-}
+import type { LogInterface } from "./lib/logger"
+import type { Mailer } from "./lib/mailer"
 
-export type CommentUser = {
-  id: number
-  username: string
+export type { CommentUser } from "./exports"
+export { Sort } from "./exports"
+
+export type GlobalContext = {
+  mailer: Mailer
+  log: LogInterface
 }
