@@ -1,66 +1,70 @@
 import { and, asc, count, desc, eq } from "drizzle-orm"
 import Elysia, { t } from "elysia"
 
-import { db } from "../db"
 import { type Comment, type Post, comments, posts, users } from "../db/schema"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
 import { dateNow } from "../utils/date"
-import { testDelay } from "./utils"
+import { execHandler, getUserId } from "./utils"
 
 export const createCommentRoutes = (ctx: GlobalContext) => {
+  const { db } = ctx
+
   return new Elysia({ prefix: "/comments" })
     .post(
       "/",
-      async ({ body }) => {
-        // await testDelay()
+      async ({ body, ...props }) => {
+        return await execHandler(async () => {
+          const { comment, postId, parentCommentId } = body
+          const userId = getUserId(props)!
 
-        const { comment, postId, parentCommentId } = body
+          let newCommentIndex = 1
 
-        let newCommentIndex = 1
+          let parent: Comment | undefined
 
-        let parent: Comment | undefined
+          if (parentCommentId) {
+            let [parent] = await db
+              .select()
+              .from(comments)
+              .where(
+                and(
+                  eq(comments.postId, postId),
+                  eq(comments.id, parentCommentId),
+                ),
+              )
 
-        if (parentCommentId) {
-          let [parent] = await db
-            .select()
-            .from(comments)
-            .where(
-              and(
-                eq(comments.postId, postId),
-                eq(comments.id, parentCommentId),
-              ),
-            )
+            if (!parent) {
+              throw new Error("Parent comment not found")
+            }
 
-          if (!parent) {
-            throw new Error("Parent comment not found")
+            newCommentIndex = parent.reply_count + 1
+          } else {
+            const cnt = await db
+              .select({ count: count() })
+              .from(comments)
+              .where(and(eq(comments.postId, postId), eq(comments.depth, 0)))
+
+            newCommentIndex = cnt[0].count + 1
           }
 
-          newCommentIndex = parent.reply_count + 1
-        } else {
-          const cnt = await db
-            .select({ count: count() })
-            .from(comments)
-            .where(and(eq(comments.postId, postId), eq(comments.depth, 0)))
+          const [inserted] = await db
+            .insert(comments)
+            .values({
+              userId,
+              postId: postId,
+              body: comment,
+              depth: parent ? parent.depth + 1 : 0,
+              path: parent
+                ? `${parent.path}.${newCommentIndex}`
+                : `${newCommentIndex}`,
+              createdAt: dateNow(),
+              updatedAt: dateNow(),
+            })
+            .returning({
+              id: comments.id,
+            })
 
-          newCommentIndex = cnt[0].count + 1
-        }
-
-        const [id] = await db
-          .insert(comments)
-          .values({
-            userId: 340,
-            postId: postId,
-            body: comment,
-            depth: parent ? parent.depth + 1 : 0,
-            path: parent
-              ? `${parent.path}.${newCommentIndex}`
-              : `${newCommentIndex}`,
-            createdAt: dateNow(),
-            updatedAt: dateNow(),
-          })
-          .returning()
-
-        return { id }
+          return { id: inserted.id }
+        })
       },
       {
         body: t.Object({
@@ -73,57 +77,57 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
     .get(
       "/",
       async ({ query }) => {
-        await testDelay()
+        return await execHandler(async () => {
+          const { url, page, limit, sort } = query
 
-        const { url, page, limit, sort } = query
+          const order_by = {
+            [Sort.newest_first]: desc(comments.createdAt),
+            [Sort.oldest_first]: asc(comments.createdAt),
+            [Sort.highest_score]: desc(comments.rating),
+            [Sort.lowest_score]: asc(comments.rating),
+            [Sort.most_replies]: desc(comments.reply_count),
+            [Sort.least_replies]: asc(comments.reply_count),
+          }[sort]
 
-        const order_by = {
-          [Sort.newest_first]: desc(comments.createdAt),
-          [Sort.oldest_first]: asc(comments.createdAt),
-          [Sort.highest_score]: desc(comments.rating),
-          [Sort.lowest_score]: asc(comments.rating),
-          [Sort.most_replies]: desc(comments.reply_count),
-          [Sort.least_replies]: asc(comments.reply_count),
-        }[sort]
+          const list = await db
+            .select()
+            .from(posts)
+            .leftJoin(comments, and(eq(posts.id, comments.postId)))
+            .leftJoin(users, eq(users.id, comments.userId))
+            .where(and(eq(posts.url, url), eq(comments.depth, 0)))
+            .orderBy(order_by)
+            .limit(Number(limit))
+            .offset((Number(page) - 1) * Number(limit))
 
-        const list = await db
-          .select()
-          .from(posts)
-          .leftJoin(comments, and(eq(posts.id, comments.postId)))
-          .leftJoin(users, eq(users.id, comments.userId))
-          .where(and(eq(posts.url, url), eq(comments.depth, 0)))
-          .orderBy(order_by)
-          .limit(Number(limit))
-          .offset((Number(page) - 1) * Number(limit))
-
-        const ret: {
-          post: Post | null
-          users: Record<number, CommentUser>
-          comments: Comment[]
-        } = {
-          post: null,
-          users: {} as Record<number, CommentUser>,
-          comments: [] as Comment[],
-        }
-
-        for (const c of list) {
-          if (!ret.post) {
-            ret.post = c.posts
+          const ret: {
+            post: Post | null
+            users: Record<number, CommentUser>
+            comments: Comment[]
+          } = {
+            post: null,
+            users: {} as Record<number, CommentUser>,
+            comments: [] as Comment[],
           }
 
-          if (c.users) {
-            ret.users[c.users.id] = {
-              id: c.users.id,
-              username: c.users.name,
+          for (const c of list) {
+            if (!ret.post) {
+              ret.post = c.posts
+            }
+
+            if (c.users) {
+              ret.users[c.users.id] = {
+                id: c.users.id,
+                username: c.users.name,
+              }
+            }
+
+            if (c.comments) {
+              ret.comments.push(c.comments)
             }
           }
 
-          if (c.comments) {
-            ret.comments.push(c.comments)
-          }
-        }
-
-        return ret
+          return ret
+        })
       },
       {
         query: t.Object({

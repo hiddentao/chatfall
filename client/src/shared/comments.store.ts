@@ -4,11 +4,11 @@ import {
   CommentUser,
   type Post,
   Sort,
-  VerifyEmailCodeBlob,
 } from "@chatfall/server"
 import { treaty } from "@elysiajs/eden"
 import { produce } from "immer"
 import { create } from "zustand"
+import { jwt } from "../lib/jwt"
 
 type State = {
   sort: Sort
@@ -18,6 +18,7 @@ type State = {
 }
 
 type Actions = {
+  checkAuth: () => Promise<void>
   addComment: (comment: string) => Promise<void>
   fetchComments: (sort?: Sort) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
@@ -29,14 +30,46 @@ export type CommentStoreProps = {
 }
 
 export const createStore = (props: CommentStoreProps) => {
-  const app = treaty<App>(props.server)
+  const app = treaty<App>(props.server, {
+    headers: () => {
+      const jwtToken = jwt.getToken()
+      if (jwtToken?.token) {
+        return {
+          authorization: `Bearer ${jwtToken.token}`,
+        }
+      }
+    },
+  })
 
   const useStore = create<State & Actions>()((set, get) => ({
     sort: Sort.newest_first,
     post: null,
     users: {},
     comments: [],
-    verifyEmail: async (blob: string, code: string) => {},
+    checkAuth: async () => {
+      if (jwt.getToken()) {
+        const { data, error } = await app.api.users.check.get()
+        if (error) {
+          console.error(`Error checking auth`, error)
+          jwt.removeToken()
+        } else if (!data.id) {
+          console.warn(`Unable to verify JWT token, removing it`)
+          jwt.removeToken()
+        }
+      }
+    },
+    verifyEmail: async (blob: string, code: string) => {
+      const { data, error } = await app.api.users.verify_email.post({
+        blob,
+        code,
+      })
+
+      if (error) {
+        throw error
+      }
+
+      jwt.setToken({ token: data.jwt })
+    },
     loginEmail: async (email: string) => {
       const { data, error } = await app.api.users.login_email.post({ email })
 

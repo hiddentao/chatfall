@@ -43,8 +43,8 @@ export const generateVerificationCodeAndBlob = async (
 
 export const verifyCodeWithBlob = async (
   log: LogInterface,
-  code: string,
   blob: string,
+  code: string,
 ): Promise<string> => {
   log.debug(`Verifying code ${code} with blob ${blob}`)
 

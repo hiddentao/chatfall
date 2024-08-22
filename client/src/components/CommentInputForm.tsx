@@ -7,7 +7,6 @@ import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { TextAreaInput, TextInput, standardInputStyle } from "./Form"
-import { Loading } from "./Loading"
 
 export type CommentInputFormProps = PropsWithClassname & {}
 

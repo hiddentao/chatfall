@@ -2,6 +2,8 @@ import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
 import { Elysia } from "elysia"
 
+import jwt from "@elysiajs/jwt"
+import { db } from "./db"
 import { env, isProd } from "./env"
 import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
@@ -28,4 +30,4 @@ export const app = new Elysia()
     }),
   )
   .use(swagger())
-  .use(createApi({ mailer, log }))
+  .use(createApi({ mailer, log, db }))

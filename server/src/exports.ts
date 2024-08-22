@@ -28,5 +28,3 @@ export type {
 } from "./db/schema"
 
 export * from "./utils/date"
-
-export type { VerifyEmailCodeBlob } from "./lib/emailVerification"
