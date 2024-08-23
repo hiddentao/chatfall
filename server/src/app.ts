@@ -2,7 +2,6 @@ import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
 import { Elysia } from "elysia"
 
-import jwt from "@elysiajs/jwt"
 import { db } from "./db"
 import { env, isProd } from "./env"
 import { createLog, createRequestLogger } from "./lib/logger"

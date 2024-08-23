@@ -13,7 +13,7 @@ export const users = pgTable(
   "users",
   {
     id: serial("id").primaryKey(),
-    name: text("name").notNull().unique(),
+    name: text("name").notNull(),
     email: text("email").notNull().unique(),
     lastLoggedIn: timestamp("last_logged_in", { mode: "string" }),
     createdAt: timestamp("created_at", { mode: "string" })

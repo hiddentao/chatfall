@@ -1,7 +1,14 @@
-import { and, asc, count, desc, eq } from "drizzle-orm"
+import { and, asc, count, desc, eq, sql } from "drizzle-orm"
 import Elysia, { t } from "elysia"
 
-import { type Comment, type Post, comments, posts, users } from "../db/schema"
+import {
+  type Comment,
+  type Post,
+  commentRatings,
+  comments,
+  posts,
+  users,
+} from "../db/schema"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
 import { dateNow } from "../utils/date"
 import { execHandler, getUserId } from "./utils"
@@ -10,6 +17,78 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
   const { db } = ctx
 
   return new Elysia({ prefix: "/comments" })
+    .post(
+      "/like",
+      async ({ body, ...props }) => {
+        return await execHandler(async () => {
+          const { commentId, like } = body
+          const userId = getUserId(props)!
+
+          await db.transaction(async (tx) => {
+            const [existing] = await db
+              .select()
+              .from(commentRatings)
+              .where(
+                and(
+                  eq(commentRatings.commentId, commentId),
+                  eq(commentRatings.userId, userId),
+                ),
+              )
+
+            if (existing) {
+              if (like) {
+                await db
+                  .update(commentRatings)
+                  .set({
+                    rating: 1,
+                    updatedAt: dateNow(),
+                  })
+                  .where(eq(commentRatings.id, existing.id))
+
+                await db
+                  .update(comments)
+                  .set({
+                    rating: sql`${comments.rating} + 1`,
+                  })
+                  .where(eq(comments.id, commentId))
+              } else {
+                await db
+                  .delete(commentRatings)
+                  .where(eq(commentRatings.id, existing.id))
+
+                await db
+                  .update(comments)
+                  .set({
+                    rating: sql`${comments.rating} - 1`,
+                  })
+                  .where(eq(comments.id, commentId))
+              }
+            } else {
+              await db.insert(commentRatings).values({
+                userId,
+                commentId,
+                rating: 1,
+                createdAt: dateNow(),
+                updatedAt: dateNow(),
+              })
+
+              await db
+                .update(comments)
+                .set({
+                  rating: sql`${comments.rating} + 1`,
+                })
+                .where(eq(comments.id, commentId))
+            }
+          })
+        })
+      },
+      {
+        body: t.Object({
+          commentId: t.Number(),
+          like: t.Boolean(),
+        }),
+      },
+    )
     .post(
       "/",
       async ({ body, ...props }) => {
@@ -76,8 +155,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
     )
     .get(
       "/",
-      async ({ query }) => {
+      async ({ query, ...props }) => {
         return await execHandler(async () => {
+          const userId = getUserId(props)
           const { url, page, limit, sort } = query
 
           const order_by = {
@@ -92,8 +172,15 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const list = await db
             .select()
             .from(posts)
-            .leftJoin(comments, and(eq(posts.id, comments.postId)))
+            .leftJoin(comments, eq(posts.id, comments.postId))
             .leftJoin(users, eq(users.id, comments.userId))
+            .leftJoin(
+              commentRatings,
+              and(
+                eq(commentRatings.commentId, comments.id),
+                eq(commentRatings.userId, userId || 0),
+              ),
+            )
             .where(and(eq(posts.url, url), eq(comments.depth, 0)))
             .orderBy(order_by)
             .limit(Number(limit))
@@ -103,10 +190,12 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             post: Post | null
             users: Record<number, CommentUser>
             comments: Comment[]
+            liked: Record<number, boolean>
           } = {
             post: null,
             users: {} as Record<number, CommentUser>,
             comments: [] as Comment[],
+            liked: {} as Record<number, boolean>,
           }
 
           for (const c of list) {
@@ -123,6 +212,10 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
             if (c.comments) {
               ret.comments.push(c.comments)
+
+              if (c.comment_ratings) {
+                ret.liked[c.comments.id] = !!c.comment_ratings.id
+              }
             }
           }
 

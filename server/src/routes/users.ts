@@ -8,6 +8,7 @@ import {
 } from "../lib/emailVerification"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
+import { generateUsernameFromEmail } from "../utils/string"
 import { execHandler, getUserId, testDelay } from "./utils"
 
 export const createUserRoutes = (ctx: GlobalContext) => {
@@ -58,14 +59,14 @@ export const createUserRoutes = (ctx: GlobalContext) => {
           const [user] = await db
             .insert(users)
             .values({
-              name: email,
+              name: generateUsernameFromEmail(email),
               email,
               lastLoggedIn: dateNow(),
               createdAt: dateNow(),
               updatedAt: dateNow(),
             })
             .onConflictDoUpdate({
-              target: users.name,
+              target: users.email,
               set: {
                 lastLoggedIn: dateNow(),
                 updatedAt: dateNow(),

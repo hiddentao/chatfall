@@ -1,20 +1,50 @@
 import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
-import { FC } from "react"
+import { FC, useCallback, useState } from "react"
+import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
-import { LikeSvg } from "./Svg"
+import { ErrorBox } from "./ErrorBox"
+import { Loading } from "./Loading"
+import { LikeSvg, LikedSvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
   comment: Comment
   user: CommentUser
+  liked: boolean
 }
 
 export const CommentListItem: FC<CommentProps> = ({
   className,
   comment: c,
   user,
+  liked,
 }) => {
+  const { store } = useGlobalContext()
+  const { likeComment } = store.useStore()
+  const [updatingLike, setUpdatingLike] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
+
+  const handleLike = useCallback(
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      try {
+        setUpdatingLike(true)
+        setError("")
+        await likeComment(c.id, !liked)
+      } catch (err: any) {
+        setError(err.toString())
+      } finally {
+        setUpdatingLike(false)
+      }
+    },
+    [c.id, liked],
+  )
+
+  const onHideError = useCallback(() => {
+    setError("")
+  }, [])
+
   return (
     <li className={cn("block", className)}>
       <div className="text-sm flex flex-row items-center mb-2">
@@ -33,8 +63,15 @@ export const CommentListItem: FC<CommentProps> = ({
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
             title="Rate"
+            onClick={handleLike}
           >
-            <LikeSvg />
+            {updatingLike ? (
+              <Loading className="w-4 h-4" />
+            ) : liked ? (
+              <LikedSvg />
+            ) : (
+              <LikeSvg />
+            )}
           </Button>
         </span>
         {c.reply_count > 0 ? (
@@ -42,6 +79,11 @@ export const CommentListItem: FC<CommentProps> = ({
             + {`${c.reply_count} replies`}
           </div>
         ) : null}
+        {error && (
+          <ErrorBox className="mt-2" hideError={onHideError}>
+            {error}
+          </ErrorBox>
+        )}
       </div>
     </li>
   )

@@ -4,7 +4,7 @@ import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
 
 export const buttonVariants = cva(
-  "inline-flex text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -28,7 +28,7 @@ export interface ButtonProps
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, className, variant, inProgress = false, ...props }, ref) => {
     const content = React.useMemo(
-      () => (inProgress ? <Loading className="w-4 h-4" /> : children),
+      () => (inProgress ? <Loading className="w-4 h-4 " /> : children),
       [inProgress, children],
     )
 

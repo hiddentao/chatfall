@@ -21,7 +21,7 @@ export interface FieldApi {
   isSet: boolean
   isValidating: boolean
   handleChange: HandleFieldChangeFunction
-  unset: () => void
+  reset: () => void
 }
 
 export interface FieldOptions<T> {
@@ -37,13 +37,15 @@ export interface FieldOptions<T> {
 
 const DUMMY_VALIDATE_ASYNC_FN = async () => ""
 
+const _calculateInitialIsSet = <T = any>(options: FieldOptions<T>): boolean => {
+  return options.optional ? true : !!options.initialValue
+}
+
 export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
   const [version, setVersion] = useState<number>(0)
-  const [value, setValue] = useState<any>(options.initialValue)
+  const [value, setValue] = useState<T | undefined>(options.initialValue)
   const [error, setError] = useState<string | undefined>(undefined)
-  const [isSet, setIsSet] = useState<boolean>(
-    options.optional ? true : !!options.initialValue,
-  )
+  const [isSet, setIsSet] = useState<boolean>(_calculateInitialIsSet(options))
   const [isValidating, setIsValidating] = useState<boolean>(false)
 
   const debouncedValidateAsync = useAsyncValidator(
@@ -80,9 +82,9 @@ export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
     [options, validate, version],
   )
 
-  const unset = useCallback(() => {
+  const reset = useCallback(() => {
     setValue(options.initialValue)
-    setIsSet(false)
+    setIsSet(_calculateInitialIsSet(options))
     setError(undefined)
   }, [options.initialValue])
 
@@ -97,7 +99,7 @@ export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
     version,
     isValidating,
     handleChange,
-    unset,
+    reset,
   }
 }
 
@@ -159,7 +161,7 @@ export const useForm = (options: FormOptions): FormApi => {
 
   const reset = useCallback(() => {
     fields.forEach((f) => {
-      f.unset()
+      f.reset()
     })
   }, [fields])
 

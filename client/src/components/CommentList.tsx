@@ -16,7 +16,7 @@ export const CommentList: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")
 
-  const { comments, users, fetchComments, sort } = store.useStore()
+  const { comments, users, liked, fetchComments, sort } = store.useStore()
 
   const refetch = useCallback(
     async (s?: Sort) => {
@@ -86,6 +86,7 @@ export const CommentList: FC = () => {
                 className="mb-9"
                 comment={c}
                 user={users[c.userId]}
+                liked={liked[c.id]}
               />
             ))}
           </ul>

@@ -107,12 +107,11 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
 
 export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   const { store } = useGlobalContext()
-  const { addComment, fetchComments, loginEmail } = store.useStore()
+  const { loggedIn, addComment, fetchComments, loginEmail } = store.useStore()
   const [focused, setFocused] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
   const [verifyEmailBlob, setVerifyEmailBlob] = useState<string>()
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false)
 
   const [commentText, email] = [
     useField({
@@ -122,7 +121,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     }),
     useField({
       name: "email",
-      initialValue: "",
+      initialValue: loggedIn ? "test@test.com" : "",
       validate: validateEmail,
     }),
   ]
@@ -146,10 +145,11 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       try {
         setIsPosting(true)
         setError("")
-        if (email.value && !isEmailVerified) {
+        if (email.value && !loggedIn) {
           setVerifyEmailBlob((await loginEmail(email.value)).blob)
         } else {
           await postComment(commentText.value)
+          reset()
         }
       } catch (err: any) {
         setError(err.toString())
@@ -161,8 +161,6 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   )
 
   const onEmailVerified = useCallback(async () => {
-    setIsEmailVerified(true)
-
     try {
       setIsPosting(true)
       setError("")
@@ -183,8 +181,8 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   }, [])
 
   const formIncomplete = useMemo(() => {
-    return (isEmailVerified ? commentText.valid : valid) === false
-  }, [valid, email.value, isEmailVerified])
+    return valid === false
+  }, [valid, email.value, loggedIn])
 
   return (
     <div
@@ -196,7 +194,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
         className,
       )}
     >
-      {verifyEmailBlob && !isEmailVerified ? (
+      {verifyEmailBlob && !loggedIn ? (
         <VerifyEmailForm
           className="mt-4"
           blob={verifyEmailBlob}
@@ -229,7 +227,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
                   size: 35,
                 }}
                 className={cn("mt-8", {
-                  hidden: isEmailVerified,
+                  hidden: loggedIn,
                 })}
                 inputClassname={cn(standardInputStyle, "max-w-full")}
                 hideTooltip={true}

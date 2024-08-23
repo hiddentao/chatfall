@@ -15,11 +15,14 @@ type State = {
   post: Post | null
   users: Record<number, CommentUser>
   comments: Comment[]
+  liked: Record<number, boolean>
+  loggedIn: boolean
 }
 
 type Actions = {
   checkAuth: () => Promise<void>
   addComment: (comment: string) => Promise<void>
+  likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
   verifyEmail: (blob: string, code: string) => Promise<void>
@@ -46,7 +49,11 @@ export const createStore = (props: CommentStoreProps) => {
     post: null,
     users: {},
     comments: [],
+    liked: {},
+    loggedIn: !!jwt.getToken(),
     checkAuth: async () => {
+      let loggedIn = false
+
       if (jwt.getToken()) {
         const { data, error } = await app.api.users.check.get()
         if (error) {
@@ -55,8 +62,16 @@ export const createStore = (props: CommentStoreProps) => {
         } else if (!data.id) {
           console.warn(`Unable to verify JWT token, removing it`)
           jwt.removeToken()
+        } else {
+          loggedIn = true
         }
       }
+
+      set(
+        produce((state) => {
+          state.loggedIn = loggedIn
+        }),
+      )
     },
     verifyEmail: async (blob: string, code: string) => {
       const { data, error } = await app.api.users.verify_email.post({
@@ -78,6 +93,16 @@ export const createStore = (props: CommentStoreProps) => {
       }
 
       return data
+    },
+    likeComment: async (commentId: number, like: boolean) => {
+      const { error } = await app.api.comments.like.post({
+        commentId,
+        like,
+      })
+
+      if (error) {
+        throw error
+      }
     },
     addComment: async (comment: string) => {
       const { error } = await app.api.comments.index.post({
@@ -109,6 +134,7 @@ export const createStore = (props: CommentStoreProps) => {
           state.post = data.post
           state.users = data.users
           state.comments = data.comments
+          state.liked = data.liked
         }),
       )
     },
