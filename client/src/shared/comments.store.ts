@@ -44,6 +44,25 @@ export const createStore = (props: CommentStoreProps) => {
     },
   })
 
+  const ws = app.ws.subscribe()
+
+  ws.subscribe((data) => {
+    console.log("New data", data)
+  })
+
+  ws.on("error", (error) => {
+    console.error("WS Error", error)
+  })
+
+  ws.on("close", () => {
+    console.log("WS Closed")
+  })
+
+  ws.on("open", () => {
+    console.log("WS Open")
+    ws.send({ type: "hello" })
+  })
+
   const useStore = create<State & Actions>()((set, get) => ({
     sort: Sort.newest_first,
     post: null,

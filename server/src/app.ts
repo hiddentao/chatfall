@@ -1,6 +1,6 @@
 import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
-import { Elysia } from "elysia"
+import { Elysia, t } from "elysia"
 
 import { db } from "./db"
 import { env, isProd } from "./env"
@@ -8,6 +8,7 @@ import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
 import { createApi } from "./routes"
 import { pluginConditionally } from "./utils/elysia"
+import { createSocket } from "./ws"
 
 const log = createLog({
   name: "@",
@@ -20,7 +21,14 @@ const mailer = new Mailer({
   fromAddress: env.MAILGUN_SENDER,
 })
 
-export const app = new Elysia()
+const ctx = { mailer, log, db }
+
+export const app = new Elysia({
+  websocket: {
+    idleTimeout: 120,
+    perMessageDeflate: true,
+  },
+})
   .use(pluginConditionally(!isProd, createRequestLogger(log)))
   .use(
     cors({
@@ -29,4 +37,5 @@ export const app = new Elysia()
     }),
   )
   .use(swagger())
-  .use(createApi({ mailer, log, db }))
+  .use(createApi(ctx))
+  .use(createSocket(ctx))
