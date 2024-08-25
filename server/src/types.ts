@@ -6,6 +6,8 @@ export type GlobalContext = {
   db: Database
   mailer: Mailer
   log: LogInterface
+  sockets: Record<string, any>
+  userSockets: Record<number, string>
 }
 
 export enum Sort {
@@ -20,4 +22,8 @@ export enum Sort {
 export type CommentUser = {
   id: number
   username: string
+}
+
+export type JwtTokenPayload = {
+  id: number
 }

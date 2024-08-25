@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.0.4",
-    "@elysiajs/jwt": "^1.1.0",
     "@elysiajs/swagger": "^1.0.5",
     "@libsql/client": "^0.7.0",
     "@sinclair/typebox": "^0.32.34",
@@ -44,6 +43,7 @@
     "elysia": "^1.0.27",
     "form-data": "^4.0.0",
     "immer": "^10.1.1",
+    "jose": "^5.7.0",
     "lodash.get": "^4.4.2",
     "mailgun.js": "^10.2.3",
     "pg": "^8.12.0",

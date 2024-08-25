@@ -44,24 +44,37 @@ export const createStore = (props: CommentStoreProps) => {
     },
   })
 
+  // websocket
   const ws = app.ws.subscribe()
-
-  ws.subscribe((data) => {
-    console.log("New data", data)
-  })
-
+  const onceWebsocketReady = new Promise<void>((resolve) =>
+    ws.on("open", () => resolve()),
+  )
   ws.on("error", (error) => {
-    console.error("WS Error", error)
+    console.error("Websocket error", error)
   })
+    .on("close", () => {
+      console.log("Websocket closed")
+    })
+    .subscribe((data) => {
+      console.log("Websocket data", data)
+    })
 
-  ws.on("close", () => {
-    console.log("WS Closed")
-  })
-
-  ws.on("open", () => {
-    console.log("WS Open")
-    ws.send({ type: "hello" })
-  })
+  const _updateLoginState = (
+    set: (
+      fn: (state: State) => (State & Actions) | Partial<State & Actions>,
+    ) => void,
+    loggedIn: boolean,
+  ) => {
+    set(
+      produce((state) => {
+        state.loggedIn = loggedIn
+        onceWebsocketReady.then(() => {
+          const token = jwt.getToken()?.token
+          ws.send({ type: "register", jwtToken: token })
+        })
+      }),
+    )
+  }
 
   const useStore = create<State & Actions>()((set, get) => ({
     sort: Sort.newest_first,
@@ -69,28 +82,25 @@ export const createStore = (props: CommentStoreProps) => {
     users: {},
     comments: [],
     liked: {},
-    loggedIn: !!jwt.getToken(),
+    loggedIn: false,
     checkAuth: async () => {
-      let loggedIn = false
-
       if (jwt.getToken()) {
         const { data, error } = await app.api.users.check.get()
         if (error) {
           console.error(`Error checking auth`, error)
           jwt.removeToken()
-        } else if (!data.id) {
-          console.warn(`Unable to verify JWT token, removing it`)
-          jwt.removeToken()
         } else {
-          loggedIn = true
+          if (!data.id) {
+            console.warn(`Unable to verify JWT token, removing it`)
+            jwt.removeToken()
+          } else {
+            _updateLoginState(set, true)
+            return
+          }
         }
       }
 
-      set(
-        produce((state) => {
-          state.loggedIn = loggedIn
-        }),
-      )
+      _updateLoginState(set, false)
     },
     verifyEmail: async (blob: string, code: string) => {
       const { data, error } = await app.api.users.verify_email.post({
@@ -103,6 +113,8 @@ export const createStore = (props: CommentStoreProps) => {
       }
 
       jwt.setToken({ token: data.jwt })
+
+      _updateLoginState(set, true)
     },
     loginEmail: async (email: string) => {
       const { data, error } = await app.api.users.login_email.post({ email })
