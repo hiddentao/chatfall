@@ -11,7 +11,8 @@ import {
 } from "../db/schema"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
 import { dateNow } from "../utils/date"
-import { execHandler, getUserId } from "./utils"
+import { SocketEventTypeEnum } from "../ws/types"
+import { execHandler, getLoggedInUser, getLoggedInUserAndAssert } from "./utils"
 
 export const createCommentRoutes = (ctx: GlobalContext) => {
   const { db } = ctx
@@ -22,7 +23,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ body, ...props }) => {
         return await execHandler(async () => {
           const { commentId, like } = body
-          const userId = getUserId(props)!
+          const user = getLoggedInUserAndAssert(props)
 
           await db.transaction(async (tx) => {
             const [existing] = await db
@@ -31,7 +32,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               .where(
                 and(
                   eq(commentRatings.commentId, commentId),
-                  eq(commentRatings.userId, userId),
+                  eq(commentRatings.userId, user.id),
                 ),
               )
 
@@ -65,7 +66,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               }
             } else {
               await db.insert(commentRatings).values({
-                userId,
+                userId: user.id,
                 commentId,
                 rating: 1,
                 createdAt: dateNow(),
@@ -94,7 +95,11 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ body, ...props }) => {
         return await execHandler(async () => {
           const { comment, postId, parentCommentId } = body
-          const userId = getUserId(props)!
+          const user = getLoggedInUserAndAssert(props)
+
+          if (!user) {
+            throw new Error("User not logged in")
+          }
 
           let newCommentIndex = 1
 
@@ -125,22 +130,41 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             newCommentIndex = cnt[0].count + 1
           }
 
+          const depth = parent ? parent.depth + 1 : 0
+          const path = parent
+            ? `${parent.path}.${newCommentIndex}`
+            : `${newCommentIndex}`
+          const createdAt = dateNow()
+
           const [inserted] = await db
             .insert(comments)
             .values({
-              userId,
+              userId: user.id,
               postId: postId,
               body: comment,
-              depth: parent ? parent.depth + 1 : 0,
-              path: parent
-                ? `${parent.path}.${newCommentIndex}`
-                : `${newCommentIndex}`,
-              createdAt: dateNow(),
+              depth,
+              path,
+              createdAt,
               updatedAt: dateNow(),
             })
             .returning({
               id: comments.id,
             })
+
+          ctx.sockets.broadcast({
+            type: SocketEventTypeEnum.NewComment,
+            user: {
+              id: user.id,
+              name: user.name,
+            },
+            data: {
+              id: inserted.id,
+              body: comment,
+              depth,
+              path,
+              createdAt,
+            },
+          })
 
           return { id: inserted.id }
         })
@@ -157,7 +181,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       "/",
       async ({ query, ...props }) => {
         return await execHandler(async () => {
-          const userId = getUserId(props)
+          const user = getLoggedInUser(props)
           const { url, page, limit, sort } = query
 
           const order_by = {
@@ -178,7 +202,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               commentRatings,
               and(
                 eq(commentRatings.commentId, comments.id),
-                eq(commentRatings.userId, userId || 0),
+                eq(commentRatings.userId, user?.id || 0),
               ),
             )
             .where(and(eq(posts.url, url), eq(comments.depth, 0)))
@@ -206,7 +230,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             if (c.users) {
               ret.users[c.users.id] = {
                 id: c.users.id,
-                username: c.users.name,
+                name: c.users.name,
               }
             }
 

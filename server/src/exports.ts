@@ -15,5 +15,5 @@ export type {
 
 export * from "./utils/date"
 
-export type { CommentUser } from "./types"
+export type { CommentUser, LoggedInUser } from "./types"
 export { Sort } from "./types"

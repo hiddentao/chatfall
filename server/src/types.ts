@@ -1,13 +1,13 @@
 import type { Database } from "./db"
 import type { LogInterface } from "./lib/logger"
 import type { Mailer } from "./lib/mailer"
+import type { SocketManager } from "./ws"
 
 export type GlobalContext = {
   db: Database
   mailer: Mailer
   log: LogInterface
-  sockets: Record<string, any>
-  userSockets: Record<number, string>
+  sockets: SocketManager
 }
 
 export enum Sort {
@@ -21,8 +21,10 @@ export enum Sort {
 
 export type CommentUser = {
   id: number
-  username: string
+  name: string
 }
+
+export type LoggedInUser = CommentUser
 
 export type JwtTokenPayload = {
   id: number

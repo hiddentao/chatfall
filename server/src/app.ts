@@ -4,13 +4,13 @@ import { Elysia, t } from "elysia"
 
 import { db } from "./db"
 import { env, isProd } from "./env"
-import { verifyJwt } from "./lib/jwt"
+import { type UserJwtPayload, verifyJwt } from "./lib/jwt"
 import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
 import { createApi } from "./routes"
 import type { JwtTokenPayload } from "./types"
 import { pluginConditionally } from "./utils/elysia"
-import { createSocket } from "./ws"
+import { SocketManager, createSocket } from "./ws"
 
 const log = createLog({
   name: "@",
@@ -23,7 +23,9 @@ const mailer = new Mailer({
   fromAddress: env.MAILGUN_SENDER,
 })
 
-const ctx = { mailer, log, db, sockets: {}, userSockets: {} }
+const sockets = new SocketManager(log.create("sockets"))
+
+const ctx = { mailer, log, db, sockets }
 
 export const app = new Elysia({
   websocket: {
@@ -45,8 +47,8 @@ export const app = new Elysia({
     const jwtToken = auth?.startsWith("Bearer ") ? auth.slice(7) : null
     if (jwtToken) {
       try {
-        const { id } = await verifyJwt<JwtTokenPayload>(jwtToken)
-        return { userId: id }
+        const user = await verifyJwt(jwtToken)
+        return { user }
       } catch (err) {
         ctx.log.error(`Error verifying JWT token`, err)
       }

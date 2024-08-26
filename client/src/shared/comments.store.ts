@@ -1,7 +1,8 @@
 import {
   type App,
   type Comment,
-  CommentUser,
+  type CommentUser,
+  type LoggedInUser,
   type Post,
   Sort,
 } from "@chatfall/server"
@@ -16,10 +17,11 @@ type State = {
   users: Record<number, CommentUser>
   comments: Comment[]
   liked: Record<number, boolean>
-  loggedIn: boolean
+  loggedInUser?: LoggedInUser
 }
 
 type Actions = {
+  logout: () => void
   checkAuth: () => Promise<void>
   addComment: (comment: string) => Promise<void>
   likeComment: (commentId: number, like: boolean) => Promise<void>
@@ -63,11 +65,11 @@ export const createStore = (props: CommentStoreProps) => {
     set: (
       fn: (state: State) => (State & Actions) | Partial<State & Actions>,
     ) => void,
-    loggedIn: boolean,
+    loggedInUser?: LoggedInUser,
   ) => {
     set(
       produce((state) => {
-        state.loggedIn = loggedIn
+        state.loggedInUser = loggedInUser
         onceWebsocketReady.then(() => {
           const token = jwt.getToken()?.token
           ws.send({ type: "register", jwtToken: token })
@@ -82,7 +84,11 @@ export const createStore = (props: CommentStoreProps) => {
     users: {},
     comments: [],
     liked: {},
-    loggedIn: false,
+    loggedInUser: undefined,
+    logout: () => {
+      jwt.removeToken()
+      _updateLoginState(set)
+    },
     checkAuth: async () => {
       if (jwt.getToken()) {
         const { data, error } = await app.api.users.check.get()
@@ -90,17 +96,17 @@ export const createStore = (props: CommentStoreProps) => {
           console.error(`Error checking auth`, error)
           jwt.removeToken()
         } else {
-          if (!data.id) {
+          if (!data) {
             console.warn(`Unable to verify JWT token, removing it`)
             jwt.removeToken()
           } else {
-            _updateLoginState(set, true)
+            _updateLoginState(set, data as LoggedInUser)
             return
           }
         }
       }
 
-      _updateLoginState(set, false)
+      _updateLoginState(set)
     },
     verifyEmail: async (blob: string, code: string) => {
       const { data, error } = await app.api.users.verify_email.post({
@@ -114,7 +120,7 @@ export const createStore = (props: CommentStoreProps) => {
 
       jwt.setToken({ token: data.jwt })
 
-      _updateLoginState(set, true)
+      _updateLoginState(set, data.user)
     },
     loginEmail: async (email: string) => {
       const { data, error } = await app.api.users.login_email.post({ email })

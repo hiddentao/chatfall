@@ -11,6 +11,7 @@ export const buttonVariants = cva(
         default: "p-2 border border-anchor",
         icon: "svg-container border border-anchor p-[0.1em]",
         iconMeta: "svg-container p-[0.1em]",
+        link: "p-0",
       },
     },
     defaultVariants: {

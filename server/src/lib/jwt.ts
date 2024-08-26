@@ -4,7 +4,12 @@ import { env } from "../env"
 const alg = "HS256"
 const secret = new TextEncoder().encode(env.ENC_KEY)
 
-export const signJwt = async <T extends JWTPayload>(payload: T) => {
+export type UserJwtPayload = JWTPayload & {
+  id: number
+  name: string
+}
+
+export const signJwt = async (payload: UserJwtPayload) => {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg })
     .setIssuedAt()
@@ -12,10 +17,10 @@ export const signJwt = async <T extends JWTPayload>(payload: T) => {
     .sign(secret)
 }
 
-export const verifyJwt = async <T>(token: string): Promise<T> => {
+export const verifyJwt = async (token: string): Promise<UserJwtPayload> => {
   return (
     await jwtVerify(token, secret, {
       algorithms: [alg],
     })
-  ).payload as T
+  ).payload as UserJwtPayload
 }

@@ -18,14 +18,14 @@ export const GlobalContext = createContext({} as StoreContextValue)
 export const GlobalProvider: FC<
   PropsWithChildren & { store: CommentStore; config: Config }
 > = ({ children, store, config }) => {
-  const { loggedIn, checkAuth } = store.useStore()
+  const { loggedInUser, checkAuth } = store.useStore()
 
   // check auth upon startup
   useEffect(() => {
-    if (!loggedIn) {
+    if (!loggedInUser) {
       checkAuth()
     }
-  }, [checkAuth, loggedIn])
+  }, [checkAuth, loggedInUser])
 
   return (
     <GlobalContext.Provider

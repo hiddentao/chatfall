@@ -7,7 +7,9 @@ import { CrossSvg } from "./Svg"
 export const ErrorBox: FC<
   PropsWithClassname & { children: string; hideError?: () => void }
 > = ({ className, children, hideError }) => {
-  const hide = useCallback(() => {
+  const hide = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+
     if (hideError) {
       hideError()
     }

@@ -9,7 +9,7 @@ export enum SocketEventTypeEnum {
 
 export const SocketCommentUser = t.Object({
   id: t.Number(),
-  username: t.String(),
+  name: t.String(),
 })
 
 export const SocketNewCommentEvent = t.Object({

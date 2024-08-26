@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
@@ -107,7 +107,8 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
 
 export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   const { store } = useGlobalContext()
-  const { loggedIn, addComment, fetchComments, loginEmail } = store.useStore()
+  const { loggedInUser, addComment, fetchComments, loginEmail, logout } =
+    store.useStore()
   const [focused, setFocused] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
@@ -121,20 +122,31 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     }),
     useField({
       name: "email",
-      initialValue: loggedIn ? "test@test.com" : "",
+      initialValue: "",
       validate: validateEmail,
     }),
   ]
 
   const { valid, reset } = useForm({
     fields: [commentText, email],
+    isValidFn: (fields, formError) => {
+      if (formError) {
+        return false
+      }
+      return fields.reduce((m: boolean, f) => {
+        if (f.name === "email" && loggedInUser) {
+          return m
+        } else {
+          return m && f.valid && f.isSet
+        }
+      }, true)
+    },
   })
 
   const postComment = useCallback(
     async (comment: string) => {
       await addComment(comment)
       reset()
-      fetchComments()
     },
     [addComment, fetchComments, reset],
   )
@@ -145,7 +157,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       try {
         setIsPosting(true)
         setError("")
-        if (email.value && !loggedIn) {
+        if (email.value && !loggedInUser) {
           setVerifyEmailBlob((await loginEmail(email.value)).blob)
         } else {
           await postComment(commentText.value)
@@ -157,7 +169,16 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
         setIsPosting(false)
       }
     },
-    [commentText, addComment, fetchComments],
+    [
+      addComment,
+      commentText.value,
+      email.value,
+      fetchComments,
+      loginEmail,
+      loggedInUser,
+      postComment,
+      reset,
+    ],
   )
 
   const onEmailVerified = useCallback(async () => {
@@ -170,7 +191,15 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     } finally {
       setIsPosting(false)
     }
-  }, [addComment, commentText.value, fetchComments])
+  }, [commentText.value, postComment])
+
+  const onClickLogout = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      logout()
+    },
+    [],
+  )
 
   const onFocusForm = useCallback(() => {
     setFocused(true)
@@ -180,21 +209,30 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     setError("")
   }, [])
 
-  const formIncomplete = useMemo(() => {
-    return valid === false
-  }, [valid, email.value, loggedIn])
-
   return (
     <div
       className={cn(
-        "flex flex-col p-4 bg-yellow-100 border border-yellow-500 rounded-md max-h-14 transition-max-height duration-1000 ease-in-out overflow-hidden",
+        "flex flex-col p-4 bg-yellow-100 border border-yellow-500 rounded-md max-h-14 transition-max-height duration-1000 ease-in-out overflow-hidden relative",
         {
           "max-h-96 overflow-y-scroll": focused,
         },
         className,
       )}
     >
-      {verifyEmailBlob && !loggedIn ? (
+      {loggedInUser && focused ? (
+        <p className="text-xs italic absolute top-2 right-2">
+          Logged in as: <strong>{loggedInUser.name}</strong>
+          <Button
+            variant="link"
+            className="ml-2 italic"
+            title="Logout"
+            onClick={onClickLogout}
+          >
+            (logout)
+          </Button>
+        </p>
+      ) : null}
+      {verifyEmailBlob && !loggedInUser ? (
         <VerifyEmailForm
           className="mt-4"
           blob={verifyEmailBlob}
@@ -213,9 +251,8 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
               "bg-transparent border-0 italic": !focused,
               [standardInputStyle]: focused,
             })}
-            extraInputProps={{
-              onFocus: onFocusForm,
-            }}
+            onFocus={onFocusForm}
+            disabled={!!isPosting}
           />
           {focused ? (
             <div>
@@ -227,7 +264,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
                   size: 35,
                 }}
                 className={cn("mt-8", {
-                  hidden: loggedIn,
+                  hidden: !!loggedInUser,
                 })}
                 inputClassname={cn(standardInputStyle, "max-w-full")}
                 hideTooltip={true}
@@ -238,7 +275,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
                 hideValidationIndicator={true}
               />
               <Button
-                disabled={formIncomplete}
+                disabled={!valid}
                 inProgress={isPosting}
                 className="inline-block mt-8"
               >

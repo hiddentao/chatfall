@@ -149,7 +149,10 @@ export const TextInput = (
 }
 
 export const TextAreaInput = (
-  props: TextFieldProps & { extraInputProps?: any },
+  props: TextFieldProps & {
+    onFocus: () => void
+    disabled?: boolean
+  },
 ) => {
   const {
     field,
@@ -157,7 +160,8 @@ export const TextAreaInput = (
     inputClassname,
     hideError,
     placeholder,
-    extraInputProps,
+    onFocus,
+    disabled,
     hideValidationIndicator,
   } = props
 
@@ -175,10 +179,11 @@ export const TextAreaInput = (
         <TextareaAutoresize
           minRows={1}
           placeholder={placeholder}
-          className={inputClassname}
+          className={cn("disabled:bg-gray-200", inputClassname)}
           onChange={onInputChange}
           value={field.value}
-          {...extraInputProps}
+          onFocus={onFocus}
+          disabled={disabled}
         />
         <FieldSuffix
           field={field}

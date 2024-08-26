@@ -6,20 +6,21 @@ import {
   generateVerificationCodeAndBlob,
   verifyCodeWithBlob,
 } from "../lib/emailVerification"
+import { signJwt } from "../lib/jwt"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
 import { generateUsernameFromEmail } from "../utils/string"
-import { execHandler, getUserId, testDelay } from "./utils"
+import { execHandler, getLoggedInUser, testDelay } from "./utils"
 
 export const createUserRoutes = (ctx: GlobalContext) => {
   const { db } = ctx
 
   return new Elysia({ prefix: "/users" })
     .get("/check", async ({ ...props }) => {
-      const userId = getUserId(props)
-      return {
-        id: userId ?? null,
-      }
+      return await execHandler(async () => {
+        const user = getLoggedInUser(props)
+        return user ?? null
+      })
     })
     .post(
       "/login_email",
@@ -48,18 +49,17 @@ export const createUserRoutes = (ctx: GlobalContext) => {
     )
     .post(
       "/verify_email",
-      async ({ body, ...props }) => {
-        const { jwt } = props as any
-
+      async ({ body }) => {
         return await execHandler(async () => {
           const { blob, code } = body
 
           const email = await verifyCodeWithBlob(ctx.log, blob, code)
+          const name = generateUsernameFromEmail(email)
 
           const [user] = await db
             .insert(users)
             .values({
-              name: generateUsernameFromEmail(email),
+              name,
               email,
               lastLoggedIn: dateNow(),
               createdAt: dateNow(),
@@ -74,11 +74,15 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             })
             .returning({
               id: users.id,
+              name: users.name,
             })
 
           return {
-            id: user.id,
-            jwt: await jwt.sign({ id: user.id }),
+            user,
+            jwt: await signJwt({
+              id: user.id,
+              name,
+            }),
           }
         })
       },

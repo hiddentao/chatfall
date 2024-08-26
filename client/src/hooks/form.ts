@@ -37,7 +37,7 @@ export interface FieldOptions<T> {
 
 const DUMMY_VALIDATE_ASYNC_FN = async () => ""
 
-const _calculateInitialIsSet = <T = any>(options: FieldOptions<T>): boolean => {
+const _calculateIsSet = <T = any>(options: FieldOptions<T>): boolean => {
   return options.optional ? true : !!options.initialValue
 }
 
@@ -45,7 +45,7 @@ export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
   const [version, setVersion] = useState<number>(0)
   const [value, setValue] = useState<T | undefined>(options.initialValue)
   const [error, setError] = useState<string | undefined>(undefined)
-  const [isSet, setIsSet] = useState<boolean>(_calculateInitialIsSet(options))
+  const [isSet, setIsSet] = useState<boolean>(_calculateIsSet(options))
   const [isValidating, setIsValidating] = useState<boolean>(false)
 
   const debouncedValidateAsync = useAsyncValidator(
@@ -84,9 +84,9 @@ export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
 
   const reset = useCallback(() => {
     setValue(options.initialValue)
-    setIsSet(_calculateInitialIsSet(options))
+    setIsSet(_calculateIsSet(options))
     setError(undefined)
-  }, [options.initialValue])
+  }, [options.initialValue, options.optional])
 
   const valid = useMemo(() => !error && !isValidating, [error, isValidating])
 
@@ -115,6 +115,7 @@ export interface FormApi {
 
 export interface FormOptions {
   fields: FieldApi[]
+  isValidFn?: (fields: FieldApi[], formError?: string) => boolean
   validate?: ValidateFunction
   validateAsync?: ValidateAsyncFunction
   validateExtraArgs?: any
@@ -131,10 +132,14 @@ export const useForm = (options: FormOptions): FormApi => {
   }, [_isValidating, fields])
 
   const valid = useMemo(() => {
-    if (formError) {
-      return false
+    if (options.isValidFn) {
+      return options.isValidFn(fields, formError)
+    } else {
+      if (formError) {
+        return false
+      }
+      return fields.reduce((m: boolean, f) => m && f.valid && f.isSet, true)
     }
-    return fields.reduce((m: boolean, f) => m && f.valid && f.isSet, true)
   }, [fields, formError])
 
   const errors = useMemo(() => {

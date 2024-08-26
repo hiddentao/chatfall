@@ -48,7 +48,7 @@ export const CommentListItem: FC<CommentProps> = ({
   return (
     <li className={cn("block", className)}>
       <div className="text-sm flex flex-row items-center mb-2">
-        <h3 className="font-bold">{user.username}</h3>
+        <h3 className="font-bold">{user.name}</h3>
         <span className="mx-2">·</span>
         <span
           title={`${c.createdAt}`}
