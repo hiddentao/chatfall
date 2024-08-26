@@ -2,13 +2,14 @@ import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
 import { Elysia, t } from "elysia"
 
+import { Cron } from "cron-async"
 import { db } from "./db"
 import { env, isProd } from "./env"
-import { type UserJwtPayload, verifyJwt } from "./lib/jwt"
+import { verifyJwt } from "./lib/jwt"
 import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
 import { createApi } from "./routes"
-import type { JwtTokenPayload } from "./types"
+import { SettingsManager } from "./settings"
 import { pluginConditionally } from "./utils/elysia"
 import { SocketManager, createSocket } from "./ws"
 
@@ -23,9 +24,13 @@ const mailer = new Mailer({
   fromAddress: env.MAILGUN_SENDER,
 })
 
+const cron = new Cron()
+
+const settings = new SettingsManager({ db, log, cron })
+
 const sockets = new SocketManager(log.create("sockets"))
 
-const ctx = { mailer, log, db, sockets }
+const ctx = { mailer, log, db, sockets, cron, settings }
 
 export const app = new Elysia({
   websocket: {

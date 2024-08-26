@@ -9,8 +9,9 @@ import {
   posts,
   users,
 } from "../db/schema"
+import { Setting } from "../settings"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
-import { dateNow } from "../utils/date"
+import { dateDiff, dateFormatDiff, dateNow } from "../utils/date"
 import { SocketEventTypeEnum } from "../ws/types"
 import { execHandler, getLoggedInUser, getLoggedInUserAndAssert } from "./utils"
 
@@ -25,7 +26,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const { commentId, like } = body
           const user = getLoggedInUserAndAssert(props)
 
-          await db.transaction(async (tx) => {
+          const rating = await db.transaction(async (tx) => {
             const [existing] = await db
               .select()
               .from(commentRatings)
@@ -80,6 +81,25 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 })
                 .where(eq(comments.id, commentId))
             }
+
+            const [{ rating }] = await db
+              .select({ rating: comments.rating })
+              .from(comments)
+              .where(eq(comments.id, commentId))
+
+            return rating
+          })
+
+          ctx.sockets.broadcast({
+            type: SocketEventTypeEnum.LikeComment,
+            user: {
+              id: user.id,
+              name: user.name,
+            },
+            data: {
+              id: commentId,
+              rating,
+            },
           })
         })
       },
@@ -99,6 +119,29 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
           if (!user) {
             throw new Error("User not logged in")
+          }
+
+          // check the last time the user commented and make sure that enough time has elapsed
+          const lastComment = await db
+            .select()
+            .from(comments)
+            .where(
+              and(eq(comments.userId, user.id), eq(comments.postId, postId)),
+            )
+            .orderBy(desc(comments.createdAt))
+            .limit(1)
+
+          if (lastComment.length > 0) {
+            const lastCommentTime = new Date(lastComment[0].createdAt).getTime()
+            const now = new Date().getTime()
+            if (
+              dateDiff(lastCommentTime, now) <
+              ctx.settings.getSetting(Setting.UserNextCommentDelayMs)
+            ) {
+              throw new Error(
+                `You must wait ${dateFormatDiff(lastCommentTime, now)} before commenting again!`,
+              )
+            }
           }
 
           let newCommentIndex = 1
@@ -255,4 +298,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         }),
       },
     )
+}
+function diff() {
+  throw new Error("Function not implemented.")
 }

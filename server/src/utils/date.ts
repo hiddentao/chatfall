@@ -18,16 +18,16 @@ const toDate = (date: RawDate): Date => {
   return f
 }
 
-const diff = (from: RawDate, to: RawDate): number => {
+export const dateDiff = (from: RawDate, to: RawDate): number => {
   return toDate(to).getTime() - toDate(from).getTime()
 }
 
 const diffDays = (from: RawDate, to: RawDate): number => {
-  return Math.floor(diff(from, to) / ONE_DAY)
+  return Math.floor(dateDiff(from, to) / ONE_DAY)
 }
 
-const formatDiff = (from: RawDate, to: RawDate): string => {
-  const ms = diff(from, to)
+export const dateFormatDiff = (from: RawDate, to: RawDate): string => {
+  const ms = dateDiff(from, to)
 
   let val = 0
   let suffix = ""
@@ -55,7 +55,7 @@ const formatDiff = (from: RawDate, to: RawDate): string => {
     suffix = "year"
   }
 
-  return `${val} ${suffix}${val > 1 ? "s" : ""} ago`
+  return `${val} ${suffix}${val > 1 ? "s" : ""}`
 }
 
 export const formatCommentTime = (date: RawDate): string => {
@@ -65,7 +65,7 @@ export const formatCommentTime = (date: RawDate): string => {
     const d = new Date(date)
     return `${d.getDay()} ${d.toLocaleString("default", { month: "short" })} ${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`
   } else {
-    return formatDiff(date, now)
+    return `${dateFormatDiff(date, now)} ago`
   }
 }
 

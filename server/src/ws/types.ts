@@ -20,8 +20,13 @@ export const SocketNewCommentEvent = t.Object({
   createdAt: t.String(),
 })
 
+export const SocketLikeCommentEvent = t.Object({
+  id: t.Number(),
+  rating: t.Number(),
+})
+
 export const SocketEvent = t.Object({
   type: t.Enum(SocketEventTypeEnum),
   user: SocketCommentUser,
-  data: t.Union([SocketNewCommentEvent]),
+  data: t.Union([SocketNewCommentEvent, SocketLikeCommentEvent]),
 })

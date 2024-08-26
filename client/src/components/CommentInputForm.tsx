@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useState } from "react"
 import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
@@ -25,12 +25,14 @@ const validateEmail = (value: string) => {
 type VerifyEmailFormProps = PropsWithClassname & {
   blob: string
   onVerified: () => void
+  onCancelVerification: () => void
 }
 
 const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
   className,
   blob,
   onVerified,
+  onCancelVerification,
 }) => {
   const { store } = useGlobalContext()
   const { verifyEmail } = store.useStore()
@@ -67,6 +69,11 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
     [blob, code.value, verifyEmail],
   )
 
+  const onCancelVerifyEmailCode = useCallback(() => {
+    setError("")
+    onCancelVerification()
+  }, [])
+
   const onHideError = useCallback(() => {
     setError("")
   }, [])
@@ -74,8 +81,7 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
   return (
     <form className={className} onSubmit={handleSubmit}>
       <p className="mb-4">
-        We have sent a verification code to your email address. Please enter it
-        below.
+        Please enter the verification code we just sent to your email address:
       </p>
       <TextInput
         label="Verification code"
@@ -89,13 +95,23 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
         placeholder="Enter code..."
         hideValidationIndicator={true}
       />
-      <Button
-        disabled={!valid}
-        inProgress={isSubmitting}
-        className="mt-8 inline-block"
-      >
-        Verify
-      </Button>
+      <div className="mt-8 flex flex-row justify-start items-center">
+        <Button
+          disabled={!valid}
+          inProgress={isSubmitting}
+          className="ml-2 inline-block"
+        >
+          Verify
+        </Button>
+        <Button
+          variant="link"
+          className="inline-block ml-2 text-xs"
+          title="Cancel and back"
+          onClick={onCancelVerifyEmailCode}
+        >
+          Cancel
+        </Button>
+      </div>
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
           {error}
@@ -181,6 +197,10 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     ],
   )
 
+  const onCancelEmailVerification = useCallback(() => {
+    setVerifyEmailBlob(undefined)
+  }, [])
+
   const onEmailVerified = useCallback(async () => {
     try {
       setIsPosting(true)
@@ -237,6 +257,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           className="mt-4"
           blob={verifyEmailBlob}
           onVerified={onEmailVerified}
+          onCancelVerification={onCancelEmailVerification}
         />
       ) : (
         <form onSubmit={handleSubmit}>

@@ -16,24 +16,26 @@ export type MailerSendParams = {
 
 export class Mailer {
   private log: LogInterface
-  private fromAddress: string
-  private domain: string
-  private mailClient: IMailgunClient
+  private fromAddress?: string
+  private domain?: string
+  private mailClient?: IMailgunClient
 
   constructor(params: {
     log: LogInterface
-    apiKey: string
-    fromAddress: string
+    apiKey?: string
+    fromAddress?: string
   }) {
     const { log, apiKey, fromAddress } = params
 
     this.fromAddress = fromAddress
-    this.domain = fromAddress.split("@")[1]
+    this.domain = fromAddress?.split("@")[1]
     this.log = log.create("mailer")
-    this.mailClient = mailgun.client({
-      username: "api",
-      key: apiKey,
-    })
+    if (apiKey) {
+      this.mailClient = mailgun.client({
+        username: "api",
+        key: apiKey,
+      })
+    }
   }
 
   async send(params: MailerSendParams) {
@@ -42,8 +44,6 @@ export class Mailer {
     this.log.info(`Sending email to ${to} with subject: ${subject}`)
 
     this.log.debug(`
-Mailer is sending:
-
 to: ${to}
 replyTo: ${replyTo}
 subject: ${subject}
@@ -64,7 +64,11 @@ html: ${html}
     }
 
     try {
-      await this.mailClient.messages.create(this.domain, attrs)
+      if (this.mailClient && this.domain) {
+        await this.mailClient.messages.create(this.domain, attrs)
+      } else {
+        this.log.warn(`Email not sent, mail client not initialized`)
+      }
     } catch (err: any) {
       const errors = get(err, "response.body.errors", [])
       const errorsStr = errors

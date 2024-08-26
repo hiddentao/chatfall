@@ -9,6 +9,28 @@ import {
 } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-typebox"
 
+export const settings = pgTable(
+  "settings",
+  {
+    id: serial("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    value: text("value").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      settings_createdAt_index: index("settings_createdAt_index").on(
+        table.createdAt,
+      ),
+    }
+  },
+)
+
 export const users = pgTable(
   "users",
   {
