@@ -190,9 +190,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               createdAt,
               updatedAt: dateNow(),
             })
-            .returning({
-              id: comments.id,
-            })
+            .returning()
 
           ctx.sockets.broadcast({
             type: SocketEventTypeEnum.NewComment,
@@ -201,11 +199,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               name: user.name,
             },
             data: {
-              id: inserted.id,
-              body: comment,
-              depth,
-              path,
-              createdAt,
+              ...inserted,
             },
           })
 

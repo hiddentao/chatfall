@@ -4,6 +4,9 @@ import {
   type CommentUser,
   type LoggedInUser,
   type Post,
+  SocketEvent,
+  SocketEventTypeEnum,
+  SocketNewCommentEvent,
   Sort,
 } from "@chatfall/server"
 import { treaty } from "@elysiajs/eden"
@@ -34,8 +37,8 @@ export type CommentStoreProps = {
   server: string
 }
 
-export const createStore = (props: CommentStoreProps) => {
-  const app = treaty<App>(props.server, {
+const createApp = (server: string) =>
+  treaty<App>(server, {
     headers: () => {
       const jwtToken = jwt.getToken()
       if (jwtToken?.token) {
@@ -46,20 +49,45 @@ export const createStore = (props: CommentStoreProps) => {
     },
   })
 
+type TreatyApp = ReturnType<typeof createApp>
+type TreatyAppWebsocket = ReturnType<TreatyApp["ws"]["subscribe"]>
+
+class Socket {
+  private ws: TreatyAppWebsocket
+  private onReady: Promise<void>
+
+  constructor(app: TreatyApp) {
+    this.ws = app.ws.subscribe()
+
+    this.onReady = new Promise<void>((resolve) =>
+      this.ws.on("open", () => resolve()),
+    )
+
+    this.ws
+      .on("error", (error) => {
+        console.error("Websocket error", error)
+      })
+      .on("close", () => {
+        console.debug("Websocket closed")
+      })
+  }
+
+  async onceReady(cb: (ws: TreatyAppWebsocket) => void) {
+    return this.onReady.then(() => cb(this.ws))
+  }
+
+  onMessage(cb: (data: SocketEvent) => void) {
+    this.ws.subscribe((data) => {
+      cb(data.data)
+    })
+  }
+}
+
+export const createStore = (props: CommentStoreProps) => {
+  const app = createApp(props.server)
+
   // websocket
-  const ws = app.ws.subscribe()
-  const onceWebsocketReady = new Promise<void>((resolve) =>
-    ws.on("open", () => resolve()),
-  )
-  ws.on("error", (error) => {
-    console.error("Websocket error", error)
-  })
-    .on("close", () => {
-      console.log("Websocket closed")
-    })
-    .subscribe((data) => {
-      console.log("Websocket data", data)
-    })
+  const ws = new Socket(app)
 
   const _updateLoginState = (
     set: (
@@ -70,7 +98,7 @@ export const createStore = (props: CommentStoreProps) => {
     set(
       produce((state) => {
         state.loggedInUser = loggedInUser
-        onceWebsocketReady.then(() => {
+        ws.onceReady((ws) => {
           const token = jwt.getToken()?.token
           ws.send({ type: "register", jwtToken: token })
         })
@@ -176,6 +204,40 @@ export const createStore = (props: CommentStoreProps) => {
       )
     },
   }))
+
+  ws.onMessage((data) => {
+    console.debug(`Received socket event`, data)
+
+    switch (data.type) {
+      case SocketEventTypeEnum.NewComment:
+        // show immediately if it's the current user
+        if (data.user.id === useStore.getState().loggedInUser?.id) {
+          useStore.setState(
+            produce((state) => {
+              state.comments.unshift({
+                ...(data.data as SocketNewCommentEvent),
+              } as Comment)
+              state.users[data.user.id] = data.user
+            }),
+          )
+        } else {
+          console.error(`TODO: show when another has sent new messages!!`)
+        }
+        break
+      case SocketEventTypeEnum.LikeComment:
+        useStore.setState(
+          produce((state) => {
+            state.comments = state.comments.map((comment: Comment) => {
+              if (comment.id === data.data.id) {
+                comment.rating = data.data.rating
+              }
+              return comment
+            })
+          }),
+        )
+        break
+    }
+  })
 
   return { useStore }
 }
