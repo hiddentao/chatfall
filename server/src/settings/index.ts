@@ -52,13 +52,10 @@ export class SettingsManager {
     const rows = await this.db.select().from(settings)
 
     if (settings) {
-      this.settings = rows.reduce(
-        (acc, row) => {
-          acc[row.key] = JSON.parse(row.value)
-          return acc
-        },
-        {} as Record<string, SettingValueRaw>,
-      )
+      this.settings = rows.reduce((acc, row) => {
+        acc[row.key] = JSON.parse(row.value)
+        return acc
+      }, this.settings)
     }
   }
 

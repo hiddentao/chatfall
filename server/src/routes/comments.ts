@@ -122,8 +122,10 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           }
 
           // check the last time the user commented and make sure that enough time has elapsed
-          const lastComment = await db
-            .select()
+          const [latestComment] = await db
+            .select({
+              createdAt: comments.createdAt,
+            })
             .from(comments)
             .where(
               and(eq(comments.userId, user.id), eq(comments.postId, postId)),
@@ -131,15 +133,17 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             .orderBy(desc(comments.createdAt))
             .limit(1)
 
-          if (lastComment.length > 0) {
-            const lastCommentTime = new Date(lastComment[0].createdAt).getTime()
-            const now = new Date().getTime()
-            if (
-              dateDiff(lastCommentTime, now) <
-              ctx.settings.getSetting(Setting.UserNextCommentDelayMs)
-            ) {
+          if (latestComment) {
+            const latestCommentTime = new Date(
+              latestComment.createdAt,
+            ).getTime()
+            const now = new Date(dateNow()).getTime()
+            const minDelay = ctx.settings.getSetting(
+              Setting.UserNextCommentDelayMs,
+            )
+            if (dateDiff(latestCommentTime, now) < minDelay) {
               throw new Error(
-                `You must wait ${dateFormatDiff(lastCommentTime, now)} before commenting again!`,
+                `You must wait ${dateFormatDiff(now, latestCommentTime + minDelay)} before commenting again!`,
               )
             }
           }
