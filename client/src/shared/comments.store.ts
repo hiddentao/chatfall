@@ -18,6 +18,7 @@ type State = {
   sort: Sort
   post: Post | null
   users: Record<number, CommentUser>
+  numNewComments: number
   comments: Comment[]
   liked: Record<number, boolean>
   loggedInUser?: LoggedInUser
@@ -110,6 +111,7 @@ export const createStore = (props: CommentStoreProps) => {
     sort: Sort.newest_first,
     post: null,
     users: {},
+    numNewComments: 0,
     comments: [],
     liked: {},
     loggedInUser: undefined,
@@ -195,6 +197,7 @@ export const createStore = (props: CommentStoreProps) => {
 
       set(
         produce((state) => {
+          state.numNewComments = 0 // reset new comments counter
           state.sort = sort
           state.post = data.post
           state.users = data.users
@@ -211,7 +214,11 @@ export const createStore = (props: CommentStoreProps) => {
     switch (data.type) {
       case SocketEventTypeEnum.NewComment:
         // show immediately if it's the current user
-        if (data.user.id === useStore.getState().loggedInUser?.id) {
+        // or if viewing newest first
+        if (
+          data.user.id === useStore.getState().loggedInUser?.id ||
+          useStore.getState().sort === Sort.newest_first
+        ) {
           useStore.setState(
             produce((state) => {
               state.comments.unshift({
@@ -221,7 +228,11 @@ export const createStore = (props: CommentStoreProps) => {
             }),
           )
         } else {
-          console.error(`TODO: show when another has sent new messages!!`)
+          useStore.setState(
+            produce((state) => {
+              state.numNewComments++
+            }),
+          )
         }
         break
       case SocketEventTypeEnum.LikeComment:

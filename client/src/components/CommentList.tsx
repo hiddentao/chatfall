@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import React, { FC, useEffect, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
 import { CommentListItem } from "./CommentListItem"
 import { ErrorBox } from "./ErrorBox"
@@ -16,7 +17,8 @@ export const CommentList: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")
 
-  const { comments, users, liked, fetchComments, sort } = store.useStore()
+  const { numNewComments, comments, users, liked, fetchComments, sort } =
+    store.useStore()
 
   const refetch = useCallback(
     async (s?: Sort) => {
@@ -37,6 +39,14 @@ export const CommentList: FC = () => {
   const handleSortChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       refetch(event.target.value as Sort)
+    },
+    [fetchComments],
+  )
+
+  const handleShowNewComments = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      refetch(Sort.newest_first)
     },
     [fetchComments],
   )
@@ -76,7 +86,23 @@ export const CommentList: FC = () => {
         <CommentInputForm className="mt-4 mb-8 mx-6" />
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {!isLoading && !error && comments.length === 0 ? (
-          <p>No comments</p>
+          <p>No comments yet!</p>
+        ) : null}
+        {numNewComments ? (
+          <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">
+            <p className="inline-block mr-2">
+              <strong>
+                {numNewComments} new comment{numNewComments > 1 ? "s" : ""}
+              </strong>
+              <span className="ml-2">available</span>
+            </p>
+            <Button
+              className="inline-block text-sm py-1"
+              onClick={handleShowNewComments}
+            >
+              Show
+            </Button>
+          </div>
         ) : null}
         {!error && comments.length ? (
           <ul className="flex flex-col">
