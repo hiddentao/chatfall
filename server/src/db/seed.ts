@@ -3,11 +3,8 @@ import { faker } from "@faker-js/faker"
 import { drizzle } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import { env } from "../env"
-import { Setting } from "../settings/index.ts"
 import {
   type CommentToInsert,
-  type Post,
-  type PostToInsert,
   type UserToInsert,
   commentRatings,
   comments,
@@ -72,6 +69,7 @@ const main = async () => {
       path: `${i}`,
       rating: faker.number.int({ min: 0, max: 100 }),
       reply_count: i === 1 ? 20 : 0,
+      status: Math.random() > 0.9 ? "flagged" : "shown",
       createdAt: faker.date
         .between({
           from: "2023-01-01T00:00:00.000Z",
@@ -92,6 +90,7 @@ const main = async () => {
         path: `${pathPrefixStr}.${j}`,
         reply_count: j === 1 && depth < 5 ? 20 : 0,
         rating: faker.number.int({ min: 0, max: 100 }),
+        status: j > 1 && Math.random() > 0.9 ? "flagged" : "shown",
         createdAt: faker.date
           .between({
             from: new Date(2023, depth + 1, 1),

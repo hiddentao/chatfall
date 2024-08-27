@@ -10,8 +10,6 @@ export interface VerifyEmailCodeBlob {
 }
 
 const _getCryptoParams = () => {
-  const len = env.ENC_KEY.length
-
   return {
     key: env.ENC_KEY.substring(0, 32),
     iv: env.ENC_KEY.substring(32, 48),

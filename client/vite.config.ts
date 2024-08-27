@@ -1,13 +1,11 @@
 import path from "path"
 import react from "@vitejs/plugin-react"
-import { ConfigEnv, UserConfig, defineConfig } from "vite"
+import { UserConfig, defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 import svgr from "vite-plugin-svgr"
 
-const workspaceRootFolder = path.resolve(__dirname, "..")
-
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ command }) => {
   let ret: Partial<UserConfig> = {
     plugins: [react(), dts(), svgr()],
   }
@@ -29,7 +27,7 @@ export default defineConfig(({ command, mode }) => {
           cssMinify: false,
           outDir: "./dist/lib",
           lib: {
-            entry: "lib/index.tsx",
+            entry: "src/scaffold/index.tsx",
             formats: ["es"],
             fileName: (format) => `chatfall.${format}.js`,
           },

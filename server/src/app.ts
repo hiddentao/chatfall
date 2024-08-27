@@ -1,6 +1,6 @@
 import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
-import { Elysia, t } from "elysia"
+import { Elysia } from "elysia"
 
 import { Cron } from "cron-async"
 import { db } from "./db"

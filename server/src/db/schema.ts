@@ -2,6 +2,7 @@ import type { InferInsertModel, InferSelectModel } from "drizzle-orm"
 import {
   index,
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
@@ -82,6 +83,8 @@ export const posts = pgTable(
 export type Post = InferSelectModel<typeof posts>
 export type PostToInsert = InferInsertModel<typeof posts>
 
+export const commentStatus = pgEnum("status", ["shown", "hidden", "flagged"])
+
 export const comments = pgTable(
   "comments",
   {
@@ -92,6 +95,7 @@ export const comments = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id),
+    status: commentStatus("status").notNull(),
     body: text("body").notNull(),
     depth: integer("depth").notNull().default(0),
     path: text("path").notNull(),

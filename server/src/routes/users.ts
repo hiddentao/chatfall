@@ -1,7 +1,7 @@
-import Elysia, { t } from "elysia"
+import { eq } from "drizzle-orm"
 
+import Elysia, { t } from "elysia"
 import { users } from "../db/schema"
-import { env } from "../env"
 import {
   generateVerificationCodeAndBlob,
   verifyCodeWithBlob,
@@ -10,7 +10,12 @@ import { signJwt } from "../lib/jwt"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
 import { generateUsernameFromEmail } from "../utils/string"
-import { execHandler, getLoggedInUser, testDelay } from "./utils"
+import { execHandler, getLoggedInUser } from "./utils"
+
+const userResponseType = t.Object({
+  id: t.Number(),
+  name: t.String(),
+})
 
 export const createUserRoutes = (ctx: GlobalContext) => {
   const { db } = ctx
@@ -19,7 +24,18 @@ export const createUserRoutes = (ctx: GlobalContext) => {
     .get("/check", async ({ ...props }) => {
       return await execHandler(async () => {
         const user = getLoggedInUser(props)
-        return user ?? null
+        if (user) {
+          // check that user actually exists
+          const [userExists] = await db
+            .select({
+              id: users.id,
+            })
+            .from(users)
+            .where(eq(users.id, user.id))
+            .limit(1)
+          return userExists ? { user: { id: user.id, name: user.name } } : {}
+        }
+        return {}
       })
     })
     .post(
@@ -44,6 +60,9 @@ export const createUserRoutes = (ctx: GlobalContext) => {
       {
         body: t.Object({
           email: t.String(),
+        }),
+        response: t.Object({
+          blob: t.String(),
         }),
       },
     )
@@ -90,6 +109,10 @@ export const createUserRoutes = (ctx: GlobalContext) => {
         body: t.Object({
           blob: t.String(),
           code: t.String(),
+        }),
+        response: t.Object({
+          jwt: t.String(),
+          user: userResponseType,
         }),
       },
     )

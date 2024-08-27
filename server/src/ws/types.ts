@@ -3,7 +3,6 @@ import { type Static, t } from "elysia"
 export enum SocketEventTypeEnum {
   NewComment = "NewComment",
   LikeComment = "LikeComment",
-  UnlikeComment = "UnlikeComment",
   NewReply = "NewReply",
 }
 

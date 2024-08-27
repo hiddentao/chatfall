@@ -1,7 +1,7 @@
 import Elysia, { t, type Static } from "elysia"
 import { verifyJwt } from "../lib/jwt"
 import type { LogInterface } from "../lib/logger"
-import type { GlobalContext, JwtTokenPayload } from "../types"
+import type { GlobalContext } from "../types"
 import { SocketEvent } from "./types"
 
 export const createSocket = (ctx: GlobalContext) => {
@@ -24,7 +24,6 @@ export const createSocket = (ctx: GlobalContext) => {
           ctx.sockets.registerUser(ws, ws.id)
 
           // deciper user id from jwt token
-          let userId: number | undefined
           if (jwtToken) {
             try {
               const { id } = await verifyJwt(jwtToken)

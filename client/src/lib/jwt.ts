@@ -1,9 +1,9 @@
 const IS_CLIENT_SIDE = typeof window !== "undefined"
 
 const DUMMY_LOCAL_STORAGE = {
-  getItem: (key: string) => "",
-  setItem: (key: string, value: string) => {},
-  removeItem: (key: string) => {},
+  getItem: () => "",
+  setItem: () => "",
+  removeItem: () => "",
 }
 
 export interface JwtToken {

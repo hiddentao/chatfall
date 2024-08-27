@@ -27,7 +27,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const user = getLoggedInUserAndAssert(props)
 
           const rating = await db.transaction(async (tx) => {
-            const [existing] = await db
+            const [existing] = await tx
               .select()
               .from(commentRatings)
               .where(
@@ -39,7 +39,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
             if (existing) {
               if (like) {
-                await db
+                await tx
                   .update(commentRatings)
                   .set({
                     rating: 1,
@@ -47,18 +47,18 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                   })
                   .where(eq(commentRatings.id, existing.id))
 
-                await db
+                await tx
                   .update(comments)
                   .set({
                     rating: sql`${comments.rating} + 1`,
                   })
                   .where(eq(comments.id, commentId))
               } else {
-                await db
+                await tx
                   .delete(commentRatings)
                   .where(eq(commentRatings.id, existing.id))
 
-                await db
+                await tx
                   .update(comments)
                   .set({
                     rating: sql`${comments.rating} - 1`,
@@ -66,7 +66,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                   .where(eq(comments.id, commentId))
               }
             } else {
-              await db.insert(commentRatings).values({
+              await tx.insert(commentRatings).values({
                 userId: user.id,
                 commentId,
                 rating: 1,
@@ -74,7 +74,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 updatedAt: dateNow(),
               })
 
-              await db
+              await tx
                 .update(comments)
                 .set({
                   rating: sql`${comments.rating} + 1`,
@@ -82,7 +82,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 .where(eq(comments.id, commentId))
             }
 
-            const [{ rating }] = await db
+            const [{ rating }] = await tx
               .select({ rating: comments.rating })
               .from(comments)
               .where(eq(comments.id, commentId))
@@ -185,6 +185,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               userId: user.id,
               postId: postId,
               body: comment,
+              status: "shown",
               depth,
               path,
               createdAt,
@@ -203,7 +204,10 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             },
           })
 
-          return { id: inserted.id }
+          return {
+            id: inserted.id,
+            message: "Your comment was successfully added!",
+          }
         })
       },
       {
@@ -211,6 +215,10 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           comment: t.String(),
           postId: t.Number(),
           parentCommentId: t.Optional(t.Number()),
+        }),
+        response: t.Object({
+          id: t.Number(),
+          message: t.String(),
         }),
       },
     )
@@ -292,7 +300,4 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         }),
       },
     )
-}
-function diff() {
-  throw new Error("Function not implemented.")
 }

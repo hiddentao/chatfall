@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
@@ -66,13 +66,13 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
         setIsSubmitting(false)
       }
     },
-    [blob, code.value, verifyEmail],
+    [blob, code.value, onVerified, reset, verifyEmail],
   )
 
   const onCancelVerifyEmailCode = useCallback(() => {
     setError("")
     onCancelVerification()
-  }, [])
+  }, [onCancelVerification])
 
   const onHideError = useCallback(() => {
     setError("")
@@ -123,11 +123,11 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
 
 export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   const { store } = useGlobalContext()
-  const { loggedInUser, addComment, fetchComments, loginEmail, logout } =
-    store.useStore()
+  const { loggedInUser, addComment, loginEmail, logout } = store.useStore()
   const [focused, setFocused] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
+  const [responseAfterPosting, setResponseAfterPosting] = useState<string>()
   const [verifyEmailBlob, setVerifyEmailBlob] = useState<string>()
 
   const [commentText, email] = [
@@ -161,10 +161,11 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
 
   const postComment = useCallback(
     async (comment: string) => {
-      await addComment(comment)
+      const response = await addComment(comment)
+      setResponseAfterPosting(response)
       reset()
     },
-    [addComment, fetchComments, reset],
+    [addComment, reset],
   )
 
   const handleSubmit = useCallback(
@@ -186,10 +187,8 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       }
     },
     [
-      addComment,
       commentText.value,
       email.value,
-      fetchComments,
       loginEmail,
       loggedInUser,
       postComment,
@@ -218,7 +217,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       event.preventDefault()
       logout()
     },
-    [],
+    [logout],
   )
 
   const onFocusForm = useCallback(() => {
@@ -259,6 +258,8 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           onVerified={onEmailVerified}
           onCancelVerification={onCancelEmailVerification}
         />
+      ) : responseAfterPosting ? (
+        <p>{responseAfterPosting}</p>
       ) : (
         <form onSubmit={handleSubmit}>
           <TextAreaInput

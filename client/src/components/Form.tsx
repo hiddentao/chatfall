@@ -1,4 +1,4 @@
-import { ReactNode, useCallback } from "react"
+import React, { ReactNode, useCallback } from "react"
 import TextareaAutoresize from "react-textarea-autosize"
 import { FieldApi } from "../hooks/form"
 import { cn } from "../utils/ui"
@@ -42,7 +42,6 @@ export interface FieldLabelProps {
 export const FieldLabel = ({
   children,
   label,
-  required,
 }: FieldLabelProps & { children?: ReactNode }) => {
   const dummyOnClick = useCallback((e: any) => {
     e.preventDefault()

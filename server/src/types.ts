@@ -33,7 +33,3 @@ export type CommentUser = {
 }
 
 export type LoggedInUser = CommentUser
-
-export type JwtTokenPayload = {
-  id: number
-}

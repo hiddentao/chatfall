@@ -6,21 +6,38 @@ import type { LogInterface } from "../lib/logger"
 
 export enum Setting {
   UserNextCommentDelayMs = "userNextCommentDelayMs",
+  BlacklistedWords = "blacklistedWords",
+  BlacklistedEmails = "blacklistedEmails",
+  BlacklistedDomains = "blacklistedDomains",
+  FlaggedWords = "flaggedWords",
+  ModerateAllComments = "moderateAllComments",
 }
 
 // Define a mapped type for setting values
 type SettingValueMap = {
   [Setting.UserNextCommentDelayMs]: number
+  [Setting.BlacklistedWords]: string[]
+  [Setting.BlacklistedEmails]: string[]
+  [Setting.BlacklistedDomains]: string[]
+  [Setting.FlaggedWords]: string[]
+  [Setting.ModerateAllComments]: boolean
 }
 
 // Create a type that maps the enum to its corresponding value type
 type SettingValue<T extends Setting> = SettingValueMap[T]
 
+type SettingValueRaw = boolean | number | string | string[]
+
 export class SettingsManager {
   private log: LogInterface
   private db: Database
-  private settings: Record<string, number | string> = {
-    [Setting.UserNextCommentDelayMs]: 60000, // 1 minute by default
+  private settings: Record<string, SettingValueRaw> = {
+    [Setting.UserNextCommentDelayMs]: 60000,
+    [Setting.BlacklistedWords]: [],
+    [Setting.BlacklistedEmails]: [],
+    [Setting.BlacklistedDomains]: [],
+    [Setting.FlaggedWords]: [],
+    [Setting.ModerateAllComments]: false,
   }
 
   constructor(cfg: { db: Database; log: LogInterface; cron: Cron }) {
@@ -40,7 +57,7 @@ export class SettingsManager {
           acc[row.key] = JSON.parse(row.value)
           return acc
         },
-        {} as Record<string, number | string>,
+        {} as Record<string, SettingValueRaw>,
       )
     }
   }

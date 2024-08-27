@@ -27,7 +27,7 @@ type State = {
 type Actions = {
   logout: () => void
   checkAuth: () => Promise<void>
-  addComment: (comment: string) => Promise<void>
+  addComment: (comment: string) => Promise<string>
   likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
@@ -126,11 +126,11 @@ export const createStore = (props: CommentStoreProps) => {
           console.error(`Error checking auth`, error)
           jwt.removeToken()
         } else {
-          if (!data) {
+          if (!data.user) {
             console.warn(`Unable to verify JWT token, removing it`)
             jwt.removeToken()
           } else {
-            _updateLoginState(set, data as LoggedInUser)
+            _updateLoginState(set, data.user as LoggedInUser)
             return
           }
         }
@@ -172,7 +172,7 @@ export const createStore = (props: CommentStoreProps) => {
       }
     },
     addComment: async (comment: string) => {
-      const { error } = await app.api.comments.index.post({
+      const { data, error } = await app.api.comments.index.post({
         comment,
         postId: get().post!.id,
       })
@@ -180,6 +180,8 @@ export const createStore = (props: CommentStoreProps) => {
       if (error) {
         throw error
       }
+
+      return data.message
     },
     fetchComments: async (sort = get().sort) => {
       const { data, error } = await app.api.comments.index.get({

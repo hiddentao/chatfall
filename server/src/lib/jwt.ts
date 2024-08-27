@@ -1,13 +1,11 @@
 import { type JWTPayload, SignJWT, jwtVerify } from "jose"
 import { env } from "../env"
+import type { LoggedInUser } from "../types"
 
 const alg = "HS256"
 const secret = new TextEncoder().encode(env.ENC_KEY)
 
-export type UserJwtPayload = JWTPayload & {
-  id: number
-  name: string
-}
+export type UserJwtPayload = JWTPayload & LoggedInUser
 
 export const signJwt = async (payload: UserJwtPayload) => {
   return await new SignJWT(payload)
