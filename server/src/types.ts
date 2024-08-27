@@ -33,3 +33,5 @@ export type CommentUser = {
 }
 
 export type LoggedInUser = CommentUser
+
+export type PostCommentResponse = { message: string; alert: boolean }

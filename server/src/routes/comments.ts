@@ -207,6 +207,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           return {
             id: inserted.id,
             message: "Your comment was successfully added!",
+            alert: false,
           }
         })
       },
@@ -219,6 +220,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         response: t.Object({
           id: t.Number(),
           message: t.String(),
+          alert: t.Boolean(),
         }),
       },
     )

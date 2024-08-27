@@ -15,7 +15,7 @@ export type {
 
 export * from "./utils/date"
 
-export type { CommentUser, LoggedInUser } from "./types"
+export type { CommentUser, LoggedInUser, PostCommentResponse } from "./types"
 export { Sort } from "./types"
 
 export { SocketEventTypeEnum } from "./ws/types"

@@ -4,6 +4,7 @@ import {
   type CommentUser,
   type LoggedInUser,
   type Post,
+  PostCommentResponse,
   SocketEvent,
   SocketEventTypeEnum,
   SocketNewCommentEvent,
@@ -27,7 +28,7 @@ type State = {
 type Actions = {
   logout: () => void
   checkAuth: () => Promise<void>
-  addComment: (comment: string) => Promise<string>
+  addComment: (comment: string) => Promise<PostCommentResponse>
   likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
@@ -181,7 +182,7 @@ export const createStore = (props: CommentStoreProps) => {
         throw error
       }
 
-      return data.message
+      return data
     },
     fetchComments: async (sort = get().sort) => {
       const { data, error } = await app.api.comments.index.get({

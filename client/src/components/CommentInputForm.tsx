@@ -1,3 +1,4 @@
+import { PostCommentResponse } from "@chatfall/server"
 import React, { FC, useCallback, useState } from "react"
 import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
@@ -7,6 +8,7 @@ import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { TextAreaInput, TextInput, standardInputStyle } from "./Form"
+import { WarningSvg } from "./Svg"
 
 export type CommentInputFormProps = PropsWithClassname & {}
 
@@ -92,6 +94,7 @@ const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
         hideError={true}
         maxChars={10}
         required={true}
+        disabled={isSubmitting}
         placeholder="Enter code..."
         hideValidationIndicator={true}
       />
@@ -127,7 +130,8 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   const [focused, setFocused] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
-  const [responseAfterPosting, setResponseAfterPosting] = useState<string>()
+  const [responseAfterPosting, setResponseAfterPosting] =
+    useState<PostCommentResponse>()
   const [verifyEmailBlob, setVerifyEmailBlob] = useState<string>()
 
   const [commentText, email] = [
@@ -163,10 +167,15 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
     async (comment: string) => {
       const response = await addComment(comment)
       setResponseAfterPosting(response)
-      reset()
     },
-    [addComment, reset],
+    [addComment],
   )
+
+  const setupForFreshComment = useCallback(() => {
+    reset()
+    setVerifyEmailBlob(undefined)
+    setResponseAfterPosting(undefined)
+  }, [reset])
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -259,7 +268,17 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           onCancelVerification={onCancelEmailVerification}
         />
       ) : responseAfterPosting ? (
-        <p>{responseAfterPosting}</p>
+        <div>
+          <p className="flex flex-row justify-start items-center">
+            {responseAfterPosting.alert ? (
+              <WarningSvg className="w-4 h-4 mr-2" />
+            ) : null}
+            {responseAfterPosting.message}
+          </p>
+          <Button className="mt-4" onClick={setupForFreshComment}>
+            Continue
+          </Button>
+        </div>
       ) : (
         <form onSubmit={handleSubmit}>
           <TextAreaInput
@@ -280,6 +299,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
             <div>
               <TextInput
                 label="Email address"
+                disabled={!!isPosting}
                 field={email}
                 extraInputProps={{
                   type: "email",
