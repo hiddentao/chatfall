@@ -1,6 +1,5 @@
 import { and, asc, count, desc, eq, sql } from "drizzle-orm"
 import Elysia, { t } from "elysia"
-
 import {
   type Comment,
   commentRatings,
@@ -291,7 +290,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             [Sort.least_replies]: asc(comments.replyCount),
           }[sort]
 
-          const list = await db
+          const result = await db
             .select({
               id: comments.id,
               userId: comments.userId,
@@ -306,8 +305,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               status: comments.status,
               users_name: users.name,
               userRatings_rating: commentRatings.rating,
-              // ... other fields from commentRatings
-              // totalCount: sql<number>`count(*) over()`.as('total_count'),
+              totalCount: sql<number>`count(*) over()`.as("total_count"),
             })
             .from(posts)
             .leftJoin(comments, eq(posts.id, comments.postId))
@@ -319,13 +317,20 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 eq(commentRatings.userId, user?.id || 0),
               ),
             )
-            .where(and(eq(posts.url, canonicalUrl)))
+            .where(and(eq(posts.url, canonicalUrl), eq(comments.depth, 0)))
             .orderBy(order_by)
             .limit(Number(limit))
             .offset((Number(page) - 1) * Number(limit))
 
+          // Extract total count from the first row
+          const totalComments = Number(result[0]?.totalCount ?? 0)
+
+          // Remove totalCount from each row
+          const list = result.map(({ totalCount, ...item }) => item)
+
           const ret = {
             canonicalUrl,
+            totalComments,
             users: {} as Record<number, CommentUser>,
             comments: [] as Comment[],
             liked: {} as Record<number, boolean>,
@@ -370,6 +375,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         }),
         response: t.Object({
           canonicalUrl: t.String(),
+          totalComments: t.Number(),
           users: t.Record(
             t.Number(),
             t.Object({

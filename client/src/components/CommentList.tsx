@@ -47,7 +47,7 @@ export const CommentList: FC = () => {
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       refetch(event.target.value as Sort)
     },
-    [fetchComments],
+    [refetch],
   )
 
   const handleShowNewComments = useCallback(
@@ -55,7 +55,7 @@ export const CommentList: FC = () => {
       event.preventDefault()
       refetch(Sort.newest_first)
     },
-    [fetchComments],
+    [refetch],
   )
 
   useEffect(() => {

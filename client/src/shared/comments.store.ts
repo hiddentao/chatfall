@@ -19,6 +19,7 @@ type State = {
   sort: Sort
   users: Record<number, CommentUser>
   numNewComments: number
+  totalComments: number
   comments: Comment[]
   liked: Record<number, boolean>
   loggedInUser?: LoggedInUser
@@ -117,6 +118,7 @@ export const createStore = (props: CommentStoreProps) => {
     sort: Sort.newest_first,
     users: {},
     numNewComments: 0,
+    totalComments: 0,
     comments: [],
     liked: {},
     loggedInUser: undefined,
@@ -208,6 +210,7 @@ export const createStore = (props: CommentStoreProps) => {
       set(
         produce((state) => {
           state.numNewComments = 0 // reset new comments counter
+          state.totalComments = data.totalComments
           state.sort = sort
           state.users = data.users
           state.comments = data.comments
