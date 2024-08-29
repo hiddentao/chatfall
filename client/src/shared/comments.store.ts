@@ -3,7 +3,6 @@ import {
   type Comment,
   type CommentUser,
   type LoggedInUser,
-  type Post,
   PostCommentResponse,
   SocketEvent,
   SocketEventTypeEnum,
@@ -16,8 +15,8 @@ import { create } from "zustand"
 import { jwt } from "../lib/jwt"
 
 type State = {
+  canonicalUrl: string | null
   sort: Sort
-  post: Post | null
   users: Record<number, CommentUser>
   numNewComments: number
   comments: Comment[]
@@ -26,6 +25,7 @@ type State = {
 }
 
 type Actions = {
+  getCanonicalUrl: () => string
   logout: () => void
   checkAuth: () => Promise<void>
   addComment: (comment: string) => Promise<PostCommentResponse>
@@ -85,6 +85,10 @@ class Socket {
   }
 }
 
+const getPageUrl = () => {
+  return window.location.href
+}
+
 export const createStore = (props: CommentStoreProps) => {
   const app = createApp(props.server)
 
@@ -102,20 +106,23 @@ export const createStore = (props: CommentStoreProps) => {
         state.loggedInUser = loggedInUser
         ws.onceReady((ws) => {
           const token = jwt.getToken()?.token
-          ws.send({ type: "register", jwtToken: token })
+          ws.send({ type: "register", url: getPageUrl(), jwtToken: token })
         })
       }),
     )
   }
 
   const useStore = create<State & Actions>()((set, get) => ({
+    canonicalUrl: null,
     sort: Sort.newest_first,
-    post: null,
     users: {},
     numNewComments: 0,
     comments: [],
     liked: {},
     loggedInUser: undefined,
+    getCanonicalUrl: () => {
+      return get().canonicalUrl || getPageUrl()
+    },
     logout: () => {
       jwt.removeToken()
       _updateLoginState(set)
@@ -175,7 +182,7 @@ export const createStore = (props: CommentStoreProps) => {
     addComment: async (comment: string) => {
       const { data, error } = await app.api.comments.index.post({
         comment,
-        postId: get().post!.id,
+        url: get().getCanonicalUrl(),
       })
 
       if (error) {
@@ -187,7 +194,7 @@ export const createStore = (props: CommentStoreProps) => {
     fetchComments: async (sort = get().sort) => {
       const { data, error } = await app.api.comments.index.get({
         query: {
-          url: "test",
+          url: get().getCanonicalUrl(),
           page: "1",
           limit: "10",
           sort,
@@ -202,10 +209,10 @@ export const createStore = (props: CommentStoreProps) => {
         produce((state) => {
           state.numNewComments = 0 // reset new comments counter
           state.sort = sort
-          state.post = data.post
           state.users = data.users
           state.comments = data.comments
           state.liked = data.liked
+          state.canonicalUrl = data.canonicalUrl
         }),
       )
     },
@@ -217,11 +224,7 @@ export const createStore = (props: CommentStoreProps) => {
     switch (data.type) {
       case SocketEventTypeEnum.NewComment:
         // show immediately if it's the current user
-        // or if viewing newest first
-        if (
-          data.user.id === useStore.getState().loggedInUser?.id ||
-          useStore.getState().sort === Sort.newest_first
-        ) {
+        if (data.user.id === useStore.getState().loggedInUser?.id) {
           useStore.setState(
             produce((state) => {
               state.comments.unshift({
@@ -241,6 +244,24 @@ export const createStore = (props: CommentStoreProps) => {
       case SocketEventTypeEnum.LikeComment:
         useStore.setState(
           produce((state) => {
+            if (data.user.id === state.loggedInUser?.id) {
+              state.liked[data.data.id] = true
+            }
+            state.comments = state.comments.map((comment: Comment) => {
+              if (comment.id === data.data.id) {
+                comment.rating = data.data.rating
+              }
+              return comment
+            })
+          }),
+        )
+        break
+      case SocketEventTypeEnum.UnlikeComment:
+        useStore.setState(
+          produce((state) => {
+            if (data.user.id === state.loggedInUser?.id) {
+              state.liked[data.data.id] = false
+            }
             state.comments = state.comments.map((comment: Comment) => {
               if (comment.id === data.data.id) {
                 comment.rating = data.data.rating

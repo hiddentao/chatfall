@@ -3,7 +3,6 @@ import Elysia, { t } from "elysia"
 
 import {
   type Comment,
-  type Post,
   commentRatings,
   comments,
   posts,
@@ -12,6 +11,7 @@ import {
 import { Setting } from "../settings"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
 import { dateDiff, dateFormatDiff, dateNow } from "../utils/date"
+import { generateCanonicalUrl } from "../utils/string"
 import { SocketEventTypeEnum } from "../ws/types"
 import { execHandler, getLoggedInUser, getLoggedInUserAndAssert } from "./utils"
 
@@ -26,7 +26,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const { commentId, like } = body
           const user = getLoggedInUserAndAssert(props)
 
-          const rating = await db.transaction(async (tx) => {
+          const { rating, url, isLike } = await db.transaction(async (tx) => {
+            let isLike = true
+
             const [existing] = await tx
               .select()
               .from(commentRatings)
@@ -64,6 +66,8 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                     rating: sql`${comments.rating} - 1`,
                   })
                   .where(eq(comments.id, commentId))
+
+                isLike = false
               }
             } else {
               await tx.insert(commentRatings).values({
@@ -82,16 +86,22 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 .where(eq(comments.id, commentId))
             }
 
-            const [{ rating }] = await tx
-              .select({ rating: comments.rating })
+            const [{ url, rating }] = await tx
+              .select({
+                url: posts.url,
+                rating: comments.rating,
+              })
               .from(comments)
+              .innerJoin(posts, eq(posts.id, comments.postId))
               .where(eq(comments.id, commentId))
 
-            return rating
+            return { url, rating, isLike }
           })
 
-          ctx.sockets.broadcast({
-            type: SocketEventTypeEnum.LikeComment,
+          ctx.sockets.broadcast(url, {
+            type: isLike
+              ? SocketEventTypeEnum.LikeComment
+              : SocketEventTypeEnum.UnlikeComment,
             user: {
               id: user.id,
               name: user.name,
@@ -114,90 +124,125 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       "/",
       async ({ body, ...props }) => {
         return await execHandler(async () => {
-          const { comment, postId, parentCommentId } = body
+          const { comment, url: _url, parentCommentId } = body
           const user = getLoggedInUserAndAssert(props)
+
+          const canonicalUrl = generateCanonicalUrl(_url)
 
           if (!user) {
             throw new Error("User not logged in")
           }
 
-          // check the last time the user commented and make sure that enough time has elapsed
-          const [latestComment] = await db
-            .select({
-              createdAt: comments.createdAt,
-            })
-            .from(comments)
-            .where(
-              and(eq(comments.userId, user.id), eq(comments.postId, postId)),
-            )
-            .orderBy(desc(comments.createdAt))
-            .limit(1)
+          const inserted = await db.transaction(async (tx) => {
+            // check if post exists
+            let postId: number
 
-          if (latestComment) {
-            const latestCommentTime = new Date(
-              latestComment.createdAt,
-            ).getTime()
-            const now = new Date(dateNow()).getTime()
-            const minDelay = ctx.settings.getSetting(
-              Setting.UserNextCommentDelayMs,
-            )
-            if (dateDiff(latestCommentTime, now) < minDelay) {
-              throw new Error(
-                `You must wait ${dateFormatDiff(now, latestCommentTime + minDelay)} before commenting again!`,
-              )
+            const [post] = await tx
+              .select({
+                id: posts.id,
+              })
+              .from(posts)
+              .where(eq(posts.url, canonicalUrl))
+              .limit(1)
+
+            if (!post) {
+              // insert post
+              const [{ id }] = await tx
+                .insert(posts)
+                .values({
+                  url: canonicalUrl,
+                  createdAt: dateNow(),
+                  updatedAt: dateNow(),
+                })
+                .returning({
+                  id: posts.id,
+                })
+
+              postId = id
+            } else {
+              postId = post.id
             }
-          }
 
-          let newCommentIndex = 1
-
-          let parent: Comment | undefined
-
-          if (parentCommentId) {
-            let [parent] = await db
-              .select()
+            // check the last time the user commented and make sure that enough time has elapsed
+            const [latestComment] = await tx
+              .select({
+                createdAt: comments.createdAt,
+              })
               .from(comments)
               .where(
-                and(
-                  eq(comments.postId, postId),
-                  eq(comments.id, parentCommentId),
-                ),
+                and(eq(comments.userId, user.id), eq(comments.postId, postId)),
               )
+              .orderBy(desc(comments.createdAt))
+              .limit(1)
 
-            if (!parent) {
-              throw new Error("Parent comment not found")
+            if (latestComment) {
+              const latestCommentTime = new Date(
+                latestComment.createdAt,
+              ).getTime()
+              const now = new Date(dateNow()).getTime()
+              const minDelay = ctx.settings.getSetting(
+                Setting.UserNextCommentDelayMs,
+              )
+              if (dateDiff(latestCommentTime, now) < minDelay) {
+                throw new Error(
+                  `You must wait ${dateFormatDiff(now, latestCommentTime + minDelay)} before commenting again!`,
+                )
+              }
             }
 
-            newCommentIndex = parent.reply_count + 1
-          } else {
-            const cnt = await db
-              .select({ count: count() })
-              .from(comments)
-              .where(and(eq(comments.postId, postId), eq(comments.depth, 0)))
+            let newCommentIndex = 1
 
-            newCommentIndex = cnt[0].count + 1
-          }
+            let parent: Comment | undefined
 
-          const depth = parent ? parent.depth + 1 : 0
-          const path = parent
-            ? `${parent.path}.${newCommentIndex}`
-            : `${newCommentIndex}`
-          const createdAt = dateNow()
+            if (parentCommentId) {
+              let [parent] = await tx
+                .select()
+                .from(comments)
+                .where(
+                  and(
+                    eq(comments.postId, postId),
+                    eq(comments.id, parentCommentId),
+                  ),
+                )
 
-          const [inserted] = await db
-            .insert(comments)
-            .values({
-              userId: user.id,
-              postId: postId,
-              body: comment,
-              status: "shown",
-              depth,
-              path,
-              createdAt,
-              updatedAt: dateNow(),
-            })
-            .returning()
+              if (!parent) {
+                throw new Error("Parent comment not found")
+              }
 
-          ctx.sockets.broadcast({
+              newCommentIndex = parent.replyCount + 1
+            } else {
+              const cnt = await tx
+                .select({ count: count() })
+                .from(comments)
+                .where(and(eq(comments.postId, postId), eq(comments.depth, 0)))
+
+              newCommentIndex = cnt[0].count + 1
+            }
+
+            const depth = parent ? parent.depth + 1 : 0
+            const path = parent
+              ? `${parent.path}.${newCommentIndex}`
+              : `${newCommentIndex}`
+            const createdAt = dateNow()
+
+            const [inserted] = await tx
+              .insert(comments)
+              .values({
+                userId: user.id,
+                postId: postId,
+                body: comment,
+                status: "shown",
+                depth,
+                path,
+                createdAt,
+                updatedAt: dateNow(),
+              })
+              .returning()
+
+            return inserted
+          })
+
+          ctx.sockets.broadcast(canonicalUrl, {
             type: SocketEventTypeEnum.NewComment,
             user: {
               id: user.id,
@@ -218,7 +263,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       {
         body: t.Object({
           comment: t.String(),
-          postId: t.Number(),
+          url: t.String(),
           parentCommentId: t.Optional(t.Number()),
         }),
         response: t.Object({
@@ -233,19 +278,37 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ query, ...props }) => {
         return await execHandler(async () => {
           const user = getLoggedInUser(props)
-          const { url, page, limit, sort } = query
+          const { url: _url, page, limit, sort } = query
+
+          const canonicalUrl = generateCanonicalUrl(_url)
 
           const order_by = {
             [Sort.newest_first]: desc(comments.createdAt),
             [Sort.oldest_first]: asc(comments.createdAt),
             [Sort.highest_score]: desc(comments.rating),
             [Sort.lowest_score]: asc(comments.rating),
-            [Sort.most_replies]: desc(comments.reply_count),
-            [Sort.least_replies]: asc(comments.reply_count),
+            [Sort.most_replies]: desc(comments.replyCount),
+            [Sort.least_replies]: asc(comments.replyCount),
           }[sort]
 
           const list = await db
-            .select()
+            .select({
+              id: comments.id,
+              userId: comments.userId,
+              postId: comments.postId,
+              body: comments.body,
+              createdAt: comments.createdAt,
+              updatedAt: comments.updatedAt,
+              rating: comments.rating,
+              depth: comments.depth,
+              replyCount: comments.replyCount,
+              path: comments.path,
+              status: comments.status,
+              users_name: users.name,
+              userRatings_rating: commentRatings.rating,
+              // ... other fields from commentRatings
+              // totalCount: sql<number>`count(*) over()`.as('total_count'),
+            })
             .from(posts)
             .leftJoin(comments, eq(posts.id, comments.postId))
             .leftJoin(users, eq(users.id, comments.userId))
@@ -256,40 +319,41 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 eq(commentRatings.userId, user?.id || 0),
               ),
             )
-            .where(and(eq(posts.url, url), eq(comments.depth, 0)))
+            .where(and(eq(posts.url, canonicalUrl)))
             .orderBy(order_by)
             .limit(Number(limit))
             .offset((Number(page) - 1) * Number(limit))
 
-          const ret: {
-            post: Post | null
-            users: Record<number, CommentUser>
-            comments: Comment[]
-            liked: Record<number, boolean>
-          } = {
-            post: null,
+          const ret = {
+            canonicalUrl,
             users: {} as Record<number, CommentUser>,
             comments: [] as Comment[],
             liked: {} as Record<number, boolean>,
           }
 
           for (const c of list) {
-            if (!ret.post) {
-              ret.post = c.posts
-            }
+            if (c.id) {
+              ret.comments.push({
+                id: c.id,
+                body: c.body!,
+                userId: c.userId!,
+                postId: c.postId!,
+                createdAt: c.createdAt!,
+                updatedAt: c.updatedAt!,
+                rating: c.rating!,
+                depth: c.depth!,
+                replyCount: c.replyCount!,
+                path: c.path!,
+                status: c.status!,
+              })
 
-            if (c.users) {
-              ret.users[c.users.id] = {
-                id: c.users.id,
-                name: c.users.name,
+              ret.users[c.userId!] = {
+                id: c.userId!,
+                name: c.users_name!,
               }
-            }
 
-            if (c.comments) {
-              ret.comments.push(c.comments)
-
-              if (c.comment_ratings) {
-                ret.liked[c.comments.id] = !!c.comment_ratings.id
+              if (c.userRatings_rating) {
+                ret.liked[c.id] = true
               }
             }
           }
@@ -303,6 +367,29 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           page: t.String(),
           limit: t.String(),
           sort: t.Enum(Sort),
+        }),
+        response: t.Object({
+          canonicalUrl: t.String(),
+          users: t.Record(
+            t.Number(),
+            t.Object({
+              id: t.Number(),
+              name: t.String(),
+            }),
+          ),
+          comments: t.Array(
+            t.Object({
+              id: t.Number(),
+              userId: t.Number(),
+              postId: t.Number(),
+              body: t.String(),
+              status: t.String(),
+              depth: t.Number(),
+              replyCount: t.Number(),
+              path: t.String(),
+            }),
+          ),
+          liked: t.Record(t.Number(), t.Boolean()),
         }),
       },
     )

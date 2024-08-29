@@ -47,6 +47,7 @@
     "jose": "^5.7.0",
     "lodash.get": "^4.4.2",
     "mailgun.js": "^10.2.3",
+    "normalize-url": "^8.0.1",
     "pg": "^8.12.0",
     "picocolors": "^1.0.1"
   },

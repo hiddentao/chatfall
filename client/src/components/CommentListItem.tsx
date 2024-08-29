@@ -1,5 +1,5 @@
 import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
-import { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
@@ -38,7 +38,7 @@ export const CommentListItem: FC<CommentProps> = ({
         setUpdatingLike(false)
       }
     },
-    [c.id, liked],
+    [c.id, liked, likeComment],
   )
 
   const onHideError = useCallback(() => {
@@ -74,9 +74,9 @@ export const CommentListItem: FC<CommentProps> = ({
             )}
           </Button>
         </span>
-        {c.reply_count > 0 ? (
+        {c.replyCount ? (
           <div className="text-anchor cursor-pointer">
-            + {`${c.reply_count} replies`}
+            + {`${c.replyCount} replies`}
           </div>
         ) : null}
         {error && (

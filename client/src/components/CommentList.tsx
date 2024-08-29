@@ -17,8 +17,15 @@ export const CommentList: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")
 
-  const { numNewComments, comments, users, liked, fetchComments, sort } =
-    store.useStore()
+  const {
+    canonicalUrl,
+    numNewComments,
+    comments,
+    users,
+    liked,
+    fetchComments,
+    sort,
+  } = store.useStore()
 
   const refetch = useCallback(
     async (s?: Sort) => {
@@ -83,7 +90,7 @@ export const CommentList: FC = () => {
         </div>
       </div>
       <div className="px-1">
-        <CommentInputForm className="mt-4 mb-8 mx-6" />
+        {canonicalUrl ? <CommentInputForm className="mt-4 mb-8 mx-6" /> : null}
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {!isLoading && !error && comments.length === 0 ? (
           <p>No comments yet!</p>

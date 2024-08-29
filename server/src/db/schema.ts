@@ -65,7 +65,6 @@ export const posts = pgTable(
   {
     id: serial("id").primaryKey(),
     url: text("url").notNull().unique(),
-    title: text("title").notNull(),
     createdAt: timestamp("created_at", { mode: "string" })
       .defaultNow()
       .notNull(),
@@ -100,7 +99,7 @@ export const comments = pgTable(
     depth: integer("depth").notNull().default(0),
     path: text("path").notNull(),
     rating: integer("rating").notNull().default(0),
-    reply_count: integer("reply_count").notNull().default(0),
+    replyCount: integer("reply_count").notNull().default(0),
     createdAt: timestamp("created_at", { mode: "string" })
       .defaultNow()
       .notNull(),

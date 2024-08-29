@@ -3,6 +3,7 @@ import { type Static, t } from "elysia"
 export enum SocketEventTypeEnum {
   NewComment = "NewComment",
   LikeComment = "LikeComment",
+  UnlikeComment = "UnlikeComment",
   NewReply = "NewReply",
 }
 
@@ -17,7 +18,7 @@ export const SocketNewCommentEvent = t.Object({
   depth: t.Number(),
   path: t.String(),
   rating: t.Number(),
-  reply_count: t.Number(),
+  replyCount: t.Number(),
   updatedAt: t.String(),
   userId: t.Number(),
   postId: t.Number(),
