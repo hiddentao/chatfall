@@ -277,7 +277,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ query, ...props }) => {
         return await execHandler(async () => {
           const user = getLoggedInUser(props)
-          const { url: _url, page, limit, sort } = query
+          const { url: _url, page, sort } = query
 
           const canonicalUrl = generateCanonicalUrl(_url)
 
@@ -289,6 +289,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             [Sort.most_replies]: desc(comments.replyCount),
             [Sort.least_replies]: asc(comments.replyCount),
           }[sort]
+
+          const pageNum = Number(page)
+          const limit = ctx.settings.getSetting(Setting.CommentsPerPage)
 
           const result = await db
             .select({
@@ -319,8 +322,8 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             )
             .where(and(eq(posts.url, canonicalUrl), eq(comments.depth, 0)))
             .orderBy(order_by)
-            .limit(Number(limit))
-            .offset((Number(page) - 1) * Number(limit))
+            .limit(limit)
+            .offset((pageNum - 1) * limit)
 
           // Extract total count from the first row
           const totalComments = Number(result[0]?.totalCount ?? 0)
@@ -331,6 +334,8 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const ret = {
             canonicalUrl,
             totalComments,
+            currentPage: pageNum,
+            totalPages: Math.ceil(totalComments / limit),
             users: {} as Record<number, CommentUser>,
             comments: [] as Comment[],
             liked: {} as Record<number, boolean>,
@@ -370,12 +375,13 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         query: t.Object({
           url: t.String(),
           page: t.String(),
-          limit: t.String(),
           sort: t.Enum(Sort),
         }),
         response: t.Object({
           canonicalUrl: t.String(),
           totalComments: t.Number(),
+          totalPages: t.Number(),
+          currentPage: t.Number(),
           users: t.Record(
             t.Number(),
             t.Object({

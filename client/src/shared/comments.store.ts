@@ -20,6 +20,8 @@ type State = {
   users: Record<number, CommentUser>
   numNewComments: number
   totalComments: number
+  currentPage: number
+  totalPages: number
   comments: Comment[]
   liked: Record<number, boolean>
   loggedInUser?: LoggedInUser
@@ -119,6 +121,8 @@ export const createStore = (props: CommentStoreProps) => {
     users: {},
     numNewComments: 0,
     totalComments: 0,
+    currentPage: 1,
+    totalPages: 1,
     comments: [],
     liked: {},
     loggedInUser: undefined,
@@ -194,11 +198,13 @@ export const createStore = (props: CommentStoreProps) => {
       return data
     },
     fetchComments: async (sort = get().sort) => {
+      // if we've changed the filter then reset the paging, otherwise increment
+      const page = sort === get().sort ? get().currentPage + 1 : 1
+
       const { data, error } = await app.api.comments.index.get({
         query: {
           url: get().getCanonicalUrl(),
-          page: "1",
-          limit: "10",
+          page: `${page}`,
           sort,
         },
       })
@@ -209,13 +215,17 @@ export const createStore = (props: CommentStoreProps) => {
 
       set(
         produce((state) => {
-          state.numNewComments = 0 // reset new comments counter
           state.totalComments = data.totalComments
           state.sort = sort
           state.users = data.users
           state.comments = data.comments
           state.liked = data.liked
           state.canonicalUrl = data.canonicalUrl
+          state.totalPages = data.totalPages
+          state.currentPage = page
+          if (state.currentPage === 1) {
+            state.numNewComments = 0 // reset new comments counter if on page 1 of filter
+          }
         }),
       )
     },
