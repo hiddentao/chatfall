@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import React, { FC, useEffect, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
 import { CommentListItem } from "./CommentListItem"
@@ -97,12 +98,13 @@ export const CommentList: FC = () => {
         ) : null}
         {numNewComments ? (
           <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">
-            <p className="inline-block mr-2">
+            <div className="inline-block mr-2">
               <strong>
-                {numNewComments} new comment{numNewComments > 1 ? "s" : ""}
+                <AnimatedNumber value={numNewComments} /> new comment
+                {numNewComments > 1 ? "s" : ""}
               </strong>
               <span className="ml-2">available</span>
-            </p>
+            </div>
             <Button
               className="inline-block text-sm py-1"
               onClick={handleShowNewComments}

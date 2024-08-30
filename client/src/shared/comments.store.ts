@@ -230,10 +230,18 @@ export const createStore = (props: CommentStoreProps) => {
         if (data.user.id === useStore.getState().loggedInUser?.id) {
           useStore.setState(
             produce((state) => {
-              state.comments.unshift({
-                ...(data.data as SocketNewCommentEvent),
-              } as Comment)
-              state.users[data.user.id] = data.user
+              const newComment = data.data as SocketNewCommentEvent
+
+              const existing = (state.comments as Comment[]).find(
+                (c) => c.id === newComment.id,
+              )
+
+              if (!existing) {
+                state.comments.unshift({
+                  ...(data.data as SocketNewCommentEvent),
+                } as Comment)
+                state.users[data.user.id] = data.user
+              }
             }),
           )
         } else {

@@ -3,6 +3,7 @@ import React, { FC, useCallback, useState } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
+import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
@@ -58,7 +59,7 @@ export const CommentListItem: FC<CommentProps> = ({
       <div className="mb-2">{c.body}</div>
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
-          <span>{c.rating}</span>
+          <AnimatedNumber value={c.rating} />
           <Button
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
@@ -76,7 +77,7 @@ export const CommentListItem: FC<CommentProps> = ({
         </span>
         {c.replyCount ? (
           <div className="text-anchor cursor-pointer">
-            + {`${c.replyCount} replies`}
+            + <AnimatedNumber value={c.replyCount} /> replies
           </div>
         ) : null}
         {error && (
