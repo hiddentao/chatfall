@@ -121,8 +121,8 @@ export const createStore = (props: CommentStoreProps) => {
     users: {},
     numNewComments: 0,
     totalComments: 0,
-    currentPage: 1,
-    totalPages: 1,
+    currentPage: 0,
+    totalPages: 0,
     comments: [],
     liked: {},
     loggedInUser: undefined,
@@ -216,12 +216,21 @@ export const createStore = (props: CommentStoreProps) => {
       set(
         produce((state) => {
           state.totalComments = data.totalComments
-          state.sort = sort
-          state.users = data.users
-          state.comments = data.comments
-          state.liked = data.liked
+          // if fetching more comments, append to existing list
+          if (page > 1) {
+            Object.assign(state.users, data.users)
+            Object.assign(state.liked, data.liked)
+            state.comments = state.comments.concat(data.comments)
+          }
+          // if fetching new comments, reset the list
+          else {
+            state.users = data.users
+            state.comments = data.comments
+            state.liked = data.liked
+          }
           state.canonicalUrl = data.canonicalUrl
           state.totalPages = data.totalPages
+          state.sort = sort
           state.currentPage = page
           if (state.currentPage === 1) {
             state.numNewComments = 0 // reset new comments counter if on page 1 of filter

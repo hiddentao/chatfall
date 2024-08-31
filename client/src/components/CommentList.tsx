@@ -1,5 +1,5 @@
 import { Sort } from "@chatfall/server"
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { AnimatedNumber } from "./AnimatedNumber"
@@ -26,6 +26,8 @@ export const CommentList: FC = () => {
     liked,
     fetchComments,
     sort,
+    currentPage,
+    totalPages,
   } = store.useStore()
 
   const refetch = useCallback(
@@ -57,6 +59,19 @@ export const CommentList: FC = () => {
       refetch(Sort.newest_first)
     },
     [refetch],
+  )
+
+  const handleClickLoadMoreComments = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      refetch()
+    },
+    [refetch],
+  )
+
+  const canLoadMoreComments = useMemo(
+    () => comments.length && currentPage < totalPages,
+    [comments.length, currentPage, totalPages],
   )
 
   useEffect(() => {
@@ -125,6 +140,15 @@ export const CommentList: FC = () => {
               />
             ))}
           </ul>
+        ) : null}
+        {canLoadMoreComments ? (
+          <Button
+            className="mt-2 mb-4"
+            onClick={handleClickLoadMoreComments}
+            inProgress={isLoading}
+          >
+            Load more comments
+          </Button>
         ) : null}
       </div>
     </div>
