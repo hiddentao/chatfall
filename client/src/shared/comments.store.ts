@@ -14,16 +14,27 @@ import { produce } from "immer"
 import { create } from "zustand"
 import { jwt } from "../lib/jwt"
 
+type CommentId = number
+
+type CommentList = {
+  parentDepth: number
+  parentPath: string
+  items: number[]
+  total: number
+  // new comments by others since last fetch
+  otherUserNewItems: number[]
+  // new comments by the current user since last fetch
+  myNewItems: number[]
+}
+
 type State = {
   canonicalUrl: string | null
   sort: Sort
-  users: Record<number, CommentUser>
-  numNewComments: number
-  totalComments: number
-  currentPage: number
-  totalPages: number
-  comments: Comment[]
-  liked: Record<number, boolean>
+  users: Record<CommentId, CommentUser>
+  liked: Record<CommentId, boolean>
+  comments: Record<number, Comment>
+  replies: Record<CommentId, CommentList>
+  rootList: CommentList
   loggedInUser?: LoggedInUser
 }
 
@@ -33,7 +44,8 @@ type Actions = {
   checkAuth: () => Promise<void>
   addComment: (comment: string) => Promise<PostCommentResponse>
   likeComment: (commentId: number, like: boolean) => Promise<void>
-  fetchComments: (sort?: Sort) => Promise<void>
+  fetchComments: (sort?: Sort, skipOverride?: number) => Promise<void>
+  // fetchReplies: (commentId: number) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
   verifyEmail: (blob: string, code: string) => Promise<void>
 }
@@ -55,10 +67,11 @@ const createApp = (server: string) =>
   })
 
 type TreatyApp = ReturnType<typeof createApp>
-type TreatyAppWebsocket = ReturnType<TreatyApp["ws"]["subscribe"]>
+
+type AppWebSocket = ReturnType<TreatyApp["ws"]["subscribe"]>
 
 class Socket {
-  private ws: TreatyAppWebsocket
+  private ws: AppWebSocket
   private onReady: Promise<void>
 
   constructor(app: TreatyApp) {
@@ -77,7 +90,7 @@ class Socket {
       })
   }
 
-  async onceReady(cb: (ws: TreatyAppWebsocket) => void) {
+  async onceReady(cb: (ws: AppWebSocket) => void) {
     return this.onReady.then(() => cb(this.ws))
   }
 
@@ -119,12 +132,17 @@ export const createStore = (props: CommentStoreProps) => {
     canonicalUrl: null,
     sort: Sort.newest_first,
     users: {},
-    numNewComments: 0,
-    totalComments: 0,
-    currentPage: 0,
-    totalPages: 0,
-    comments: [],
     liked: {},
+    comments: {},
+    replies: {},
+    rootList: {
+      parentDepth: -1,
+      parentPath: "",
+      items: [],
+      total: 0,
+      otherUserNewItems: [],
+      myNewItems: [],
+    },
     loggedInUser: undefined,
     getCanonicalUrl: () => {
       return get().canonicalUrl || getPageUrl()
@@ -197,14 +215,18 @@ export const createStore = (props: CommentStoreProps) => {
 
       return data
     },
-    fetchComments: async (sort = get().sort) => {
+    fetchComments: async (sort = get().sort, skipOverride?: number) => {
       // if we've changed the filter then reset the paging, otherwise increment
-      const page = sort === get().sort ? get().currentPage + 1 : 1
+      const skip =
+        typeof skipOverride === "number"
+          ? skipOverride
+          : get().rootList.items.length
 
       const { data, error } = await app.api.comments.index.get({
         query: {
           url: get().getCanonicalUrl(),
-          page: `${page}`,
+          depth: `0`,
+          skip: `${skip}`,
           sort,
         },
       })
@@ -215,29 +237,73 @@ export const createStore = (props: CommentStoreProps) => {
 
       set(
         produce((state) => {
-          state.totalComments = data.totalComments
+          state.canonicalUrl = data.canonicalUrl
+          state.sort = sort
+
           // if fetching more comments, append to existing list
-          if (page > 1) {
+          if (skip) {
             Object.assign(state.users, data.users)
             Object.assign(state.liked, data.liked)
-            state.comments = state.comments.concat(data.comments)
+            Object.assign(state.comments, commentListToMap(data.comments))
+            appendCommentList(state.rootList, data)
           }
           // if fetching new comments, reset the list
           else {
             state.users = data.users
-            state.comments = data.comments
             state.liked = data.liked
-          }
-          state.canonicalUrl = data.canonicalUrl
-          state.totalPages = data.totalPages
-          state.sort = sort
-          state.currentPage = page
-          if (state.currentPage === 1) {
-            state.numNewComments = 0 // reset new comments counter if on page 1 of filter
+            state.comments = commentListToMap(data.comments)
+            replaceCommentList(state.rootList, data)
+            state.rootList.otherUserNewItems = []
+            state.rootList.myNewItems = []
           }
         }),
       )
     },
+    // fetchReplies: async (commentId: number) => {
+    //   const parentComment =
+    //   const existing = get().replies[commentId]
+
+    //   // if we've changed the filter then reset the paging, otherwise increment
+    //   const page = sort === get().sort ? get().currentPage + 1 : 1
+
+    //   const { data, error } = await app.api.comments.index.get({
+    //     query: {
+    //       url: get().getCanonicalUrl(),
+    //       depth: existing?.parentDepth || 0,
+    //       page: `${page}`,
+    //       sort,
+    //     },
+    //   })
+
+    //   if (error) {
+    //     throw error
+    //   }
+
+    //   set(
+    //     produce((state) => {
+    //       state.totalComments = data.totalComments
+    //       // if fetching more comments, append to existing list
+    //       if (page > 1) {
+    //         Object.assign(state.users, data.users)
+    //         Object.assign(state.liked, data.liked)
+    //         state.comments = state.comments.concat(data.comments)
+    //       }
+    //       // if fetching new comments, reset the list
+    //       else {
+    //         state.users = data.users
+    //         state.comments = data.comments
+    //         state.liked = data.liked
+    //       }
+    //       state.canonicalUrl = data.canonicalUrl
+    //       state.totalPages = data.totalPages
+    //       state.sort = sort
+    //       state.currentPage = page
+    //       if (state.currentPage === 1) {
+    //         state.numNewComments = 0 // reset new comments counter if on page 1 of filter
+    //       }
+    //     }),
+    //   )
+    // },
   }))
 
   ws.onMessage((data) => {
@@ -245,31 +311,32 @@ export const createStore = (props: CommentStoreProps) => {
 
     switch (data.type) {
       case SocketEventTypeEnum.NewComment:
-        // show immediately if it's the current user
-        if (data.user.id === useStore.getState().loggedInUser?.id) {
-          useStore.setState(
-            produce((state) => {
-              const newComment = data.data as SocketNewCommentEvent
+        useStore.setState(
+          produce((state) => {
+            const newComment = data.data as SocketNewCommentEvent
+            state.comments[newComment.id] = newComment
+            state.users[data.user.id] = data.user
 
-              const existing = (state.comments as Comment[]).find(
-                (c) => c.id === newComment.id,
+            // if the comment is from the current user
+            if (data.user.id === state.loggedInUser?.id) {
+              const existing = (state.rootList.myNewItems as number[]).find(
+                (c) => c === newComment.id,
               )
 
               if (!existing) {
-                state.comments.unshift({
-                  ...(data.data as SocketNewCommentEvent),
-                } as Comment)
-                state.users[data.user.id] = data.user
+                state.rootList.myNewItems.unshift(newComment.id)
               }
-            }),
-          )
-        } else {
-          useStore.setState(
-            produce((state) => {
-              state.numNewComments++
-            }),
-          )
-        }
+            } else {
+              const existing = (
+                state.rootList.otherUserNewItems as number[]
+              ).find((c) => c === newComment.id)
+
+              if (!existing) {
+                state.rootList.otherUserNewItems.unshift(newComment.id)
+              }
+            }
+          }),
+        )
         break
       case SocketEventTypeEnum.LikeComment:
         useStore.setState(
@@ -277,12 +344,7 @@ export const createStore = (props: CommentStoreProps) => {
             if (data.user.id === state.loggedInUser?.id) {
               state.liked[data.data.id] = true
             }
-            state.comments = state.comments.map((comment: Comment) => {
-              if (comment.id === data.data.id) {
-                comment.rating = data.data.rating
-              }
-              return comment
-            })
+            state.comments[data.data.id].rating = data.data.rating
           }),
         )
         break
@@ -292,12 +354,7 @@ export const createStore = (props: CommentStoreProps) => {
             if (data.user.id === state.loggedInUser?.id) {
               state.liked[data.data.id] = false
             }
-            state.comments = state.comments.map((comment: Comment) => {
-              if (comment.id === data.data.id) {
-                comment.rating = data.data.rating
-              }
-              return comment
-            })
+            state.comments[data.data.id].rating = data.data.rating
           }),
         )
         break
@@ -308,3 +365,40 @@ export const createStore = (props: CommentStoreProps) => {
 }
 
 export type CommentStore = ReturnType<typeof createStore>
+
+const commentListToMap = (comments: Comment[]) => {
+  return comments.reduce(
+    (acc, c) => {
+      acc[c.id] = c
+      return acc
+    },
+    {} as Record<CommentId, Comment>,
+  )
+}
+
+const replaceCommentList = (
+  list: CommentList,
+  data: {
+    comments: Comment[]
+    totalComments: number
+  },
+) => {
+  const { comments, totalComments } = data
+  list.items = comments.map((c) => c.id)
+  list.total = totalComments
+}
+
+const appendCommentList = (
+  list: CommentList,
+  data: {
+    comments: Comment[]
+    totalComments: number
+  },
+) => {
+  const { comments, totalComments } = data
+  const newItems = comments
+    .filter((c) => !list.items.includes(c.id))
+    .map((c) => c.id)
+  list.items = list.items.concat(newItems)
+  list.total = totalComments
+}

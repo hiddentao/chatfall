@@ -7,7 +7,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { LikeSvg, LikedSvg } from "./Svg"
+import { LikeSvg, LikedSvg, ReplySvg, RightSvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
   comment: Comment
@@ -63,7 +63,7 @@ export const CommentListItem: FC<CommentProps> = ({
           <Button
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
-            title="Rate"
+            title="Like/unlike"
             onClick={handleLike}
           >
             {updatingLike ? (
@@ -76,9 +76,19 @@ export const CommentListItem: FC<CommentProps> = ({
           </Button>
         </span>
         {c.replyCount ? (
-          <div className="text-anchor cursor-pointer">
-            + <AnimatedNumber value={c.replyCount} /> replies
-          </div>
+          <Button
+            variant="link"
+            className="ml-4 inline-flex justify-start items-center"
+            title="View comments"
+          >
+            <AnimatedNumber value={c.replyCount} />
+            <div className="svg-container w-4 h-4 ml-1">
+              <ReplySvg />
+            </div>
+            <div className="svg-container w-4 h-4 ml-1">
+              <RightSvg />
+            </div>
+          </Button>
         ) : null}
         {error && (
           <ErrorBox className="mt-2" hideError={onHideError}>

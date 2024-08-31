@@ -20,23 +20,21 @@ export const CommentList: FC = () => {
 
   const {
     canonicalUrl,
-    numNewComments,
     comments,
+    rootList,
     users,
     liked,
     fetchComments,
     sort,
-    currentPage,
-    totalPages,
   } = store.useStore()
 
   const refetch = useCallback(
-    async (s?: Sort) => {
+    async (s?: Sort, skipOverride?: number) => {
       setIsLoading(true)
       setError("")
 
       try {
-        await fetchComments(s)
+        await fetchComments(s, skipOverride)
       } catch (error: any) {
         setError(error.toString())
       } finally {
@@ -48,7 +46,7 @@ export const CommentList: FC = () => {
 
   const handleSortChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
-      refetch(event.target.value as Sort)
+      refetch(event.target.value as Sort, 0)
     },
     [refetch],
   )
@@ -56,7 +54,7 @@ export const CommentList: FC = () => {
   const handleShowNewComments = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
-      refetch(Sort.newest_first)
+      refetch(Sort.newest_first, 0)
     },
     [refetch],
   )
@@ -70,9 +68,17 @@ export const CommentList: FC = () => {
   )
 
   const canLoadMoreComments = useMemo(
-    () => comments.length && currentPage < totalPages,
-    [comments.length, currentPage, totalPages],
+    () => rootList.items.length < rootList.total,
+    [rootList.items.length, rootList.total],
   )
+
+  const allItems = useMemo(() => {
+    const items = [...rootList.items]
+    if (rootList.myNewItems.length) {
+      items.unshift(...rootList.myNewItems)
+    }
+    return items
+  }, [rootList.items, rootList.myNewItems])
 
   useEffect(() => {
     refetch()
@@ -108,15 +114,16 @@ export const CommentList: FC = () => {
       <div className="px-1">
         {canonicalUrl ? <CommentInputForm className="mt-4 mb-8 mx-6" /> : null}
         {error ? <ErrorBox>{error}</ErrorBox> : null}
-        {!isLoading && !error && comments.length === 0 ? (
+        {!isLoading && !error && rootList.items.length === 0 ? (
           <p>No comments yet!</p>
         ) : null}
-        {numNewComments ? (
+        {rootList.otherUserNewItems.length ? (
           <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">
             <div className="inline-block mr-2">
               <strong>
-                <AnimatedNumber value={numNewComments} /> new comment
-                {numNewComments > 1 ? "s" : ""}
+                <AnimatedNumber value={rootList.otherUserNewItems.length} /> new
+                comment
+                {rootList.otherUserNewItems.length > 1 ? "s" : ""}
               </strong>
               <span className="ml-2">available</span>
             </div>
@@ -128,15 +135,15 @@ export const CommentList: FC = () => {
             </Button>
           </div>
         ) : null}
-        {!error && comments.length ? (
+        {!error && rootList.items.length ? (
           <ul className="flex flex-col">
-            {comments.map((c) => (
+            {allItems.map((c) => (
               <CommentListItem
-                key={c.id}
+                key={c}
                 className="mb-9"
-                comment={c}
-                user={users[c.userId]}
-                liked={liked[c.id]}
+                comment={comments[c]}
+                user={users[comments[c].userId]}
+                liked={liked[c]}
               />
             ))}
           </ul>

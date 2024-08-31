@@ -83,6 +83,11 @@ export type Post = InferSelectModel<typeof posts>
 export type PostToInsert = InferInsertModel<typeof posts>
 
 export const commentStatus = pgEnum("status", ["shown", "hidden", "flagged"])
+export enum commentStatusEnum {
+  shown = "shown",
+  hidden = "hidden",
+  flagged = "flagged",
+}
 
 export const comments = pgTable(
   "comments",

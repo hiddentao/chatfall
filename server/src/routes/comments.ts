@@ -3,6 +3,7 @@ import Elysia, { t } from "elysia"
 import {
   type Comment,
   commentRatings,
+  commentStatusEnum,
   comments,
   posts,
   users,
@@ -277,7 +278,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ query, ...props }) => {
         return await execHandler(async () => {
           const user = getLoggedInUser(props)
-          const { url: _url, page, sort } = query
+          const { url: _url, skip, sort, depth } = query
 
           const canonicalUrl = generateCanonicalUrl(_url)
 
@@ -290,7 +291,6 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             [Sort.least_replies]: asc(comments.replyCount),
           }[sort]
 
-          const pageNum = Number(page)
           const limit = ctx.settings.getSetting(Setting.CommentsPerPage)
 
           const result = await db
@@ -320,10 +320,15 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 eq(commentRatings.userId, user?.id || 0),
               ),
             )
-            .where(and(eq(posts.url, canonicalUrl), eq(comments.depth, 0)))
+            .where(
+              and(
+                eq(posts.url, canonicalUrl),
+                eq(comments.depth, Number(depth)),
+              ),
+            )
             .orderBy(order_by)
             .limit(limit)
-            .offset((pageNum - 1) * limit)
+            .offset(Number(skip))
 
           // Extract total count from the first row
           const totalComments = Number(result[0]?.totalCount ?? 0)
@@ -334,8 +339,6 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const ret = {
             canonicalUrl,
             totalComments,
-            currentPage: pageNum,
-            totalPages: Math.ceil(totalComments / limit),
             users: {} as Record<number, CommentUser>,
             comments: [] as Comment[],
             liked: {} as Record<number, boolean>,
@@ -374,14 +377,13 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       {
         query: t.Object({
           url: t.String(),
-          page: t.String(),
+          depth: t.String(),
+          skip: t.String(),
           sort: t.Enum(Sort),
         }),
         response: t.Object({
           canonicalUrl: t.String(),
           totalComments: t.Number(),
-          totalPages: t.Number(),
-          currentPage: t.Number(),
           users: t.Record(
             t.Number(),
             t.Object({
@@ -395,10 +397,13 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               userId: t.Number(),
               postId: t.Number(),
               body: t.String(),
-              status: t.String(),
+              status: t.Enum(commentStatusEnum),
               depth: t.Number(),
+              rating: t.Number(),
               replyCount: t.Number(),
               path: t.String(),
+              createdAt: t.String(),
+              updatedAt: t.String(),
             }),
           ),
           liked: t.Record(t.Number(), t.Boolean()),
