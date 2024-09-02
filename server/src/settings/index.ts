@@ -6,6 +6,7 @@ import type { LogInterface } from "../lib/logger"
 
 export enum Setting {
   CommentsPerPage = "commentsPerPage",
+  MaxCommentDepth = "maxCommentDepth",
   UserNextCommentDelayMs = "userNextCommentDelayMs",
   BlacklistedWords = "blacklistedWords",
   BlacklistedEmails = "blacklistedEmails",
@@ -17,6 +18,7 @@ export enum Setting {
 // Define a mapped type for setting values
 type SettingValueMap = {
   [Setting.CommentsPerPage]: number
+  [Setting.MaxCommentDepth]: number
   [Setting.UserNextCommentDelayMs]: number
   [Setting.BlacklistedWords]: string[]
   [Setting.BlacklistedEmails]: string[]
@@ -35,6 +37,7 @@ export class SettingsManager {
   private db: Database
   private settings: Record<string, SettingValueRaw> = {
     [Setting.CommentsPerPage]: 10,
+    [Setting.MaxCommentDepth]: 2,
     [Setting.UserNextCommentDelayMs]: 60000,
     [Setting.BlacklistedWords]: [],
     [Setting.BlacklistedEmails]: [],

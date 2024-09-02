@@ -8,6 +8,10 @@ export const ONE_YEAR = 365 * ONE_DAY
 
 export type RawDate = Date | string | number
 
+const pad = (n: number): string => {
+  return n < 10 ? `0${n}` : n.toString()
+}
+
 const toDate = (date: RawDate): Date => {
   let f: Date
   if (typeof date === "string") {
@@ -63,7 +67,7 @@ export const formatCommentTime = (date: RawDate): string => {
 
   if (diffDays(date, now) > 7) {
     const d = new Date(date)
-    return `${d.getDay()} ${d.toLocaleString("default", { month: "short" })} ${d.getFullYear()} ${d.getHours()}:${d.getMinutes()}`
+    return `${d.getDate()} ${d.toLocaleString("default", { month: "short" })} ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
   } else {
     return `${dateFormatDiff(date, now)} ago`
   }

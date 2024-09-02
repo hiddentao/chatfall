@@ -45,7 +45,7 @@ type Actions = {
   addComment: (comment: string) => Promise<PostCommentResponse>
   likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort, skipOverride?: number) => Promise<void>
-  // fetchReplies: (commentId: number) => Promise<void>
+  fetchReplies: (commentId: number) => Promise<void>
   loginEmail: (email: string) => Promise<{ blob: string }>
   verifyEmail: (blob: string, code: string) => Promise<void>
 }
@@ -128,21 +128,25 @@ export const createStore = (props: CommentStoreProps) => {
     )
   }
 
-  const useStore = create<State & Actions>()((set, get) => ({
-    canonicalUrl: null,
-    sort: Sort.newest_first,
-    users: {},
-    liked: {},
-    comments: {},
-    replies: {},
-    rootList: {
-      parentDepth: -1,
-      parentPath: "",
+  const createCommentList = (parentDepth: number, parentPath: string) => {
+    return {
+      parentDepth,
+      parentPath,
       items: [],
       total: 0,
       otherUserNewItems: [],
       myNewItems: [],
-    },
+    }
+  }
+
+  const useStore = create<State & Actions>()((set, get) => ({
+    canonicalUrl: null,
+    sort: Sort.most_replies,
+    users: {},
+    liked: {},
+    comments: {},
+    replies: {},
+    rootList: createCommentList(-1, ""),
     loggedInUser: undefined,
     getCanonicalUrl: () => {
       return get().canonicalUrl || getPageUrl()
@@ -259,51 +263,54 @@ export const createStore = (props: CommentStoreProps) => {
         }),
       )
     },
-    // fetchReplies: async (commentId: number) => {
-    //   const parentComment =
-    //   const existing = get().replies[commentId]
+    fetchReplies: async (parentCommentId: number) => {
+      const existing = get().replies[parentCommentId]
 
-    //   // if we've changed the filter then reset the paging, otherwise increment
-    //   const page = sort === get().sort ? get().currentPage + 1 : 1
+      const parentDepth = existing
+        ? existing.parentDepth
+        : get().comments[parentCommentId].depth
 
-    //   const { data, error } = await app.api.comments.index.get({
-    //     query: {
-    //       url: get().getCanonicalUrl(),
-    //       depth: existing?.parentDepth || 0,
-    //       page: `${page}`,
-    //       sort,
-    //     },
-    //   })
+      const parentPath = existing
+        ? existing.parentPath
+        : get().comments[parentCommentId].path
 
-    //   if (error) {
-    //     throw error
-    //   }
+      const skip = existing ? existing.items.length : 0
 
-    //   set(
-    //     produce((state) => {
-    //       state.totalComments = data.totalComments
-    //       // if fetching more comments, append to existing list
-    //       if (page > 1) {
-    //         Object.assign(state.users, data.users)
-    //         Object.assign(state.liked, data.liked)
-    //         state.comments = state.comments.concat(data.comments)
-    //       }
-    //       // if fetching new comments, reset the list
-    //       else {
-    //         state.users = data.users
-    //         state.comments = data.comments
-    //         state.liked = data.liked
-    //       }
-    //       state.canonicalUrl = data.canonicalUrl
-    //       state.totalPages = data.totalPages
-    //       state.sort = sort
-    //       state.currentPage = page
-    //       if (state.currentPage === 1) {
-    //         state.numNewComments = 0 // reset new comments counter if on page 1 of filter
-    //       }
-    //     }),
-    //   )
-    // },
+      const { data, error } = await app.api.comments.index.get({
+        query: {
+          url: get().getCanonicalUrl(),
+          depth: `${parentDepth + 1}`,
+          pathPrefix: `${parentPath}.`,
+          skip: `${skip}`,
+          sort: Sort.oldest_first,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      set(
+        produce((state) => {
+          Object.assign(state.users, data.users)
+          Object.assign(state.liked, data.liked)
+          Object.assign(state.comments, commentListToMap(data.comments))
+
+          // if fetching more replies, append to existing list
+          if (skip) {
+            appendCommentList(state.replies[parentCommentId], data)
+          }
+          // if fetching new replies, reset the list
+          else {
+            state.replies[parentCommentId] = createCommentList(
+              parentDepth,
+              parentPath,
+            )
+            replaceCommentList(state.replies[parentCommentId], data)
+          }
+        }),
+      )
+    },
   }))
 
   ws.onMessage((data) => {

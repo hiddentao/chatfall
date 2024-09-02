@@ -79,24 +79,24 @@ const main = async () => {
     })
   }
 
-  for (let depth = 1; depth <= 5; depth++) {
+  const maxDepth = 2
+
+  for (let depth = 1; depth <= maxDepth; depth++) {
     const pathPrefixStr = Array.from({ length: depth }, (_) => "1").join(".")
     for (let j = 1; j <= 20; j++) {
+      const d = new Date(2023, depth + 1, j).toUTCString()
+
       commentData.push({
         userId: uList[faker.number.int({ min: 0, max: uList.length - 1 })],
         postId: p.id,
         body: faker.lorem.paragraph(),
         depth: depth,
         path: `${pathPrefixStr}.${j}`,
-        replyCount: j === 1 && depth < 5 ? 20 : 0,
+        replyCount: j === 1 && depth < maxDepth ? 20 : 0,
         rating: faker.number.int({ min: 0, max: 100 }),
         status: j > 1 && Math.random() > 0.9 ? "flagged" : "shown",
-        createdAt: faker.date
-          .between({
-            from: new Date(2023, depth + 1, 1),
-            to: new Date(2023, depth + 2, 1),
-          })
-          .toUTCString(),
+        createdAt: d,
+        updatedAt: d,
       })
     }
   }

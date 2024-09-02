@@ -1,5 +1,5 @@
 import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
-import React, { FC, useCallback, useState } from "react"
+import React, { FC, useCallback, useMemo, useState } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
@@ -7,7 +7,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { LikeSvg, LikedSvg, ReplySvg, RightSvg } from "./Svg"
+import { LeftSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
   comment: Comment
@@ -22,9 +22,13 @@ export const CommentListItem: FC<CommentProps> = ({
   liked,
 }) => {
   const { store } = useGlobalContext()
-  const { likeComment } = store.useStore()
+  const { likeComment, fetchReplies, ...s } = store.useStore()
+  const [showingReplies, setShowingReplies] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
+  const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
+
+  const myReplies = useMemo(() => s.replies[c.id] || [], [s.replies, c.id])
 
   const handleLike = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,6 +44,25 @@ export const CommentListItem: FC<CommentProps> = ({
       }
     },
     [c.id, liked, likeComment],
+  )
+
+  const handleToggleReplies = useCallback(
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      try {
+        setShowingReplies((prev) => !prev)
+        if (!showingReplies && !s.replies[c.id]) {
+          setLoadingReplies(true)
+          setError("")
+          await fetchReplies(c.id)
+        }
+      } catch (err: any) {
+        setError(err.toString())
+      } finally {
+        setLoadingReplies(false)
+      }
+    },
+    [c.id, fetchReplies, showingReplies],
   )
 
   const onHideError = useCallback(() => {
@@ -79,23 +102,41 @@ export const CommentListItem: FC<CommentProps> = ({
           <Button
             variant="link"
             className="ml-4 inline-flex justify-start items-center"
-            title="View comments"
+            title={showingReplies ? "Hide replies" : "Show replies"}
+            onClick={handleToggleReplies}
           >
             <AnimatedNumber value={c.replyCount} />
             <div className="svg-container w-4 h-4 ml-1">
               <ReplySvg />
             </div>
-            <div className="svg-container w-4 h-4 ml-1">
-              <RightSvg />
-            </div>
+            {showingReplies ? (
+              <div className="svg-container w-4 h-4 ml-1">{<LeftSvg />}</div>
+            ) : null}
           </Button>
         ) : null}
-        {error && (
-          <ErrorBox className="mt-2" hideError={onHideError}>
-            {error}
-          </ErrorBox>
-        )}
       </div>
+      {showingReplies ? (
+        loadingReplies ? (
+          <Loading className="mt-4 ml-4" />
+        ) : myReplies ? (
+          <ul className="flex flex-col mt-6 ml-12">
+            {myReplies.items.map((r) => (
+              <CommentListItem
+                key={r}
+                className="mb-8"
+                comment={s.comments[r]}
+                user={s.users[s.comments[r].userId]}
+                liked={s.liked[r]}
+              />
+            ))}
+          </ul>
+        ) : null
+      ) : null}
+      {error && (
+        <ErrorBox className="mt-2" hideError={onHideError}>
+          {error}
+        </ErrorBox>
+      )}
     </li>
   )
 }

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm"
+import { and, asc, count, desc, eq, like, sql } from "drizzle-orm"
 import Elysia, { t } from "elysia"
 import {
   type Comment,
@@ -278,7 +278,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       async ({ query, ...props }) => {
         return await execHandler(async () => {
           const user = getLoggedInUser(props)
-          const { url: _url, skip, sort, depth } = query
+          const { url: _url, skip, sort, depth, pathPrefix } = query
 
           const canonicalUrl = generateCanonicalUrl(_url)
 
@@ -324,6 +324,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               and(
                 eq(posts.url, canonicalUrl),
                 eq(comments.depth, Number(depth)),
+                like(comments.path, `${pathPrefix || ""}%`),
               ),
             )
             .orderBy(order_by)
@@ -378,6 +379,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         query: t.Object({
           url: t.String(),
           depth: t.String(),
+          pathPrefix: t.Optional(t.String()),
           skip: t.String(),
           sort: t.Enum(Sort),
         }),
