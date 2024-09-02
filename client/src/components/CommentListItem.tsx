@@ -28,7 +28,8 @@ export const CommentListItem: FC<CommentProps> = ({
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
 
-  const myReplies = useMemo(() => s.replies[c.id] || [], [s.replies, c.id])
+  const replyDivBgOpacity = useMemo(() => 0.05 * (c.depth + 1), [c.depth])
+  const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
 
   const handleLike = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -62,7 +63,7 @@ export const CommentListItem: FC<CommentProps> = ({
         setLoadingReplies(false)
       }
     },
-    [c.id, fetchReplies, showingReplies],
+    [c.id, fetchReplies, showingReplies, s.replies],
   )
 
   const onHideError = useCallback(() => {
@@ -118,19 +119,30 @@ export const CommentListItem: FC<CommentProps> = ({
       {showingReplies ? (
         loadingReplies ? (
           <Loading className="mt-4 ml-4" />
-        ) : myReplies ? (
-          <ul className="flex flex-col mt-6 ml-12">
-            {myReplies.items.map((r) => (
-              <CommentListItem
-                key={r}
-                className="mb-8"
-                comment={s.comments[r]}
-                user={s.users[s.comments[r].userId]}
-                liked={s.liked[r]}
-              />
-            ))}
-          </ul>
-        ) : null
+        ) : (
+          <>
+            {myReplies ? (
+              <div
+                className="mt-3 ml-8 p-4"
+                style={{
+                  backgroundColor: `rgba(0, 0, 0, ${replyDivBgOpacity})`,
+                }}
+              >
+                <ul className="flex flex-col">
+                  {myReplies.items.map((r) => (
+                    <CommentListItem
+                      key={r}
+                      className="mb-8 last-of-type:mb-0"
+                      comment={s.comments[r]}
+                      user={s.users[s.comments[r].userId]}
+                      liked={s.liked[r]}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </>
+        )
       ) : null}
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
