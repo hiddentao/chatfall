@@ -5,6 +5,7 @@ import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
+import { CommentInputForm } from "./CommentInputForm"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { LoginWrapper, LoginWrapperChildProps } from "./Login"
@@ -142,6 +143,12 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
                       liked={s.liked[r]}
                     />
                   ))}
+                  <CommentInputForm
+                    className="mt-4 mx-6"
+                    parentCommentId={c.id}
+                    commentFieldPlaceholder="Add reply..."
+                    commentFieldTitle="Reply"
+                  />
                 </ul>
               </div>
             ) : null}

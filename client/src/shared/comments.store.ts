@@ -42,7 +42,10 @@ type Actions = {
   getCanonicalUrl: () => string
   logout: () => void
   checkAuth: () => Promise<void>
-  addComment: (comment: string) => Promise<PostCommentResponse>
+  addComment: (
+    comment: string,
+    parentCommentId?: number,
+  ) => Promise<PostCommentResponse>
   likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort, skipOverride?: number) => Promise<void>
   fetchReplies: (commentId: number) => Promise<void>
@@ -207,9 +210,10 @@ export const createStore = (props: CommentStoreProps) => {
         throw error
       }
     },
-    addComment: async (comment: string) => {
+    addComment: async (comment: string, parentCommentId?: number) => {
       const { data, error } = await app.api.comments.index.post({
         comment,
+        parentCommentId: parentCommentId ? `${parentCommentId}` : undefined,
         url: get().getCanonicalUrl(),
       })
 

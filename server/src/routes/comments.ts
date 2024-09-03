@@ -201,7 +201,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 .where(
                   and(
                     eq(comments.postId, postId),
-                    eq(comments.id, parentCommentId),
+                    eq(comments.id, Number(parentCommentId)),
                   ),
                 )
 
@@ -255,7 +255,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
           return {
             id: inserted.id,
-            message: "Your comment was successfully added!",
+            message: parentCommentId
+              ? "Your reply was successfully added!"
+              : "Your comment was successfully added!",
             alert: false,
           }
         })
@@ -264,7 +266,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         body: t.Object({
           comment: t.String(),
           url: t.String(),
-          parentCommentId: t.Optional(t.Number()),
+          parentCommentId: t.Optional(t.String()),
         }),
         response: t.Object({
           id: t.Number(),

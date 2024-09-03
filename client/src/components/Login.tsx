@@ -78,7 +78,6 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
       <TextInput
         label="Verification code"
         field={code}
-        className="mt-8"
         inputClassname={cn(standardInputStyle, "max-w-full")}
         hideTooltip={true}
         hideError={true}
@@ -229,6 +228,7 @@ export const LoginForm: FC<
         className,
       )}
     >
+      <p className="mb-4">You need to login first.</p>
       <LoginEmailForm onEmailVerified={onLoginComplete} />
     </FormDiv>
   )
@@ -272,10 +272,10 @@ export const LoginWrapper: FC<{ children: LoginWrapperChild }> = ({
   }, [loginPromiseResolver])
 
   const renderedLoginForm = useMemo(() => {
-    return (
+    return loggedInUser ? null : (
       <LoginForm showForm={showLoginForm} onLoginComplete={onLoginComplete} />
     )
-  }, [showLoginForm, onLoginComplete])
+  }, [showLoginForm, onLoginComplete, loggedInUser])
 
   return children({ login, showLoginForm, renderedLoginForm })
 }

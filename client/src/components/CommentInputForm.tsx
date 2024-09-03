@@ -10,7 +10,11 @@ import { FormDiv, TextAreaInput, standardInputStyle } from "./Form"
 import { EmailTextInput, VerifyEmailForm, validateEmail } from "./Login"
 import { WarningSvg } from "./Svg"
 
-export type CommentInputFormProps = PropsWithClassname & {}
+export type CommentInputFormProps = PropsWithClassname & {
+  parentCommentId?: number
+  commentFieldPlaceholder?: string
+  commentFieldTitle?: string
+}
 
 const validateCommentText = (value: string) => {
   if (value.trim() === "") {
@@ -18,7 +22,12 @@ const validateCommentText = (value: string) => {
   }
 }
 
-export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
+export const CommentInputForm: FC<CommentInputFormProps> = ({
+  className,
+  parentCommentId,
+  commentFieldPlaceholder,
+  commentFieldTitle,
+}) => {
   const { store } = useGlobalContext()
   const { loggedInUser, addComment, loginEmail, logout } = store.useStore()
   const [focused, setFocused] = useState<boolean>(false)
@@ -59,10 +68,10 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
 
   const postComment = useCallback(
     async (comment: string) => {
-      const response = await addComment(comment)
+      const response = await addComment(comment, parentCommentId)
       setResponseAfterPosting(response)
     },
-    [addComment],
+    [addComment, parentCommentId],
   )
 
   const setupForFreshComment = useCallback(() => {
@@ -156,7 +165,6 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       ) : null}
       {verifyEmailBlob && !loggedInUser ? (
         <VerifyEmailForm
-          className="mt-4"
           blob={verifyEmailBlob}
           onVerified={onEmailVerified}
           onCancelVerification={onCancelEmailVerification}
@@ -176,11 +184,11 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
       ) : (
         <form onSubmit={handleSubmit}>
           <TextAreaInput
-            label={focused ? "Comment" : ""}
+            label={focused ? commentFieldTitle || "Comment" : ""}
             field={commentText}
             hideError={true}
             required={true}
-            placeholder="Add comment..."
+            placeholder={commentFieldPlaceholder || "Add comment..."}
             hideValidationIndicator={true}
             inputClassname={cn("w-full", {
               "bg-transparent border-0 italic": !focused,
