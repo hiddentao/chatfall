@@ -1,13 +1,13 @@
 import { PostCommentResponse } from "@chatfall/server"
 import React, { FC, useCallback, useState } from "react"
-import isEmail from "validator/es/lib/isEmail"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
-import { TextAreaInput, TextInput, standardInputStyle } from "./Form"
+import { FormDiv, TextAreaInput, standardInputStyle } from "./Form"
+import { EmailTextInput, VerifyEmailForm, validateEmail } from "./Login"
 import { WarningSvg } from "./Svg"
 
 export type CommentInputFormProps = PropsWithClassname & {}
@@ -16,112 +16,6 @@ const validateCommentText = (value: string) => {
   if (value.trim() === "") {
     return "Comment cannot be empty"
   }
-}
-
-const validateEmail = (value: string) => {
-  if (!isEmail(value)) {
-    return "Must be an email address"
-  }
-}
-
-type VerifyEmailFormProps = PropsWithClassname & {
-  blob: string
-  onVerified: () => void
-  onCancelVerification: () => void
-}
-
-const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
-  className,
-  blob,
-  onVerified,
-  onCancelVerification,
-}) => {
-  const { store } = useGlobalContext()
-  const { verifyEmail } = store.useStore()
-
-  const [code] = [
-    useField({
-      name: "code",
-      initialValue: "",
-    }),
-  ]
-
-  const { valid, reset } = useForm({
-    fields: [code],
-  })
-
-  const [error, setError] = useState<string>("")
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      try {
-        setIsSubmitting(true)
-        setError("")
-        await verifyEmail(blob, code.value)
-        reset()
-        onVerified()
-      } catch (err: any) {
-        setError(err.toString())
-      } finally {
-        setIsSubmitting(false)
-      }
-    },
-    [blob, code.value, onVerified, reset, verifyEmail],
-  )
-
-  const onCancelVerifyEmailCode = useCallback(() => {
-    setError("")
-    onCancelVerification()
-  }, [onCancelVerification])
-
-  const onHideError = useCallback(() => {
-    setError("")
-  }, [])
-
-  return (
-    <form className={className} onSubmit={handleSubmit}>
-      <p className="mb-4">
-        Please enter the verification code we just sent to your email address:
-      </p>
-      <TextInput
-        label="Verification code"
-        field={code}
-        className="mt-8"
-        inputClassname={cn(standardInputStyle, "max-w-full")}
-        hideTooltip={true}
-        hideError={true}
-        maxChars={10}
-        required={true}
-        disabled={isSubmitting}
-        placeholder="Enter code..."
-        hideValidationIndicator={true}
-      />
-      <div className="mt-8 flex flex-row justify-start items-center">
-        <Button
-          disabled={!valid}
-          inProgress={isSubmitting}
-          className="ml-2 inline-block"
-        >
-          Verify
-        </Button>
-        <Button
-          variant="link"
-          className="inline-block ml-2 text-xs"
-          title="Cancel and back"
-          onClick={onCancelVerifyEmailCode}
-        >
-          Cancel
-        </Button>
-      </div>
-      {error && (
-        <ErrorBox className="mt-2" hideError={onHideError}>
-          {error}
-        </ErrorBox>
-      )}
-    </form>
-  )
 }
 
 export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
@@ -238,9 +132,9 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
   }, [])
 
   return (
-    <div
+    <FormDiv
       className={cn(
-        "flex flex-col p-4 bg-yellow-100 border border-yellow-500 rounded-md max-h-14 transition-max-height duration-1000 ease-in-out overflow-hidden relative",
+        "max-h-14 p-4 border",
         {
           "max-h-96 overflow-y-scroll": focused,
         },
@@ -297,24 +191,12 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           />
           {focused ? (
             <div>
-              <TextInput
-                label="Email address"
-                disabled={!!isPosting}
+              <EmailTextInput
                 field={email}
-                extraInputProps={{
-                  type: "email",
-                  size: 35,
-                }}
                 className={cn("mt-8", {
                   hidden: !!loggedInUser,
                 })}
-                inputClassname={cn(standardInputStyle, "max-w-full")}
-                hideTooltip={true}
-                hideError={true}
-                maxChars={64}
-                required={true}
-                placeholder="Email address..."
-                hideValidationIndicator={true}
+                isDisabled={!!isPosting}
               />
               <Button
                 disabled={!valid}
@@ -332,6 +214,6 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({ className }) => {
           ) : null}
         </form>
       )}
-    </div>
+    </FormDiv>
   )
 }

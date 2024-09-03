@@ -1,8 +1,25 @@
-import React, { ReactNode, useCallback } from "react"
+import React, { FC, PropsWithChildren, ReactNode, useCallback } from "react"
 import TextareaAutoresize from "react-textarea-autosize"
 import { FieldApi } from "../hooks/form"
+import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
+
+export const FormDiv: FC<PropsWithChildren<PropsWithClassname>> = ({
+  children,
+  className,
+}) => {
+  return (
+    <div
+      className={cn(
+        "flex flex-col bg-yellow-100 border-yellow-500 rounded-md transition-props duration-1000 ease-in-out overflow-hidden relative",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
+}
 
 export const FieldError = ({
   error,

@@ -20,7 +20,7 @@ export const getLoggedInUser = (props: any): LoggedInUser | undefined => {
 export const getLoggedInUserAndAssert = (props: any): LoggedInUser => {
   const user = getLoggedInUser(props)
   if (!user) {
-    throw new Error("User is not logged in")
+    throw new Error("You must be logged in")
   }
   return user
 }

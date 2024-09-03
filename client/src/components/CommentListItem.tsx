@@ -7,6 +7,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
+import { LoginWrapper, LoginWrapperChildProps } from "./Login"
 import { LeftSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
@@ -15,14 +16,16 @@ export type CommentProps = PropsWithClassname & {
   liked: boolean
 }
 
-export const CommentListItem: FC<CommentProps> = ({
+const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
   className,
   comment: c,
   user,
   liked,
+  login,
+  renderedLoginForm,
 }) => {
   const { store } = useGlobalContext()
-  const { likeComment, fetchReplies, ...s } = store.useStore()
+  const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
   const [showingReplies, setShowingReplies] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
@@ -35,8 +38,9 @@ export const CommentListItem: FC<CommentProps> = ({
     async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       try {
-        setUpdatingLike(true)
+        await login()
         setError("")
+        setUpdatingLike(true)
         await likeComment(c.id, !liked)
       } catch (err: any) {
         setError(err.toString())
@@ -44,7 +48,7 @@ export const CommentListItem: FC<CommentProps> = ({
         setUpdatingLike(false)
       }
     },
-    [c.id, liked, likeComment],
+    [c.id, liked, likeComment, login],
   )
 
   const handleToggleReplies = useCallback(
@@ -144,11 +148,33 @@ export const CommentListItem: FC<CommentProps> = ({
           </>
         )
       ) : null}
+      {renderedLoginForm}
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
           {error}
         </ErrorBox>
       )}
     </li>
+  )
+}
+
+export const CommentListItem: FC<CommentProps> = ({
+  className,
+  comment: c,
+  user,
+  liked,
+}) => {
+  return (
+    <LoginWrapper>
+      {(props) => (
+        <CommentListItemInner
+          className={className}
+          comment={c}
+          user={user}
+          liked={liked}
+          {...props}
+        />
+      )}
+    </LoginWrapper>
   )
 }
