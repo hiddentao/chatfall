@@ -170,6 +170,7 @@ export const TextInput = (
 export const TextAreaInput = (
   props: TextFieldProps & {
     onFocus: () => void
+    rows?: number
   },
 ) => {
   const {
@@ -180,6 +181,7 @@ export const TextAreaInput = (
     placeholder,
     onFocus,
     disabled,
+    rows = 4,
     hideValidationIndicator,
   } = props
 
@@ -195,7 +197,7 @@ export const TextAreaInput = (
       <TextFieldLabel {...props} />
       <div className="flex flex-row justify-start items-center">
         <TextareaAutoresize
-          minRows={1}
+          minRows={rows}
           placeholder={placeholder}
           className={cn("disabled:bg-gray-200", inputClassname)}
           onChange={onInputChange}

@@ -9,7 +9,7 @@ import { CommentInputForm } from "./CommentInputForm"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { LoginWrapper, LoginWrapperChildProps } from "./Login"
-import { LeftSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
+import { ChatSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
   comment: Comment
@@ -28,11 +28,11 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
   const { store } = useGlobalContext()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
   const [showingReplies, setShowingReplies] = useState<boolean>(false)
+  const [showReplyForm, setShowReplyForm] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
 
-  const replyDivBgOpacity = useMemo(() => 0.05 * (c.depth + 1), [c.depth])
   const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
 
   const handleLike = useCallback(
@@ -71,6 +71,14 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
     [c.id, fetchReplies, showingReplies, s.replies],
   )
 
+  const handleToggleReplyForm = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      setShowReplyForm((prev) => !prev)
+    },
+    [],
+  )
+
   const onHideError = useCallback(() => {
     setError("")
   }, [])
@@ -104,52 +112,61 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
             )}
           </Button>
         </span>
+        <Button
+          variant="link"
+          className="ml-4 inline-flex justify-start items-center"
+          title={"Reply"}
+          onClick={handleToggleReplyForm}
+        >
+          <div className="svg-container w-4 h-4 mx-1">
+            <ReplySvg />
+          </div>
+          Reply
+        </Button>
         {c.replyCount ? (
           <Button
             variant="link"
-            className="ml-4 inline-flex justify-start items-center"
-            title={showingReplies ? "Hide replies" : "Show replies"}
+            className="ml-8 inline-flex justify-start items-center"
+            title={"Show/hide replies"}
             onClick={handleToggleReplies}
           >
-            <AnimatedNumber value={c.replyCount} />
-            <div className="svg-container w-4 h-4 ml-1">
-              <ReplySvg />
+            <div className="svg-container w-4 h-4 mr-1">
+              <ChatSvg />
             </div>
-            {showingReplies ? (
-              <div className="svg-container w-4 h-4 ml-1">{<LeftSvg />}</div>
-            ) : null}
+            <AnimatedNumber value={c.replyCount} />
+            &nbsp;replies
           </Button>
         ) : null}
       </div>
+      <CommentInputForm
+        className={cn("max-h-0 p-0 border-0", {
+          "max-h-72 border p-4 mx-6 mt-4": showReplyForm,
+        })}
+        parentCommentId={c.id}
+        commentFieldPlaceholder="Add reply..."
+        initiallyFocused={true}
+      />
       {showingReplies ? (
         loadingReplies ? (
           <Loading className="mt-4 ml-4" />
         ) : (
           <>
             {myReplies ? (
-              <div
-                className="mt-3 ml-8 p-4"
-                style={{
-                  backgroundColor: `rgba(0, 0, 0, ${replyDivBgOpacity})`,
-                }}
-              >
-                <ul className="flex flex-col">
-                  {myReplies.items.map((r) => (
-                    <CommentListItem
-                      key={r}
-                      className="mb-8 last-of-type:mb-0"
-                      comment={s.comments[r]}
-                      user={s.users[s.comments[r].userId]}
-                      liked={s.liked[r]}
-                    />
-                  ))}
-                  <CommentInputForm
-                    className="mt-4 mx-6"
-                    parentCommentId={c.id}
-                    commentFieldPlaceholder="Add reply..."
-                    commentFieldTitle="Reply"
-                  />
-                </ul>
+              <div className="mt-3 p-4 flex flex-row">
+                <div className="border-r border-r-gray-400 w-1"></div>
+                <div className="ml-8">
+                  <ul className="flex flex-col">
+                    {myReplies.items.map((r) => (
+                      <CommentListItem
+                        key={r}
+                        className="mb-8 last-of-type:mb-0"
+                        comment={s.comments[r]}
+                        user={s.users[s.comments[r].userId]}
+                        liked={s.liked[r]}
+                      />
+                    ))}
+                  </ul>
+                </div>
               </div>
             ) : null}
           </>

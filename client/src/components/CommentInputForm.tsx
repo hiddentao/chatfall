@@ -14,6 +14,7 @@ export type CommentInputFormProps = PropsWithClassname & {
   parentCommentId?: number
   commentFieldPlaceholder?: string
   commentFieldTitle?: string
+  initiallyFocused?: boolean
 }
 
 const validateCommentText = (value: string) => {
@@ -26,11 +27,11 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
   className,
   parentCommentId,
   commentFieldPlaceholder,
-  commentFieldTitle,
+  initiallyFocused,
 }) => {
   const { store } = useGlobalContext()
   const { loggedInUser, addComment, loginEmail, logout } = store.useStore()
-  const [focused, setFocused] = useState<boolean>(false)
+  const [focused, setFocused] = useState<boolean>(!!initiallyFocused)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
   const [responseAfterPosting, setResponseAfterPosting] =
@@ -184,7 +185,6 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
       ) : (
         <form onSubmit={handleSubmit}>
           <TextAreaInput
-            label={focused ? commentFieldTitle || "Comment" : ""}
             field={commentText}
             hideError={true}
             required={true}

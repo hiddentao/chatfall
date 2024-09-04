@@ -1,3 +1,4 @@
+import ChatSvg from "../images/chat.svg?react"
 import CrossSvg from "../images/cross.svg?react"
 import LeftSvg from "../images/left.svg?react"
 import LikeSvg from "../images/like.svg?react"
@@ -14,6 +15,7 @@ export {
   LikeSvg,
   LikedSvg,
   CrossSvg,
+  ChatSvg,
   WarningSvg,
   ReplySvg,
   RightSvg,
