@@ -286,8 +286,12 @@ export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
     async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       event.preventDefault()
       try {
-        if (!loggedInUser && !showLoginForm) {
-          await login()
+        if (!loggedInUser) {
+          if (!showLoginForm) {
+            await login()
+          } else {
+            return
+          }
         }
         props.onClick?.(event)
       } catch (err: any) {
