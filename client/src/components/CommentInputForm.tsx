@@ -7,7 +7,7 @@ import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { FormDiv, TextAreaInput, standardInputStyle } from "./Form"
-import { EmailTextInput, VerifyEmailForm, validateEmail } from "./Login"
+import { ButtonWithLogin } from "./Login"
 import { WarningSvg } from "./Svg"
 
 export type CommentInputFormProps = PropsWithClassname & {
@@ -30,29 +30,23 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
   initiallyFocused,
 }) => {
   const { store } = useGlobalContext()
-  const { loggedInUser, addComment, loginEmail, logout } = store.useStore()
+  const { loggedInUser, addComment, logout } = store.useStore()
   const [focused, setFocused] = useState<boolean>(!!initiallyFocused)
   const [error, setError] = useState<string>("")
   const [isPosting, setIsPosting] = useState<boolean>(false)
   const [responseAfterPosting, setResponseAfterPosting] =
     useState<PostCommentResponse>()
-  const [verifyEmailBlob, setVerifyEmailBlob] = useState<string>()
 
-  const [commentText, email] = [
+  const [commentText] = [
     useField({
       name: "commentText",
       initialValue: "",
       validate: validateCommentText,
     }),
-    useField({
-      name: "email",
-      initialValue: "",
-      validate: validateEmail,
-    }),
   ]
 
   const { valid, reset } = useForm({
-    fields: [commentText, email],
+    fields: [commentText],
     isValidFn: (fields, formError) => {
       if (formError) {
         return false
@@ -77,53 +71,25 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
 
   const setupForFreshComment = useCallback(() => {
     reset()
-    setVerifyEmailBlob(undefined)
     setResponseAfterPosting(undefined)
   }, [reset])
 
   const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       try {
         setIsPosting(true)
         setError("")
-        if (email.value && !loggedInUser) {
-          setVerifyEmailBlob((await loginEmail(email.value)).blob)
-        } else {
-          await postComment(commentText.value)
-          reset()
-        }
+        await postComment(commentText.value)
+        reset()
       } catch (err: any) {
         setError(err.toString())
       } finally {
         setIsPosting(false)
       }
     },
-    [
-      commentText.value,
-      email.value,
-      loginEmail,
-      loggedInUser,
-      postComment,
-      reset,
-    ],
+    [commentText.value, postComment, reset],
   )
-
-  const onCancelEmailVerification = useCallback(() => {
-    setVerifyEmailBlob(undefined)
-  }, [])
-
-  const onEmailVerified = useCallback(async () => {
-    try {
-      setIsPosting(true)
-      setError("")
-      await postComment(commentText.value)
-    } catch (err: any) {
-      setError(err.toString())
-    } finally {
-      setIsPosting(false)
-    }
-  }, [commentText.value, postComment])
 
   const onClickLogout = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -146,31 +112,12 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
       className={cn(
         "max-h-14 p-4 border",
         {
-          "max-h-96 overflow-y-scroll": focused,
+          "max-h-full": focused,
         },
         className,
       )}
     >
-      {loggedInUser && focused ? (
-        <p className="text-xs italic absolute top-2 right-2">
-          Logged in as: <strong>{loggedInUser.name}</strong>
-          <Button
-            variant="link"
-            className="ml-2 italic"
-            title="Logout"
-            onClick={onClickLogout}
-          >
-            (logout)
-          </Button>
-        </p>
-      ) : null}
-      {verifyEmailBlob && !loggedInUser ? (
-        <VerifyEmailForm
-          blob={verifyEmailBlob}
-          onVerified={onEmailVerified}
-          onCancelVerification={onCancelEmailVerification}
-        />
-      ) : responseAfterPosting ? (
+      {responseAfterPosting ? (
         <div>
           <p className="flex flex-row justify-start items-center">
             {responseAfterPosting.alert ? (
@@ -183,36 +130,44 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form className="flex flex-col">
           <TextAreaInput
             field={commentText}
             hideError={true}
             required={true}
             placeholder={commentFieldPlaceholder || "Add comment..."}
             hideValidationIndicator={true}
-            inputClassname={cn("w-full", {
+            inputClassname={cn("self-stretch w-full", {
               "bg-transparent border-0 italic": !focused,
               [standardInputStyle]: focused,
             })}
             onFocus={onFocusForm}
             disabled={!!isPosting}
           />
+          {loggedInUser && focused ? (
+            <p className="text-xs italic">
+              Logged in as: <strong>{loggedInUser.name}</strong>
+              <Button
+                variant="link"
+                className="ml-2 italic"
+                title="Logout"
+                onClick={onClickLogout}
+              >
+                (logout)
+              </Button>
+            </p>
+          ) : null}
           {focused ? (
             <div>
-              <EmailTextInput
-                field={email}
-                className={cn("mt-8", {
-                  hidden: !!loggedInUser,
-                })}
-                isDisabled={!!isPosting}
-              />
-              <Button
+              <ButtonWithLogin
                 disabled={!valid}
                 inProgress={isPosting}
-                className="inline-block mt-8"
+                className="inline-block mt-6"
+                type="submit"
+                onClick={handleSubmit}
               >
-                Submit
-              </Button>
+                {loggedInUser ? "Submit" : "Login and submit"}
+              </ButtonWithLogin>
               {error && (
                 <ErrorBox className="mt-2" hideError={onHideError}>
                   {error}

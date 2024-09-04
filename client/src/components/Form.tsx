@@ -12,7 +12,7 @@ export const FormDiv: FC<PropsWithChildren<PropsWithClassname>> = ({
   return (
     <div
       className={cn(
-        "flex flex-col bg-yellow-100 border-yellow-500 rounded-md transition-props duration-1000 ease-in-out overflow-hidden relative",
+        "flex flex-col bg-yellow-100 border-yellow-500 rounded-md transition-props duration-500 ease-in-out relative",
         className,
       )}
     >
@@ -122,7 +122,7 @@ const TextFieldLabel = (props: TextFieldProps) => {
 }
 
 export const TextInput = (
-  props: TextFieldProps & { extraInputProps?: any },
+  props: TextFieldProps & { onEnterPress?: () => void; extraInputProps?: any },
 ) => {
   const {
     field,
@@ -134,6 +134,7 @@ export const TextInput = (
     disabled,
     extraInputProps,
     hideValidationIndicator,
+    onEnterPress,
   } = props
 
   const onInputChange = useCallback(
@@ -141,6 +142,16 @@ export const TextInput = (
       field.handleChange(event.target.value)
     },
     [field],
+  )
+
+  const onKeyUp = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (event.key === "Enter" && onEnterPress) {
+        event.preventDefault()
+        onEnterPress()
+      }
+    },
+    [onEnterPress],
   )
 
   return (
@@ -155,6 +166,7 @@ export const TextInput = (
           onChange={onInputChange}
           placeholder={placeholder}
           disabled={disabled}
+          onKeyUp={onKeyUp}
           {...extraInputProps}
         ></input>
         <FieldSuffix

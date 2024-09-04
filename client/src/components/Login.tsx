@@ -1,12 +1,13 @@
-import React, { FC, ReactNode, useCallback, useMemo, useState } from "react"
+import React, { FC, PropsWithChildren, useCallback, useState } from "react"
 import { isEmail } from "validator"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
-import { Button } from "./Button"
+import { Button, ButtonProps } from "./Button"
 import { ErrorBox } from "./ErrorBox"
 import { FormDiv, TextInput, standardInputStyle } from "./Form"
+import { CrossSvg } from "./Svg"
 
 export const validateEmail = (value: string) => {
   if (!isEmail(value)) {
@@ -44,8 +45,8 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
+    async (event?: React.MouseEvent<HTMLButtonElement>) => {
+      event?.preventDefault()
       try {
         setIsSubmitting(true)
         setError("")
@@ -71,7 +72,7 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
   }, [])
 
   return (
-    <form className={className} onSubmit={handleSubmit}>
+    <div className={className}>
       <p className="mb-4">
         Please enter the verification code we just sent to your email address:
       </p>
@@ -86,12 +87,14 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
         disabled={isSubmitting}
         placeholder="Enter code..."
         hideValidationIndicator={true}
+        onEnterPress={() => handleSubmit()}
       />
-      <div className="mt-8 flex flex-row justify-start items-center">
+      <div className="mt-6 flex flex-row justify-start items-center">
         <Button
           disabled={!valid}
           inProgress={isSubmitting}
           className="inline-block"
+          onClick={handleSubmit}
         >
           Verify
         </Button>
@@ -109,7 +112,7 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
           {error}
         </ErrorBox>
       )}
-    </form>
+    </div>
   )
 }
 
@@ -117,8 +120,9 @@ export const EmailTextInput: FC<
   PropsWithClassname & {
     isDisabled?: boolean
     field: ReturnType<typeof useField>
+    onEnterPress?: () => void
   }
-> = ({ isDisabled, field, className }) => {
+> = ({ isDisabled, field, className, onEnterPress }) => {
   return (
     <TextInput
       label="Email address"
@@ -128,6 +132,7 @@ export const EmailTextInput: FC<
         type: "email",
         size: 35,
       }}
+      onEnterPress={onEnterPress}
       className={className}
       inputClassname={cn(standardInputStyle, "max-w-full")}
       hideTooltip={true}
@@ -163,18 +168,20 @@ export const LoginEmailForm: FC<
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      try {
-        setIsSubmitting(true)
-        setError("")
-        setVerifyEmailBlob((await loginEmail(email.value)).blob)
-        reset()
-      } catch (err: any) {
-        setError(err.toString())
-      } finally {
-        setIsSubmitting(false)
-      }
+    (event?: React.MouseEvent<HTMLButtonElement>) => {
+      event?.preventDefault()
+      ;(async () => {
+        try {
+          setIsSubmitting(true)
+          setError("")
+          setVerifyEmailBlob((await loginEmail(email.value)).blob)
+          reset()
+        } catch (err: any) {
+          setError(err.toString())
+        } finally {
+          setIsSubmitting(false)
+        }
+      })()
     },
     [email.value, loginEmail, reset],
   )
@@ -194,12 +201,17 @@ export const LoginEmailForm: FC<
       onCancelVerification={onCancelEmailVerification}
     />
   ) : (
-    <form onSubmit={handleSubmit} className={className}>
-      <EmailTextInput field={email} isDisabled={isSubmitting} />
+    <div className={className}>
+      <EmailTextInput
+        field={email}
+        isDisabled={isSubmitting}
+        onEnterPress={() => handleSubmit()}
+      />
       <Button
         disabled={!valid}
         inProgress={isSubmitting}
-        className="inline-block mt-8"
+        className="inline-block mt-6"
+        onClick={handleSubmit}
       >
         Submit
       </Button>
@@ -208,54 +220,45 @@ export const LoginEmailForm: FC<
           {error}
         </ErrorBox>
       )}
-    </form>
+    </div>
   )
 }
 
 export const LoginForm: FC<
-  PropsWithClassname & {
-    showForm?: boolean
-    onLoginComplete: () => void
-  }
-> = ({ className, showForm, onLoginComplete }) => {
+  PropsWithChildren<
+    PropsWithClassname & {
+      showForm?: boolean
+      onLoginComplete: () => void
+    }
+  >
+> = ({ children, className, showForm, onLoginComplete }) => {
   return (
     <FormDiv
       className={cn(
-        "max-h-0 mt-0",
+        "max-h-0 overflow-hidden bg-slate-200 border-slate-700",
         {
-          "max-h-72 mt-4 p-4 border": showForm,
+          "max-h-72 p-4 border overflow-visible": showForm,
         },
         className,
       )}
     >
-      <p className="mb-4">You need to login first.</p>
       <LoginEmailForm onEmailVerified={onLoginComplete} />
+      {children}
     </FormDiv>
   )
 }
 
-export type LoginWrapperChildProps = {
-  login: () => Promise<void>
-  showLoginForm: boolean
-  renderedLoginForm: ReactNode
-}
-
-export type LoginWrapperChild = (props: LoginWrapperChildProps) => ReactNode
-
-export const LoginWrapper: FC<{ children: LoginWrapperChild }> = ({
-  children,
-}) => {
+export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
   const { store } = useGlobalContext()
   const { loggedInUser } = store.useStore()
 
   const [showLoginForm, setShowLoginForm] = useState<boolean>(false)
+  const [formIteration, setFormIteration] = useState<number>(0)
   const [loginPromiseResolver, setLoginPromiseResolver] = useState<() => void>()
 
   const login = useCallback(async () => {
-    if (loggedInUser) {
-      return
-    }
     setShowLoginForm(true)
+    setFormIteration((v) => v + 1)
     return new Promise((resolve) => {
       setLoginPromiseResolver(() => () => {
         resolve()
@@ -263,7 +266,15 @@ export const LoginWrapper: FC<{ children: LoginWrapperChild }> = ({
         setLoginPromiseResolver(undefined)
       })
     }) as Promise<void>
-  }, [loggedInUser])
+  }, [])
+
+  const closeLoginForm = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      setShowLoginForm(false)
+    },
+    [],
+  )
 
   const onLoginComplete = useCallback(() => {
     if (loginPromiseResolver) {
@@ -271,11 +282,46 @@ export const LoginWrapper: FC<{ children: LoginWrapperChild }> = ({
     }
   }, [loginPromiseResolver])
 
-  const renderedLoginForm = useMemo(() => {
-    return loggedInUser ? null : (
-      <LoginForm showForm={showLoginForm} onLoginComplete={onLoginComplete} />
-    )
-  }, [showLoginForm, onLoginComplete, loggedInUser])
+  const onClick = useCallback(
+    async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      event.preventDefault()
+      try {
+        if (!loggedInUser && !showLoginForm) {
+          await login()
+        }
+        props.onClick?.(event)
+      } catch (err: any) {
+        console.error(err)
+      }
+    },
+    [loggedInUser, login, props.onClick, showLoginForm],
+  )
 
-  return children({ login, showLoginForm, renderedLoginForm })
+  const btn = <Button className={cn(className)} {...props} onClick={onClick} />
+
+  return (
+    <div
+      className={cn("dropdown", {
+        "dropdown-open": showLoginForm,
+      })}
+    >
+      {btn}
+      <div className="dropdown-content card card-compact rounded-box z-[1] w-72 shadow">
+        <LoginForm
+          key={formIteration}
+          showForm={showLoginForm}
+          onLoginComplete={onLoginComplete}
+          className="relative"
+        >
+          <Button
+            variant="iconMeta"
+            className="w-4 h-4 p-1 absolute top-1 right-1"
+            onClick={closeLoginForm}
+          >
+            <CrossSvg />
+          </Button>
+        </LoginForm>
+      </div>
+    </div>
+  )
 }

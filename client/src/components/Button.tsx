@@ -27,7 +27,10 @@ export interface ButtonProps
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, variant, inProgress = false, ...props }, ref) => {
+  (
+    { children, className, variant, inProgress = false, title, ...props },
+    ref,
+  ) => {
     const content = React.useMemo(
       () => (inProgress ? <Loading className="w-4 h-4 " /> : children),
       [inProgress, children],
@@ -39,7 +42,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         {...props}
       >
-        {content}
+        <div
+          className="tooltip inline-flex flex-row justify-center items-center"
+          data-tip={title}
+        >
+          {content}
+        </div>
       </button>
     )
 

@@ -8,7 +8,7 @@ import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { LoginWrapper, LoginWrapperChildProps } from "./Login"
+import { ButtonWithLogin } from "./Login"
 import { ChatSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
@@ -17,13 +17,11 @@ export type CommentProps = PropsWithClassname & {
   liked: boolean
 }
 
-const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
+const CommentListItemInner: FC<CommentProps> = ({
   className,
   comment: c,
   user,
   liked,
-  login,
-  renderedLoginForm,
 }) => {
   const { store } = useGlobalContext()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
@@ -39,7 +37,6 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
     async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       try {
-        await login()
         setError("")
         setUpdatingLike(true)
         await likeComment(c.id, !liked)
@@ -49,7 +46,7 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
         setUpdatingLike(false)
       }
     },
-    [c.id, liked, likeComment, login],
+    [c.id, liked, likeComment],
   )
 
   const handleToggleReplies = useCallback(
@@ -97,7 +94,7 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
           <AnimatedNumber value={c.rating} />
-          <Button
+          <ButtonWithLogin
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
             title="Like/unlike"
@@ -110,7 +107,7 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
             ) : (
               <LikeSvg />
             )}
-          </Button>
+          </ButtonWithLogin>
         </span>
         <Button
           variant="link"
@@ -139,8 +136,8 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
         ) : null}
       </div>
       <CommentInputForm
-        className={cn("max-h-0 p-0 border-0", {
-          "max-h-72 border p-4 mx-6 mt-4": showReplyForm,
+        className={cn("max-h-0 p-0 border-0 overflow-y-scroll", {
+          "max-h-full border p-4 mx-6 mt-4 overflow-visible": showReplyForm,
         })}
         parentCommentId={c.id}
         commentFieldPlaceholder="Add reply..."
@@ -172,7 +169,6 @@ const CommentListItemInner: FC<CommentProps & LoginWrapperChildProps> = ({
           </>
         )
       ) : null}
-      {renderedLoginForm}
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
           {error}
@@ -189,16 +185,11 @@ export const CommentListItem: FC<CommentProps> = ({
   liked,
 }) => {
   return (
-    <LoginWrapper>
-      {(props) => (
-        <CommentListItemInner
-          className={className}
-          comment={c}
-          user={user}
-          liked={liked}
-          {...props}
-        />
-      )}
-    </LoginWrapper>
+    <CommentListItemInner
+      className={className}
+      comment={c}
+      user={user}
+      liked={liked}
+    />
   )
 }
