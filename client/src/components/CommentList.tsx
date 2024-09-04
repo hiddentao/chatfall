@@ -6,6 +6,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
 import { CommentListItem } from "./CommentListItem"
+import { CommentPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 
@@ -112,6 +113,16 @@ export const CommentList: FC = () => {
         </div>
       </div>
       <div className="px-1">
+        {
+          /* first-time loading? */ isLoading && !rootList.items.length ? (
+            <>
+              <CommentPlaceholder />
+              <CommentPlaceholder />
+              <CommentPlaceholder />
+              <CommentPlaceholder />
+            </>
+          ) : null
+        }
         {canonicalUrl ? <CommentInputForm className="mt-4 mb-8 mx-6" /> : null}
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {!isLoading && !error && rootList.items.length === 0 ? (

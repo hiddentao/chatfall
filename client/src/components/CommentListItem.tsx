@@ -6,6 +6,7 @@ import { cn } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
+import { CommentPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { ButtonWithLogin } from "./Login"
@@ -145,7 +146,11 @@ const CommentListItemInner: FC<CommentProps> = ({
       />
       {showingReplies ? (
         loadingReplies ? (
-          <Loading className="mt-4 ml-4" />
+          <div className="ml-8">
+            <CommentPlaceholder />
+            <CommentPlaceholder />
+            <CommentPlaceholder />
+          </div>
         ) : (
           <>
             {myReplies ? (
