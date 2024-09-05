@@ -45,6 +45,8 @@ module.exports = {
           "neutral-content": "#fff",
           info: "#415A77",
           "info-content": "#fff",
+          error: "#ff0000",
+          "error-content": "#fff",
         },
       },
       "dark",

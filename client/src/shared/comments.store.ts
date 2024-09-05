@@ -328,22 +328,47 @@ export const createStore = (props: CommentStoreProps) => {
             state.comments[newComment.id] = newComment
             state.users[data.user.id] = data.user
 
-            // if the comment is from the current user
-            if (data.user.id === state.loggedInUser?.id) {
-              const existing = (state.rootList.myNewItems as number[]).find(
-                (c) => c === newComment.id,
-              )
+            console.log(newComment)
 
-              if (!existing) {
-                state.rootList.myNewItems.unshift(newComment.id)
+            // if it's a root comment
+            if (newComment.depth === 0) {
+              // if the comment is from the current user
+              if (data.user.id === state.loggedInUser?.id) {
+                const existing = (state.rootList.myNewItems as number[]).find(
+                  (c) => c === newComment.id,
+                )
+
+                if (!existing) {
+                  state.rootList.myNewItems.unshift(newComment.id)
+                }
+              } else {
+                const existing = (
+                  state.rootList.otherUserNewItems as number[]
+                ).find((c) => c === newComment.id)
+
+                if (!existing) {
+                  state.rootList.otherUserNewItems.unshift(newComment.id)
+                }
               }
             } else {
-              const existing = (
-                state.rootList.otherUserNewItems as number[]
-              ).find((c) => c === newComment.id)
+              const parentCommentPath = newComment.path.slice(
+                0,
+                newComment.path.lastIndexOf("."),
+              )
 
-              if (!existing) {
-                state.rootList.otherUserNewItems.unshift(newComment.id)
+              const parentComment = Object.values(state.comments).find(
+                (c) => (c as Comment).path === parentCommentPath,
+              ) as Comment
+
+              if (parentComment) {
+                parentComment.replyCount++
+                const replies = state.replies[parentComment.id]
+                if (replies) {
+                  if (replies.total === replies.items.length) {
+                    replies.items.push(newComment.id)
+                  }
+                  replies.total++
+                }
               }
             }
           }),

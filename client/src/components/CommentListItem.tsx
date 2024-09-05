@@ -5,6 +5,7 @@ import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
+import { CommentBody } from "./CommentBody"
 import { CommentInputForm } from "./CommentInputForm"
 import { CommentPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
@@ -81,6 +82,10 @@ const CommentListItemInner: FC<CommentProps> = ({
     [],
   )
 
+  const hideReplyForm = useCallback(() => {
+    setShowReplyForm(false)
+  }, [])
+
   const handleClickLoadMoreReplies = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
@@ -108,7 +113,9 @@ const CommentListItemInner: FC<CommentProps> = ({
           className="text-gray-400 text-xs"
         >{`${formatCommentTime(c.createdAt)}`}</span>{" "}
       </div>
-      <div className="mb-2">{c.body}</div>
+      <div className="mb-2">
+        <CommentBody body={c.body} />
+      </div>
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
           <AnimatedNumber value={c.rating} />
@@ -160,13 +167,14 @@ const CommentListItemInner: FC<CommentProps> = ({
         parentCommentId={c.id}
         commentFieldPlaceholder="Add reply..."
         initiallyFocused={true}
+        onCommentPosted={hideReplyForm}
       />
       {showingReplies ? (
         <>
           {myReplies ? (
             <div className="mt-3 p-4 flex flex-row">
               <div className="border-r border-r-gray-400 w-1"></div>
-              <div className="ml-8">
+              <div className="ml-8 flex-1">
                 <ul className="flex flex-col">
                   {myReplies.items.map((r) => (
                     <CommentListItem
@@ -180,7 +188,7 @@ const CommentListItemInner: FC<CommentProps> = ({
                 </ul>
                 {canLoadMoreReplies ? (
                   <Button
-                    className={cn("mt-2 mb-4", {
+                    className={cn("mt-6 mb-4", {
                       hidden: loadingReplies,
                     })}
                     onClick={handleClickLoadMoreReplies}

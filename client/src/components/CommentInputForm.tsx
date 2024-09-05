@@ -15,6 +15,7 @@ export type CommentInputFormProps = PropsWithClassname & {
   commentFieldPlaceholder?: string
   commentFieldTitle?: string
   initiallyFocused?: boolean
+  onCommentPosted?: () => void
 }
 
 const validateCommentText = (value: string) => {
@@ -28,6 +29,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
   parentCommentId,
   commentFieldPlaceholder,
   initiallyFocused,
+  onCommentPosted,
 }) => {
   const { store } = useGlobalContext()
   const { loggedInUser, addComment, logout } = store.useStore()
@@ -69,10 +71,11 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
     [addComment, parentCommentId],
   )
 
-  const setupForFreshComment = useCallback(() => {
+  const onClickContinue = useCallback(() => {
     reset()
     setResponseAfterPosting(undefined)
-  }, [reset])
+    onCommentPosted?.()
+  }, [reset, onCommentPosted])
 
   const handleSubmit = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -125,7 +128,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
             ) : null}
             {responseAfterPosting.message}
           </p>
-          <Button className="mt-4" onClick={setupForFreshComment}>
+          <Button className="mt-4" onClick={onClickContinue}>
             Continue
           </Button>
         </div>

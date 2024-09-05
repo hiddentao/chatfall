@@ -195,7 +195,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             let parent: Comment | undefined
 
             if (parentCommentId) {
-              let [parent] = await tx
+              ;[parent] = await tx
                 .select()
                 .from(comments)
                 .where(
@@ -204,12 +204,21 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                     eq(comments.id, Number(parentCommentId)),
                   ),
                 )
+                .limit(1)
 
               if (!parent) {
                 throw new Error("Parent comment not found")
               }
 
               newCommentIndex = parent.replyCount + 1
+
+              // update parent reply count
+              await tx
+                .update(comments)
+                .set({
+                  replyCount: sql`${comments.replyCount} + 1`,
+                })
+                .where(eq(comments.id, parent.id))
             } else {
               const cnt = await tx
                 .select({ count: count() })

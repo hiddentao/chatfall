@@ -13,7 +13,7 @@ export const FormDiv: FC<PropsWithChildren<PropsWithClassname>> = ({
     <div
       className={cn(
         className,
-        "flex flex-col bg-secondary text-secondary-content rounded-md transition-props duration-500 ease-in-out relative",
+        "flex flex-col bg-secondary text-secondary-content rounded-md relative",
       )}
     >
       {children}
