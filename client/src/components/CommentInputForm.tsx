@@ -110,7 +110,7 @@ export const CommentInputForm: FC<CommentInputFormProps> = ({
   return (
     <FormDiv
       className={cn(
-        "max-h-14 p-4 border",
+        "max-h-14 p-4",
         {
           "max-h-full": focused,
         },

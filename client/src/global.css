@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    @apply bg-base-100 text-base-content;
+  }
+}
+
 @layer utilities {
   .svg-container {
     svg {

@@ -23,15 +23,32 @@ module.exports = {
       },
       transitionProperty: {
         props:
-          "opacity, background-color, color, border-color, height, margin, padding, max-height",
+          "scale, opacity, background-color, color, border-color, height, margin, padding, max-height",
       },
     },
   },
   plugins: [require("daisyui")],
   // daisyUI config (optional - here are the default values)
   daisyui: {
-    themes: false, // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
-    darkTheme: "dark", // name of one of the included themes for dark mode
+    themes: [
+      {
+        chatfallLight: {
+          "base-100": "#fff",
+          "base-content": "#000",
+          "base-200": "#eee",
+          "base-300": "#ddd",
+          primary: "#f77f00",
+          "primary-content": "#fff",
+          secondary: "#E0E1DD",
+          "secondary-content": "#000",
+          neutral: "#000",
+          "neutral-content": "#fff",
+          info: "#415A77",
+          "info-content": "#fff",
+        },
+      },
+      "dark",
+    ],
     base: true, // applies background color and foreground color for root element by default
     styled: true, // include daisyUI colors and design decisions for all components
     utils: true, // adds responsive and modifier utility classes

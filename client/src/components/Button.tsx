@@ -4,14 +4,15 @@ import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
 
 export const buttonVariants = cva(
-  "inline-flex text-anchor hover:text-white hover:bg-anchor items-center rounded-md justify-center text-sm ring-offset-anchor transition-colors focus-visible:outline-none focus-visible:ring-none disabled:pointer-events-none disabled:opacity-50",
+  "hover:scale-105 inline-flex bg-primary text-primary-content items-center rounded-md justify-center text-sm ring-offset-primary transition-colors focus-visible:outline-none focus-visible:ring-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "p-2 border border-anchor",
-        icon: "svg-container border border-anchor p-[0.1em]",
-        iconMeta: "svg-container p-[0.1em]",
-        link: "p-0",
+        default: "p-2 border border-primary",
+        icon: "svg-container border border-primary p-[0.1em] ",
+        iconMeta:
+          "svg-container p-[0.1em] bg-transparent text-primary hover:bg-primary hover:text-primary-content",
+        link: "p-0 bg-transparent text-primary hover:bg-primary hover:text-primary-content",
       },
     },
     defaultVariants: {

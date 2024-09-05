@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
@@ -7,13 +7,16 @@ import { CrossSvg } from "./Svg"
 export const ErrorBox: FC<
   PropsWithClassname & { children: string; hideError?: () => void }
 > = ({ className, children, hideError }) => {
-  const hide = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
+  const hide = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
 
-    if (hideError) {
-      hideError()
-    }
-  }, [])
+      if (hideError) {
+        hideError()
+      }
+    },
+    [hideError],
+  )
 
   const errMsg = useMemo(() => {
     try {
@@ -24,6 +27,7 @@ export const ErrorBox: FC<
         return `Error: ${match[1]}`
       }
     } finally {
+      // do nothing
     }
 
     return children
@@ -32,7 +36,7 @@ export const ErrorBox: FC<
   return (
     <div
       className={cn(
-        "relative bg-red-100 border border-red-500 text-black p-2 pr-4 rounded-md",
+        "relative bg-error border border-error text-error-content p-2 pr-4 rounded-md",
         className,
       )}
     >

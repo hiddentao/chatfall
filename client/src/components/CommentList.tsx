@@ -87,7 +87,7 @@ export const CommentList: FC = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row justify-between font-heading bg-blue-200 border border-blue-500 px-4 py-3 rounded-md">
+      <div className="flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md">
         <div className="text-xl flex flex-row items-center">
           {title}
           {isLoading ? <Loading className="ml-4 w-8 h-8" /> : null}
@@ -101,7 +101,7 @@ export const CommentList: FC = () => {
             id="sort-select"
             value={sort}
             onChange={handleSortChange}
-            className="rounded-md p-1 "
+            className="select select-sm rounded-md bg-neutral text-neutral-content"
           >
             <option value={Sort.newest_first}>Newest</option>
             <option value={Sort.oldest_first}>Oldest</option>

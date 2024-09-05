@@ -50,23 +50,27 @@ const CommentListItemInner: FC<CommentProps> = ({
     [c.id, liked, likeComment],
   )
 
+  const fetchMoreReplies = useCallback(async () => {
+    try {
+      setLoadingReplies(true)
+      setError("")
+      await fetchReplies(c.id)
+    } catch (err: any) {
+      setError(err.toString())
+    } finally {
+      setLoadingReplies(false)
+    }
+  }, [c.id, fetchReplies])
+
   const handleToggleReplies = useCallback(
     async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
-      try {
-        setShowingReplies((prev) => !prev)
-        if (!showingReplies && !s.replies[c.id]) {
-          setLoadingReplies(true)
-          setError("")
-          await fetchReplies(c.id)
-        }
-      } catch (err: any) {
-        setError(err.toString())
-      } finally {
-        setLoadingReplies(false)
+      setShowingReplies((prev) => !prev)
+      if (!showingReplies && !s.replies[c.id]) {
+        await fetchMoreReplies()
       }
     },
-    [c.id, fetchReplies, showingReplies, s.replies],
+    [c.id, fetchMoreReplies, showingReplies, s.replies],
   )
 
   const handleToggleReplyForm = useCallback(
@@ -75,6 +79,19 @@ const CommentListItemInner: FC<CommentProps> = ({
       setShowReplyForm((prev) => !prev)
     },
     [],
+  )
+
+  const handleClickLoadMoreReplies = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      fetchMoreReplies()
+    },
+    [fetchMoreReplies],
+  )
+
+  const canLoadMoreReplies = useMemo(
+    () => myReplies && myReplies.items.length < myReplies.total,
+    [myReplies],
   )
 
   const onHideError = useCallback(() => {
@@ -145,34 +162,44 @@ const CommentListItemInner: FC<CommentProps> = ({
         initiallyFocused={true}
       />
       {showingReplies ? (
-        loadingReplies ? (
-          <div className="ml-8">
-            <CommentPlaceholder />
-            <CommentPlaceholder />
-            <CommentPlaceholder />
-          </div>
-        ) : (
-          <>
-            {myReplies ? (
-              <div className="mt-3 p-4 flex flex-row">
-                <div className="border-r border-r-gray-400 w-1"></div>
-                <div className="ml-8">
-                  <ul className="flex flex-col">
-                    {myReplies.items.map((r) => (
-                      <CommentListItem
-                        key={r}
-                        className="mb-8 last-of-type:mb-0"
-                        comment={s.comments[r]}
-                        user={s.users[s.comments[r].userId]}
-                        liked={s.liked[r]}
-                      />
-                    ))}
-                  </ul>
-                </div>
+        <>
+          {myReplies ? (
+            <div className="mt-3 p-4 flex flex-row">
+              <div className="border-r border-r-gray-400 w-1"></div>
+              <div className="ml-8">
+                <ul className="flex flex-col">
+                  {myReplies.items.map((r) => (
+                    <CommentListItem
+                      key={r}
+                      className="mb-8 last-of-type:mb-0"
+                      comment={s.comments[r]}
+                      user={s.users[s.comments[r].userId]}
+                      liked={s.liked[r]}
+                    />
+                  ))}
+                </ul>
+                {canLoadMoreReplies ? (
+                  <Button
+                    className={cn("mt-2 mb-4", {
+                      hidden: loadingReplies,
+                    })}
+                    onClick={handleClickLoadMoreReplies}
+                    inProgress={loadingReplies}
+                  >
+                    Load more replies
+                  </Button>
+                ) : null}
               </div>
-            ) : null}
-          </>
-        )
+            </div>
+          ) : null}
+          {loadingReplies ? (
+            <div className="ml-8">
+              <CommentPlaceholder />
+              <CommentPlaceholder />
+              <CommentPlaceholder />
+            </div>
+          ) : null}
+        </>
       ) : null}
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
