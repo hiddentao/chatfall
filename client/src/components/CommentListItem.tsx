@@ -2,7 +2,7 @@ import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
-import { cn } from "../utils/ui"
+import { cn, formatPlural } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentBody } from "./CommentBody"
@@ -156,7 +156,7 @@ const CommentListItemInner: FC<CommentProps> = ({
               <ChatSvg />
             </div>
             <AnimatedNumber value={c.replyCount} />
-            &nbsp;replies
+            &nbsp;{formatPlural(c.replyCount, "reply", "replies")}
           </Button>
         ) : null}
       </div>

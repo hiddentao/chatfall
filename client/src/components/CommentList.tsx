@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { cn } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
@@ -113,16 +114,6 @@ export const CommentList: FC = () => {
         </div>
       </div>
       <div className="px-1">
-        {
-          /* first-time loading? */ isLoading && !rootList.items.length ? (
-            <>
-              <CommentPlaceholder />
-              <CommentPlaceholder />
-              <CommentPlaceholder />
-              <CommentPlaceholder />
-            </>
-          ) : null
-        }
         {canonicalUrl ? <CommentInputForm className="mt-4 mb-8 mx-6" /> : null}
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {!isLoading && !error && rootList.items.length === 0 ? (
@@ -161,12 +152,22 @@ export const CommentList: FC = () => {
         ) : null}
         {canLoadMoreComments ? (
           <Button
-            className="mt-2 mb-4"
+            className={cn("mt-2 mb-4", {
+              hidden: isLoading,
+            })}
             onClick={handleClickLoadMoreComments}
             inProgress={isLoading}
           >
             Load more comments
           </Button>
+        ) : null}
+        {isLoading ? (
+          <>
+            <CommentPlaceholder />
+            <CommentPlaceholder />
+            <CommentPlaceholder />
+            <CommentPlaceholder />
+          </>
         ) : null}
       </div>
     </div>

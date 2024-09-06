@@ -260,6 +260,7 @@ export const createStore = (props: CommentStoreProps) => {
             state.users = data.users
             state.liked = data.liked
             state.comments = commentListToMap(data.comments)
+            state.replies = {}
             replaceCommentList(state.rootList, data)
             state.rootList.otherUserNewItems = []
             state.rootList.myNewItems = []
@@ -327,8 +328,6 @@ export const createStore = (props: CommentStoreProps) => {
             const newComment = data.data as SocketNewCommentEvent
             state.comments[newComment.id] = newComment
             state.users[data.user.id] = data.user
-
-            console.log(newComment)
 
             // if it's a root comment
             if (newComment.depth === 0) {
