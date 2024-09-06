@@ -6,6 +6,13 @@
   html {
     @apply bg-base-100 text-base-content;
   }
+
+  [data-theme='cLight'] .theme-light-button {
+    @apply hidden;
+  }
+  [data-theme='cDark'] .theme-dark-button {
+    @apply hidden;
+  }
 }
 
 @layer utilities {
@@ -13,5 +20,9 @@
     svg {
       @apply fill-current w-full h-full m-auto;
     }    
+  }
+
+  .theme-light-button, .theme-dark-button {
+    @apply w-8 h-8 p-1 bg-info text-info-content;
   }
 }

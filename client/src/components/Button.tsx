@@ -25,11 +25,20 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   inProgress?: boolean
+  tooltipClassName?: string
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { children, className, variant, inProgress = false, title, ...props },
+    {
+      children,
+      className,
+      variant,
+      inProgress = false,
+      title,
+      tooltipClassName,
+      ...props
+    },
     ref,
   ) => {
     const content = React.useMemo(
@@ -44,7 +53,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         <div
-          className="tooltip inline-flex flex-row justify-center items-center"
+          className={cn(
+            "tooltip inline-flex flex-row justify-center items-center",
+            tooltipClassName,
+          )}
           data-tip={title}
         >
           {content}

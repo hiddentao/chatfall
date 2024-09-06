@@ -162,7 +162,7 @@ const CommentListItemInner: FC<CommentProps> = ({
       </div>
       <CommentInputForm
         className={cn("max-h-0 p-0 border-0 overflow-y-scroll", {
-          "max-h-full border p-4 mx-6 mt-4 overflow-visible": showReplyForm,
+          "max-h-full p-4 mx-6 mt-4 overflow-visible": showReplyForm,
         })}
         parentCommentId={c.id}
         commentFieldPlaceholder="Add reply..."

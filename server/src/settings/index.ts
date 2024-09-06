@@ -6,25 +6,23 @@ import type { LogInterface } from "../lib/logger"
 
 export enum Setting {
   CommentsPerPage = "commentsPerPage",
-  MaxCommentDepth = "maxCommentDepth",
   UserNextCommentDelayMs = "userNextCommentDelayMs",
-  BlacklistedWords = "blacklistedWords",
-  BlacklistedEmails = "blacklistedEmails",
-  BlacklistedDomains = "blacklistedDomains",
-  FlaggedWords = "flaggedWords",
-  ModerateAllComments = "moderateAllComments",
+  // BlacklistedWords = "blacklistedWords",
+  // BlacklistedEmails = "blacklistedEmails",
+  // BlacklistedDomains = "blacklistedDomains",
+  // FlaggedWords = "flaggedWords",
+  // ModerateAllComments = "moderateAllComments",
 }
 
 // Define a mapped type for setting values
 type SettingValueMap = {
   [Setting.CommentsPerPage]: number
-  [Setting.MaxCommentDepth]: number
   [Setting.UserNextCommentDelayMs]: number
-  [Setting.BlacklistedWords]: string[]
-  [Setting.BlacklistedEmails]: string[]
-  [Setting.BlacklistedDomains]: string[]
-  [Setting.FlaggedWords]: string[]
-  [Setting.ModerateAllComments]: boolean
+  // [Setting.BlacklistedWords]: string[]
+  // [Setting.BlacklistedEmails]: string[]
+  // [Setting.BlacklistedDomains]: string[]
+  // [Setting.FlaggedWords]: string[]
+  // [Setting.ModerateAllComments]: boolean
 }
 
 // Create a type that maps the enum to its corresponding value type
@@ -37,13 +35,12 @@ export class SettingsManager {
   private db: Database
   private settings: Record<string, SettingValueRaw> = {
     [Setting.CommentsPerPage]: 10,
-    [Setting.MaxCommentDepth]: 2,
     [Setting.UserNextCommentDelayMs]: 60000,
-    [Setting.BlacklistedWords]: [],
-    [Setting.BlacklistedEmails]: [],
-    [Setting.BlacklistedDomains]: [],
-    [Setting.FlaggedWords]: [],
-    [Setting.ModerateAllComments]: false,
+    // [Setting.BlacklistedWords]: [],
+    // [Setting.BlacklistedEmails]: [],
+    // [Setting.BlacklistedDomains]: [],
+    // [Setting.FlaggedWords]: [],
+    // [Setting.ModerateAllComments]: false,
   }
 
   constructor(cfg: { db: Database; log: LogInterface; cron: Cron }) {
