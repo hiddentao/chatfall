@@ -21,15 +21,8 @@ export const CommentList: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")
 
-  const {
-    canonicalUrl,
-    comments,
-    rootList,
-    users,
-    liked,
-    fetchComments,
-    sort,
-  } = store.useStore()
+  const { canonicalUrl, comments, rootList, users, liked, fetchComments } =
+    store.useStore()
 
   const refetch = useCallback(
     async (s?: Sort, skipOverride?: number) => {
@@ -102,7 +95,7 @@ export const CommentList: FC = () => {
             <select
               disabled={isLoading}
               id="sort-select"
-              value={sort}
+              value={rootList.sort}
               onChange={handleSortChange}
               className="select select-sm rounded-md bg-neutral text-neutral-content"
             >

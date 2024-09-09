@@ -17,6 +17,7 @@ import { jwt } from "../lib/jwt"
 type CommentId = number
 
 type CommentList = {
+  sort: Sort
   parentDepth: number
   parentPath: string
   items: number[]
@@ -29,7 +30,6 @@ type CommentList = {
 
 type State = {
   canonicalUrl: string | null
-  sort: Sort
   users: Record<CommentId, CommentUser>
   liked: Record<CommentId, boolean>
   comments: Record<number, Comment>
@@ -133,6 +133,7 @@ export const createStore = (props: CommentStoreProps) => {
 
   const createCommentList = (parentDepth: number, parentPath: string) => {
     return {
+      sort: Sort.newest_first,
       parentDepth,
       parentPath,
       items: [],
@@ -144,7 +145,6 @@ export const createStore = (props: CommentStoreProps) => {
 
   const useStore = create<State & Actions>()((set, get) => ({
     canonicalUrl: null,
-    sort: Sort.most_replies,
     users: {},
     liked: {},
     comments: {},
@@ -223,7 +223,10 @@ export const createStore = (props: CommentStoreProps) => {
 
       return data
     },
-    fetchComments: async (sort = get().sort, skipOverride?: number) => {
+    fetchComments: async (
+      sort = get().rootList.sort,
+      skipOverride?: number,
+    ) => {
       // if we've changed the filter then reset the paging, otherwise increment
       const skip =
         typeof skipOverride === "number"
@@ -246,7 +249,6 @@ export const createStore = (props: CommentStoreProps) => {
       set(
         produce((state) => {
           state.canonicalUrl = data.canonicalUrl
-          state.sort = sort
 
           // if fetching more comments, append to existing list
           if (skip) {
@@ -262,6 +264,7 @@ export const createStore = (props: CommentStoreProps) => {
             state.comments = commentListToMap(data.comments)
             state.replies = {}
             replaceCommentList(state.rootList, data)
+            state.rootList.sort = sort
             state.rootList.otherUserNewItems = []
             state.rootList.myNewItems = []
           }

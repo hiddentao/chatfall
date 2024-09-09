@@ -137,7 +137,7 @@ const CommentListItemInner: FC<CommentProps> = ({
         <Button
           variant="link"
           className="ml-4 inline-flex justify-start items-center"
-          title={"Reply"}
+          title="Reply"
           onClick={handleToggleReplyForm}
         >
           <div className="svg-container w-4 h-4 mx-1">
@@ -160,21 +160,21 @@ const CommentListItemInner: FC<CommentProps> = ({
           </Button>
         ) : null}
       </div>
-      <CommentInputForm
-        className={cn("max-h-0 p-0 border-0 overflow-y-scroll", {
-          "max-h-full p-4 mx-6 mt-4 overflow-visible": showReplyForm,
-        })}
-        parentCommentId={c.id}
-        commentFieldPlaceholder="Add reply..."
-        initiallyFocused={true}
-        onCommentPosted={hideReplyForm}
-      />
-      {showingReplies ? (
-        <>
-          {myReplies ? (
-            <div className="mt-3 p-4 flex flex-row">
-              <div className="border-r border-r-gray-400 w-1"></div>
-              <div className="ml-8 flex-1">
+      {showingReplies || showReplyForm ? (
+        <div className="mt-3 p-4 flex flex-row">
+          <div className="border-r border-r-gray-400 w-1"></div>
+          <div className="flex-1 ml-8">
+            {showReplyForm ? (
+              <CommentInputForm
+                className={cn("p-4 mb-8 w-full")}
+                parentCommentId={c.id}
+                commentFieldPlaceholder="Add reply..."
+                initiallyFocused={true}
+                onCommentPosted={hideReplyForm}
+              />
+            ) : null}
+            {myReplies ? (
+              <>
                 <ul className="flex flex-col">
                   {myReplies.items.map((r) => (
                     <CommentListItem
@@ -197,17 +197,17 @@ const CommentListItemInner: FC<CommentProps> = ({
                     Load more replies
                   </Button>
                 ) : null}
+              </>
+            ) : null}
+            {loadingReplies ? (
+              <div>
+                <CommentPlaceholder />
+                <CommentPlaceholder />
+                <CommentPlaceholder />
               </div>
-            </div>
-          ) : null}
-          {loadingReplies ? (
-            <div className="ml-8">
-              <CommentPlaceholder />
-              <CommentPlaceholder />
-              <CommentPlaceholder />
-            </div>
-          ) : null}
-        </>
+            ) : null}
+          </div>
+        </div>
       ) : null}
       {error && (
         <ErrorBox className="mt-2" hideError={onHideError}>
