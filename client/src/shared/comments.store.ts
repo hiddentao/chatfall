@@ -265,8 +265,6 @@ export const createStore = (props: CommentStoreProps) => {
             state.replies = {}
             replaceCommentList(state.rootList, data)
             state.rootList.sort = sort
-            state.rootList.otherUserNewItems = []
-            state.rootList.myNewItems = []
           }
         }),
       )
@@ -322,7 +320,7 @@ export const createStore = (props: CommentStoreProps) => {
   }))
 
   ws.onMessage((data) => {
-    console.debug(`Received socket event`, data)
+    // console.debug(`Received socket event`, data)
 
     switch (data.type) {
       case SocketEventTypeEnum.NewComment:
@@ -352,6 +350,7 @@ export const createStore = (props: CommentStoreProps) => {
                   state.rootList.otherUserNewItems.unshift(newComment.id)
                 }
               }
+              // it's a reply
             } else {
               const parentCommentPath = newComment.path.slice(
                 0,
@@ -366,9 +365,23 @@ export const createStore = (props: CommentStoreProps) => {
                 parentComment.replyCount++
                 const replies = state.replies[parentComment.id]
                 if (replies) {
+                  // if already got all comments then add to the list
                   if (replies.total === replies.items.length) {
                     replies.items.push(newComment.id)
                   }
+                  // else if there are more comments to fetch
+                  else {
+                    // if the comment is from the current user then show it immediately
+                    if (data.user.id === state.loggedInUser?.id) {
+                      const existing = (replies.myNewItems as number[]).find(
+                        (c) => c === newComment.id,
+                      )
+                      if (!existing) {
+                        replies.myNewItems.unshift(newComment.id)
+                      }
+                    }
+                  }
+                  // increment the total reply count
                   replies.total++
                 }
               }
@@ -424,6 +437,8 @@ const replaceCommentList = (
   const { comments, totalComments } = data
   list.items = comments.map((c) => c.id)
   list.total = totalComments
+  list.otherUserNewItems = []
+  list.myNewItems = []
 }
 
 const appendCommentList = (
@@ -439,4 +454,11 @@ const appendCommentList = (
     .map((c) => c.id)
   list.items = list.items.concat(newItems)
   list.total = totalComments
+  // remove items from the other new items lists that are now in the core list
+  list.otherUserNewItems = list.otherUserNewItems.filter(
+    (c: number) => !list.items.includes(c),
+  )
+  list.myNewItems = list.myNewItems.filter(
+    (c: number) => !list.items.includes(c),
+  )
 }

@@ -104,6 +104,7 @@ export const FieldCharLimitIndicator = ({
 }
 
 export interface TextFieldProps extends FieldProps {
+  tabIndex?: number
   disabled?: boolean
   maxChars?: number
   showCharCount?: boolean
@@ -142,6 +143,7 @@ export const TextInput = (
     extraInputProps,
     hideValidationIndicator,
     onEnterPress,
+    tabIndex,
   } = props
 
   const onInputChange = useCallback(
@@ -166,6 +168,7 @@ export const TextInput = (
       <TextFieldLabel {...props} />
       <div className="flex flex-row justify-start items-center">
         <input
+          tabIndex={tabIndex}
           className={cn("disabled:bg-gray-200", inputClassname)}
           maxLength={maxChars}
           name={field.name}
@@ -202,6 +205,7 @@ export const TextAreaInput = (
     disabled,
     rows = 4,
     hideValidationIndicator,
+    tabIndex,
   } = props
 
   const onInputChange = useCallback(
@@ -216,6 +220,7 @@ export const TextAreaInput = (
       <TextFieldLabel {...props} />
       <div className="flex flex-row justify-start items-center">
         <TextareaAutoresize
+          tabIndex={tabIndex}
           minRows={rows}
           placeholder={placeholder}
           className={cn("disabled:bg-gray-200", inputClassname)}

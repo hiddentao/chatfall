@@ -4,7 +4,7 @@ import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
 
 export const buttonVariants = cva(
-  "hover:scale-105 inline-flex bg-primary text-primary-content items-center rounded-md justify-center text-sm ring-offset-primary transition-colors focus-visible:outline-none focus-visible:ring-none disabled:pointer-events-none disabled:opacity-50",
+  "hover:scale-105 inline-flex bg-primary text-primary-content items-center rounded-md justify-center text-sm ring-offset-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/75 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       [inProgress, children],
     )
 
-    const btn = (
+    return (
       <button
         className={cn(buttonVariants({ variant, className }))}
         ref={ref}
@@ -63,7 +63,5 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </div>
       </button>
     )
-
-    return btn
   },
 )

@@ -124,6 +124,14 @@ const CommentListItemInner: FC<CommentProps> = ({
     setError("")
   }, [])
 
+  const allItems = useMemo(() => {
+    const items = [...(myReplies?.items || [])]
+    if (myReplies?.myNewItems.length) {
+      items.push(...myReplies.myNewItems)
+    }
+    return items
+  }, [myReplies?.items, myReplies?.myNewItems])
+
   useEffect(() => {
     if (scrollToReplyForm && replyFormRef.current) {
       setScrollToReplyForm(false)
@@ -195,10 +203,10 @@ const CommentListItemInner: FC<CommentProps> = ({
         <div className="mt-3 p-4 flex flex-row">
           <div className="border-r border-r-gray-400 w-1"></div>
           <div className="flex-1 ml-8">
-            {myReplies ? (
+            {allItems.length ? (
               <>
                 <ul className="flex flex-col">
-                  {myReplies.items.map((r) => (
+                  {allItems.map((r) => (
                     <CommentListItem
                       key={r}
                       className="mb-8"

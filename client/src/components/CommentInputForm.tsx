@@ -143,6 +143,7 @@ export const CommentInputForm = forwardRef<
         ) : (
           <form className="flex flex-col">
             <TextAreaInput
+              tabIndex={1}
               field={commentText}
               hideError={true}
               required={true}
@@ -172,6 +173,7 @@ export const CommentInputForm = forwardRef<
             {focused ? (
               <div>
                 <ButtonWithLogin
+                  tabIndex={2}
                   disabled={!valid}
                   inProgress={isPosting}
                   className="inline-block mt-6"
