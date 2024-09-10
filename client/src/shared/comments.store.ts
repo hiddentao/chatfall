@@ -55,10 +55,11 @@ type Actions = {
 
 export type CommentStoreProps = {
   server: string
+  initialSort?: Sort
 }
 
-const createApp = (server: string) =>
-  treaty<App>(server, {
+const createApp = (server: string) => {
+  return treaty<App>(server, {
     headers: () => {
       const jwtToken = jwt.getToken()
       if (jwtToken?.token) {
@@ -68,6 +69,7 @@ const createApp = (server: string) =>
       }
     },
   })
+}
 
 type TreatyApp = ReturnType<typeof createApp>
 
@@ -131,9 +133,13 @@ export const createStore = (props: CommentStoreProps) => {
     )
   }
 
-  const createCommentList = (parentDepth: number, parentPath: string) => {
+  const createCommentList = (
+    parentDepth: number,
+    parentPath: string,
+    sort: Sort = Sort.newestFirst,
+  ) => {
     return {
-      sort: Sort.newest_first,
+      sort,
       parentDepth,
       parentPath,
       items: [],
@@ -149,7 +155,7 @@ export const createStore = (props: CommentStoreProps) => {
     liked: {},
     comments: {},
     replies: {},
-    rootList: createCommentList(-1, ""),
+    rootList: createCommentList(-1, "", props.initialSort),
     loggedInUser: undefined,
     getCanonicalUrl: () => {
       return get().canonicalUrl || getPageUrl()
@@ -288,7 +294,7 @@ export const createStore = (props: CommentStoreProps) => {
           depth: `${parentDepth + 1}`,
           pathPrefix: `${parentPath}.`,
           skip: `${skip}`,
-          sort: Sort.oldest_first,
+          sort: Sort.oldestFirst,
         },
       })
 

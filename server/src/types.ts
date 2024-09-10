@@ -19,12 +19,12 @@ export type GlobalContext = {
 }
 
 export enum Sort {
-  newest_first = "nf",
-  oldest_first = "of",
-  highest_score = "hs",
-  lowest_score = "ls",
-  most_replies = "mr",
-  least_replies = "lr",
+  newestFirst = "nf",
+  oldestFirst = "of",
+  highestScore = "hs",
+  lowestScore = "ls",
+  mostReplies = "mr",
+  leastReplies = "lr",
 }
 
 export type CommentUser = {

@@ -61,8 +61,8 @@ module.exports = {
           "secondary-content": "#f7f7f7", // consistent with base-content for optimal text visibility
           neutral: "#333", // consistent with primary-content, maintains balance in dark mode
           "neutral-content": "#f7f7f7", // matches base-content value to ensure clear text on backgrounds
-          info: "#66CCCC", // lightened from original info color, retains its calming effect
-          "info-content": "#333", // follows the "primary-content" pattern for better contrast
+          info: "#339999", // lightened from original info color, retains its calming effect
+          "info-content": "#000", // follows the "primary-content" pattern for better contrast
           error: "#FF3737", // slightly lightened from original error color, maintains intensity without overpowering users
           "error-content": "#f7f7f7", // consistent with base-content to provide clear visibility of text on backgrounds
         },

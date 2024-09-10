@@ -15,7 +15,7 @@ import { ThemeSwitcher } from "./ThemeSwitcher"
 export const CommentList: FC = () => {
   const {
     store,
-    config: { title = "Comments" },
+    config: { title = "Comments", disableModeSwitcher },
   } = useGlobalContext()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -50,7 +50,7 @@ export const CommentList: FC = () => {
   const handleShowNewComments = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
-      refetch(Sort.newest_first, 0)
+      refetch(Sort.newestFirst, 0)
     },
     [refetch],
   )
@@ -99,17 +99,19 @@ export const CommentList: FC = () => {
               onChange={handleSortChange}
               className="select select-sm rounded-md bg-neutral text-neutral-content"
             >
-              <option value={Sort.newest_first}>Newest</option>
-              <option value={Sort.oldest_first}>Oldest</option>
-              <option value={Sort.highest_score}>Highest rated</option>
-              <option value={Sort.lowest_score}>Lowest rated</option>
-              <option value={Sort.most_replies}>Most replies</option>
-              <option value={Sort.least_replies}>Least replies</option>
+              <option value={Sort.newestFirst}>Newest</option>
+              <option value={Sort.oldestFirst}>Oldest</option>
+              <option value={Sort.highestScore}>Highest rated</option>
+              <option value={Sort.lowestScore}>Lowest rated</option>
+              <option value={Sort.mostReplies}>Most replies</option>
+              <option value={Sort.leastReplies}>Least replies</option>
             </select>
           </div>
-          <div className="ml-2">
-            <ThemeSwitcher />
-          </div>
+          {disableModeSwitcher ? null : (
+            <div className="ml-2">
+              <ThemeSwitcher />
+            </div>
+          )}
         </div>
       </div>
       <div className="px-1">

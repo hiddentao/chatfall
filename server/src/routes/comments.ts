@@ -294,12 +294,12 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const canonicalUrl = generateCanonicalUrl(_url)
 
           const order_by = {
-            [Sort.newest_first]: desc(comments.createdAt),
-            [Sort.oldest_first]: asc(comments.createdAt),
-            [Sort.highest_score]: desc(comments.rating),
-            [Sort.lowest_score]: asc(comments.rating),
-            [Sort.most_replies]: desc(comments.replyCount),
-            [Sort.least_replies]: asc(comments.replyCount),
+            [Sort.newestFirst]: desc(comments.createdAt),
+            [Sort.oldestFirst]: asc(comments.createdAt),
+            [Sort.highestScore]: desc(comments.rating),
+            [Sort.lowestScore]: asc(comments.rating),
+            [Sort.mostReplies]: desc(comments.replyCount),
+            [Sort.leastReplies]: asc(comments.replyCount),
           }[sort]
 
           const limit = ctx.settings.getSetting(Setting.CommentsPerPage)

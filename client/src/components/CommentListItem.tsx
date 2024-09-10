@@ -38,7 +38,9 @@ const CommentListItemInner: FC<CommentProps> = ({
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
   const [scrollToReplyForm, setScrollToReplyForm] = useState<boolean>(false)
+  const [scrollToFirstReply, setScrollToFirstReply] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
+  const replyListRef = useRef<HTMLUListElement>(null)
   const replyFormRef = useRef<HTMLDivElement>(null)
 
   const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
@@ -77,17 +79,24 @@ const CommentListItemInner: FC<CommentProps> = ({
       onceLoaded?: () => void,
     ) => {
       event?.preventDefault()
+
+      if (!onceLoaded) {
+        onceLoaded = () => {
+          setScrollToFirstReply(true)
+        }
+      }
+
       setShowingReplies((prev) => !prev)
       if (!showingReplies && !s.replies[c.id]) {
         try {
           setError("")
           await fetchMoreReplies()
-          onceLoaded?.()
+          onceLoaded()
         } catch (err: any) {
           setError(err.toString())
         }
       } else {
-        onceLoaded?.()
+        onceLoaded()
       }
     },
     [c.id, fetchMoreReplies, showingReplies, s.replies],
@@ -143,6 +152,16 @@ const CommentListItemInner: FC<CommentProps> = ({
       replyFormRef.current.querySelector("textarea")?.focus()
     }
   }, [scrollToReplyForm])
+
+  useEffect(() => {
+    if (scrollToFirstReply && replyListRef.current) {
+      setScrollToFirstReply(false)
+      replyListRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      })
+    }
+  }, [ scrollToFirstReply]) 
 
   return (
     <li className={cn("block", className)}>
@@ -207,7 +226,7 @@ const CommentListItemInner: FC<CommentProps> = ({
           <div className="flex-1 ml-8">
             {allItems.length ? (
               <>
-                <ul className="flex flex-col">
+                <ul className="flex flex-col" ref={replyListRef}>
                   {allItems.map((r) => (
                     <CommentListItem
                       key={r}
