@@ -1,5 +1,12 @@
 import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
-import React, { FC, useCallback, useMemo, useState } from "react"
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { useGlobalContext } from "../contexts/global"
 import { PropsWithClassname } from "../types"
 import { cn, formatPlural } from "../utils/ui"
@@ -7,7 +14,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentBody } from "./CommentBody"
 import { CommentInputForm } from "./CommentInputForm"
-import { CommentPlaceholder } from "./CommentPlaceholder"
+import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { ButtonWithLogin } from "./Login"
@@ -28,10 +35,11 @@ const CommentListItemInner: FC<CommentProps> = ({
   const { store } = useGlobalContext()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
   const [showingReplies, setShowingReplies] = useState<boolean>(false)
-  const [showReplyForm, setShowReplyForm] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
+  const [scrollToReplyForm, setScrollToReplyForm] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
+  const replyFormRef = useRef<HTMLDivElement>(null)
 
   const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
 
@@ -64,27 +72,40 @@ const CommentListItemInner: FC<CommentProps> = ({
   }, [c.id, fetchReplies])
 
   const handleToggleReplies = useCallback(
-    async (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault()
+    async (
+      event?: React.MouseEvent<HTMLButtonElement>,
+      onceLoaded?: () => void,
+    ) => {
+      event?.preventDefault()
       setShowingReplies((prev) => !prev)
       if (!showingReplies && !s.replies[c.id]) {
-        await fetchMoreReplies()
+        try {
+          setError("")
+          await fetchMoreReplies()
+          onceLoaded?.()
+        } catch (err: any) {
+          setError(err.toString())
+        }
+      } else {
+        onceLoaded?.()
       }
     },
     [c.id, fetchMoreReplies, showingReplies, s.replies],
   )
 
-  const handleToggleReplyForm = useCallback(
+  const showReplyForm = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
-      setShowReplyForm((prev) => !prev)
+      if (!showingReplies) {
+        handleToggleReplies(undefined, () => {
+          setScrollToReplyForm(true)
+        })
+      } else {
+        setScrollToReplyForm(true)
+      }
     },
-    [],
+    [handleToggleReplies, showingReplies],
   )
-
-  const hideReplyForm = useCallback(() => {
-    setShowReplyForm(false)
-  }, [])
 
   const handleClickLoadMoreReplies = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -102,6 +123,16 @@ const CommentListItemInner: FC<CommentProps> = ({
   const onHideError = useCallback(() => {
     setError("")
   }, [])
+
+  useEffect(() => {
+    if (scrollToReplyForm && replyFormRef.current) {
+      setScrollToReplyForm(false)
+      replyFormRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      })
+    }
+  }, [scrollToReplyForm])
 
   return (
     <li className={cn("block", className)}>
@@ -138,7 +169,7 @@ const CommentListItemInner: FC<CommentProps> = ({
           variant="link"
           className="ml-4 inline-flex justify-start items-center"
           title="Reply"
-          onClick={handleToggleReplyForm}
+          onClick={showReplyForm}
         >
           <div className="svg-container w-4 h-4 mx-1">
             <ReplySvg />
@@ -160,26 +191,17 @@ const CommentListItemInner: FC<CommentProps> = ({
           </Button>
         ) : null}
       </div>
-      {showingReplies || showReplyForm ? (
+      {showingReplies ? (
         <div className="mt-3 p-4 flex flex-row">
           <div className="border-r border-r-gray-400 w-1"></div>
           <div className="flex-1 ml-8">
-            {showReplyForm ? (
-              <CommentInputForm
-                className={cn("p-4 mb-8 w-full")}
-                parentCommentId={c.id}
-                commentFieldPlaceholder="Add reply..."
-                initiallyFocused={true}
-                onCommentPosted={hideReplyForm}
-              />
-            ) : null}
             {myReplies ? (
               <>
                 <ul className="flex flex-col">
                   {myReplies.items.map((r) => (
                     <CommentListItem
                       key={r}
-                      className="mb-8 last-of-type:mb-0"
+                      className="mb-8"
                       comment={s.comments[r]}
                       user={s.users[s.comments[r].userId]}
                       liked={s.liked[r]}
@@ -188,7 +210,7 @@ const CommentListItemInner: FC<CommentProps> = ({
                 </ul>
                 {canLoadMoreReplies ? (
                   <Button
-                    className={cn("mt-6 mb-4", {
+                    className={cn("mb-8", {
                       hidden: loadingReplies,
                     })}
                     onClick={handleClickLoadMoreReplies}
@@ -200,12 +222,15 @@ const CommentListItemInner: FC<CommentProps> = ({
               </>
             ) : null}
             {loadingReplies ? (
-              <div>
-                <CommentPlaceholder />
-                <CommentPlaceholder />
-                <CommentPlaceholder />
-              </div>
+              <CommentsBlockPlaceholder className="mb-8" />
             ) : null}
+            <CommentInputForm
+              ref={replyFormRef}
+              className={cn("p-4 w-full")}
+              parentCommentId={c.id}
+              commentFieldPlaceholder="Add reply..."
+              initiallyFocused={true}
+            />
           </div>
         </div>
       ) : null}

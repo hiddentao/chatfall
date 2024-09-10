@@ -7,7 +7,7 @@ import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentInputForm } from "./CommentInputForm"
 import { CommentListItem } from "./CommentListItem"
-import { CommentPlaceholder } from "./CommentPlaceholder"
+import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { ThemeSwitcher } from "./ThemeSwitcher"
@@ -137,7 +137,7 @@ export const CommentList: FC = () => {
           </div>
         ) : null}
         {!error && rootList.items.length ? (
-          <ul className="flex flex-col">
+          <ul className="flex flex-col" key={rootList.sort}>
             {allItems.map((c) => (
               <CommentListItem
                 key={c}
@@ -161,12 +161,7 @@ export const CommentList: FC = () => {
           </Button>
         ) : null}
         {isLoading ? (
-          <>
-            <CommentPlaceholder />
-            <CommentPlaceholder />
-            <CommentPlaceholder />
-            <CommentPlaceholder />
-          </>
+          <CommentsBlockPlaceholder className="mt-6" numComments={4} />
         ) : null}
       </div>
     </div>

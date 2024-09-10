@@ -1,16 +1,23 @@
-import React, { FC, PropsWithChildren, ReactNode, useCallback } from "react"
+import React, {
+  forwardRef,
+  PropsWithChildren,
+  ReactNode,
+  Ref,
+  useCallback,
+} from "react"
 import TextareaAutoresize from "react-textarea-autosize"
 import { FieldApi } from "../hooks/form"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Loading } from "./Loading"
 
-export const FormDiv: FC<PropsWithChildren<PropsWithClassname>> = ({
-  children,
-  className,
-}) => {
+export const FormDiv = forwardRef<
+  HTMLDivElement,
+  PropsWithChildren<PropsWithClassname>
+>(({ children, className }, ref: Ref<HTMLDivElement>) => {
   return (
     <div
+      ref={ref}
       className={cn(
         className,
         "flex flex-col bg-secondary text-secondary-content rounded-md relative overflow-visible",
@@ -19,7 +26,7 @@ export const FormDiv: FC<PropsWithChildren<PropsWithClassname>> = ({
       {children}
     </div>
   )
-}
+})
 
 export const FieldError = ({
   error,

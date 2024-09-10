@@ -232,20 +232,14 @@ export const LoginForm: FC<
     }
   >
 > = ({ children, className, showForm, onLoginComplete }) => {
-  return (
+  return showForm ? (
     <FormDiv
-      className={cn(
-        "max-h-0 overflow-hidden bg-slate-200 border-slate-700",
-        {
-          "max-h-72 p-4 border overflow-visible": showForm,
-        },
-        className,
-      )}
+      className={cn("p-4 border bg-slate-200 border-slate-700", className)}
     >
       <LoginEmailForm onEmailVerified={onLoginComplete} />
       {children}
     </FormDiv>
-  )
+  ) : null
 }
 
 export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
