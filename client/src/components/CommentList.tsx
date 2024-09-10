@@ -10,12 +10,11 @@ import { CommentListItem } from "./CommentListItem"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
-import { ThemeSwitcher } from "./ThemeSwitcher"
 
 export const CommentList: FC = () => {
   const {
     store,
-    config: { title = "Comments", disableModeSwitcher },
+    config: { title = "Comments" },
   } = useGlobalContext()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -107,11 +106,6 @@ export const CommentList: FC = () => {
               <option value={Sort.leastReplies}>Least replies</option>
             </select>
           </div>
-          {disableModeSwitcher ? null : (
-            <div className="ml-2">
-              <ThemeSwitcher />
-            </div>
-          )}
         </div>
       </div>
       <div className="px-1">

@@ -6,13 +6,6 @@
   html {
     @apply bg-base-100 text-base-content;
   }
-
-  [data-theme='cLight'] .theme-light-button {
-    @apply hidden;
-  }
-  [data-theme='cDark'] .theme-dark-button {
-    @apply hidden;
-  }
 }
 
 @layer utilities {

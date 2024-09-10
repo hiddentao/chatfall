@@ -13,7 +13,7 @@ import { cn, formatPlural } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentBody } from "./CommentBody"
-import { CommentInputForm } from "./CommentInputForm"
+import { CommentInputForm, CommentInputFormHandle } from "./CommentInputForm"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
@@ -41,7 +41,7 @@ const CommentListItemInner: FC<CommentProps> = ({
   const [scrollToFirstReply, setScrollToFirstReply] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const replyListRef = useRef<HTMLUListElement>(null)
-  const replyFormRef = useRef<HTMLDivElement>(null)
+  const replyFormRef = useRef<CommentInputFormHandle>(null)
 
   const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
 
@@ -144,12 +144,7 @@ const CommentListItemInner: FC<CommentProps> = ({
   useEffect(() => {
     if (scrollToReplyForm && replyFormRef.current) {
       setScrollToReplyForm(false)
-      replyFormRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      })
-      // focus on the form in the div
-      replyFormRef.current.querySelector("textarea")?.focus()
+      replyFormRef.current.scrollIntoViewAndFocus()
     }
   }, [scrollToReplyForm])
 
