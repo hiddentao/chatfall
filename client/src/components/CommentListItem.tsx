@@ -139,6 +139,8 @@ const CommentListItemInner: FC<CommentProps> = ({
         behavior: "smooth",
         block: "center",
       })
+      // focus on the form in the div
+      replyFormRef.current.querySelector("textarea")?.focus()
     }
   }, [scrollToReplyForm])
 
