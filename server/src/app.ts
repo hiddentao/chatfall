@@ -66,9 +66,9 @@ export const app = new Elysia({
   .use(createApi(ctx))
   .use(createSocket(ctx))
   .use(staticPlugin())
-  .get("/", async () => {
+  .get("/*", async ({ params }) => {
     // create our react App component
-    const app = createElement(App)
+    const app = createElement(App, { path: params })
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
