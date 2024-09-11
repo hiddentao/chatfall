@@ -1,4 +1,5 @@
 import { type Config, GlobalProvider, createStore } from "@chatfall/client"
+import { useEffect, useMemo, useState } from "react"
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
 import Home from "./pages/Home"
@@ -19,10 +20,20 @@ const AppRoutes = () => (
 )
 
 export const App = ({ path }: { path: string }) => {
-  const Router = typeof window === "undefined" ? StaticRouter : BrowserRouter
+  const [themeName, setThemeName] = useState<string>("")
+
+  const Router = useMemo(
+    () => (typeof window === "undefined" ? StaticRouter : BrowserRouter),
+    [],
+  )
+
+  useEffect(() => {
+    const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+    setThemeName(darkMode ? "cDark" : "cLight")
+  }, [])
 
   return (
-    <html>
+    <html data-theme={themeName}>
       <head>
         <meta charSet="utf-8" />
         <title>Chatfall admin</title>
@@ -44,7 +55,7 @@ function checkForRebuild() {
     })
     .catch(console.error);
 }
-setInterval(checkForRebuild, 100);
+setInterval(checkForRebuild, 2000);
             `,
           }}
         />

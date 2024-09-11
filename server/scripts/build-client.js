@@ -4,6 +4,7 @@ import esbuild from "esbuild"
 import svgr from "esbuild-plugin-svgr"
 import tailwind from "esbuild-plugin-tailwind"
 import postcssImport from "postcss-import"
+import tailwindcss from "tailwindcss"
 import tailwindNesting from "tailwindcss/nesting/index.js"
 
 const isDev = process.env.NODE_ENV === "development"
@@ -21,9 +22,14 @@ async function watch() {
     jsx: "automatic",
     plugins: [
       tailwind({
-        config: "../client/tailwind.config.js",
+        config: "./tailwind.config.js",
         cssModulesEnabled: true,
-        postcssPlugins: [postcssImport, tailwindNesting, autoprefixer],
+        postcssPlugins: [
+          postcssImport,
+          tailwindNesting,
+          tailwindcss,
+          autoprefixer,
+        ],
         cssModulesExcludePaths: ["styles.css"],
       }),
       svgr(),
@@ -31,7 +37,7 @@ async function watch() {
         name: "on-rebuild",
         setup(build) {
           build.onEnd(() => {
-            console.log("public/client.js rebuilt")
+            console.log("client rebuilt")
             fs.writeFileSync(
               "public/rebuild-trigger.json",
               JSON.stringify({ timestamp: Date.now() }),

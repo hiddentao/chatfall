@@ -64,5 +64,5 @@ export const verifyCodeWithBlob = async (
     throw new Error(`Code has expired`)
   }
 
-  return orig.email
+  return orig.email.toLowerCase()
 }

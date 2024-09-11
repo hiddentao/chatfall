@@ -42,6 +42,7 @@ type Actions = {
   getCanonicalUrl: () => string
   logout: () => void
   checkAuth: () => Promise<void>
+  hasAdmin: () => Promise<boolean>
   addComment: (
     comment: string,
     parentCommentId?: number,
@@ -49,7 +50,7 @@ type Actions = {
   likeComment: (commentId: number, like: boolean) => Promise<void>
   fetchComments: (sort?: Sort, skipOverride?: number) => Promise<void>
   fetchReplies: (commentId: number) => Promise<void>
-  loginEmail: (email: string) => Promise<{ blob: string }>
+  loginEmail: (email: string, adminOnly?: boolean) => Promise<{ blob: string }>
   verifyEmail: (blob: string, code: string) => Promise<void>
 }
 
@@ -183,6 +184,13 @@ export const createStore = (props: CommentStoreProps) => {
 
       _updateLoginState(set)
     },
+    hasAdmin: async () => {
+      const { data, error } = await app.api.users.has_admin.get()
+      if (error) {
+        throw error
+      }
+      return !!data
+    },
     verifyEmail: async (blob: string, code: string) => {
       const { data, error } = await app.api.users.verify_email.post({
         blob,
@@ -197,8 +205,11 @@ export const createStore = (props: CommentStoreProps) => {
 
       _updateLoginState(set, data.user)
     },
-    loginEmail: async (email: string) => {
-      const { data, error } = await app.api.users.login_email.post({ email })
+    loginEmail: async (email: string, adminOnly?: boolean) => {
+      const { data, error } = await app.api.users.login_email.post({
+        email,
+        adminOnly,
+      })
 
       if (error) {
         throw error

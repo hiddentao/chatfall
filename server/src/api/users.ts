@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { asc, countDistinct, eq } from "drizzle-orm"
 
 import Elysia, { t } from "elysia"
 import { users } from "../db/schema"
@@ -9,7 +9,7 @@ import {
 import { signJwt } from "../lib/jwt"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
-import { generateUsernameFromEmail } from "../utils/string"
+import { generateUsernameFromEmail, isSameEmail } from "../utils/string"
 import { execHandler, getLoggedInUser } from "./utils"
 
 const userResponseType = t.Object({
@@ -38,11 +38,38 @@ export const createUserRoutes = (ctx: GlobalContext) => {
         return {}
       })
     })
+    .get("/has_admin", async () => {
+      return await execHandler(async () => {
+        const [user] = await db
+          .select({
+            id: users.id,
+          })
+          .from(users)
+          .orderBy(asc(users.id))
+          .limit(1)
+
+        return !!user
+      })
+    })
     .post(
       "/login_email",
       async ({ body }) => {
         return await execHandler(async () => {
-          const { email } = body
+          const { email, adminOnly } = body
+
+          if (adminOnly) {
+            const [user] = await db
+              .select({
+                email: users.email,
+              })
+              .from(users)
+              .orderBy(asc(users.id))
+              .limit(1)
+
+            if (user && !isSameEmail(user.email, email)) {
+              throw new Error("Must be an admin user")
+            }
+          }
 
           const data = await generateVerificationCodeAndBlob(ctx.log, email)
 
@@ -60,6 +87,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
       {
         body: t.Object({
           email: t.String(),
+          adminOnly: t.Optional(t.Boolean()),
         }),
         response: t.Object({
           blob: t.String(),
@@ -95,6 +123,17 @@ export const createUserRoutes = (ctx: GlobalContext) => {
               id: users.id,
               name: users.name,
             })
+
+          let message = ""
+
+          // if there is only 1 user then this user is an admin
+          const numUsers = await db
+            .select({ count: countDistinct(users.id) })
+            .from(users)
+
+          if (numUsers.length === 1 && numUsers[0].count === 1) {
+            ctx.log.info(`Admin user created: ${user.name} - ${email}`)
+          }
 
           return {
             user,

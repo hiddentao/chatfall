@@ -3,9 +3,6 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
   theme: {
     extend: {
-      colors: {
-        anchor: "#1a73e8",
-      },
       borderRadius: {
         lg: `0.5rem`,
         md: `calc(0.5rem - 2px)`,

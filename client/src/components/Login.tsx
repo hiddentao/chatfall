@@ -146,8 +146,8 @@ export const EmailTextInput: FC<
 }
 
 export const LoginEmailForm: FC<
-  PropsWithClassname & { onEmailVerified: () => void }
-> = ({ onEmailVerified, className }) => {
+  PropsWithClassname & { onEmailVerified: () => void; adminOnly?: boolean }
+> = ({ onEmailVerified, adminOnly, className }) => {
   const { store } = useGlobalContext()
   const { loginEmail } = store.useStore()
 
@@ -174,7 +174,7 @@ export const LoginEmailForm: FC<
         try {
           setIsSubmitting(true)
           setError("")
-          setVerifyEmailBlob((await loginEmail(email.value)).blob)
+          setVerifyEmailBlob((await loginEmail(email.value, adminOnly)).blob)
           reset()
         } catch (err: any) {
           setError(err.toString())
@@ -183,7 +183,7 @@ export const LoginEmailForm: FC<
         }
       })()
     },
-    [email.value, loginEmail, reset],
+    [email.value, loginEmail, reset, adminOnly],
   )
 
   const onCancelEmailVerification = useCallback(() => {
