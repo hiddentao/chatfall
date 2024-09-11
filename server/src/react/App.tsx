@@ -1,29 +1,21 @@
-import { useState } from "react"
+import { type Config, GlobalProvider, createStore } from "@chatfall/client"
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
+import Home from "./pages/Home"
 
-const Home = () => {
-  const [count, setCount] = useState(0)
-  return (
-    <>
-      <h1>Counter {count}</h1>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </>
-  )
+const config: Config = {
+  server: "http://localhost:3000",
 }
 
-const About = () => <h1>About Page</h1>
-
 const AppRoutes = () => (
-  <>
+  <GlobalProvider store={createStore(config)} config={config}>
     <nav>
-      <Link to="/">Home</Link> | <Link to="/about">About</Link>
+      <Link to="/">Home</Link>
     </nav>
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/about" element={<About />} />
     </Routes>
-  </>
+  </GlobalProvider>
 )
 
 export const App = ({ path }: { path: string }) => {
@@ -36,6 +28,7 @@ export const App = ({ path }: { path: string }) => {
         <title>Chatfall admin</title>
         <meta name="description" content="Bun, Elysia & React" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="/public/client.css" />
         <script
           type="text/javascript"
           dangerouslySetInnerHTML={{

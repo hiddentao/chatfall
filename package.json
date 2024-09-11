@@ -1,31 +1,28 @@
 {
-	"name": "@chatfall/chatfall",
-	"workspaces": [
-		"client",
-		"server"
-	],
-	"scripts": {
-		"dev": "turbo run dev",
-		"check": "turbo run check",
-		"prepare": "husky"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.8.3",
-		"@commitlint/cli": "^19.4.0",
-		"@commitlint/config-conventional": "^19.2.2",
-		"husky": "^9.1.4"
-	},
-	"trustedDependencies": [
-		"husky",
-		"@biomejs/biome",
-		"esbuild",
-		"keccak",
-		"secp256k1",
-		"core-js",
-		"websocket"
-	],
-	"dependencies": {
-		"turbo": "^2.0.6"
-	},
-	"packageManager": "bun@1.1.18"
+  "name": "@chatfall/chatfall",
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "check": "turbo run check",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "husky": "^9.1.4"
+  },
+  "trustedDependencies": [
+    "husky",
+    "@biomejs/biome",
+    "esbuild",
+    "keccak",
+    "secp256k1",
+    "core-js",
+    "websocket"
+  ],
+  "dependencies": {
+    "turbo": "^2.0.6"
+  },
+  "packageManager": "bun@1.1.18"
 }

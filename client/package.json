@@ -2,6 +2,9 @@
   "name": "@chatfall/client",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/exports.ts"
+  },
   "scripts": {
     "dev": "bunx --bun vite",
     "lib:build": "tsc -b && vite build",

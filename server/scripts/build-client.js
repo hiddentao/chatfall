@@ -1,5 +1,10 @@
 import fs from "fs"
+import autoprefixer from "autoprefixer"
 import esbuild from "esbuild"
+import svgr from "esbuild-plugin-svgr"
+import tailwind from "esbuild-plugin-tailwind"
+import postcssImport from "postcss-import"
+import tailwindNesting from "tailwindcss/nesting/index.js"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -9,11 +14,19 @@ async function watch() {
     bundle: true,
     outfile: "public/client.js",
     platform: "browser",
-    target: "es2015",
+    target: "es2020",
     format: "esm",
     minify: !isDev,
     sourcemap: isDev,
+    jsx: "automatic",
     plugins: [
+      tailwind({
+        config: "../client/tailwind.config.js",
+        cssModulesEnabled: true,
+        postcssPlugins: [postcssImport, tailwindNesting, autoprefixer],
+        cssModulesExcludePaths: ["styles.css"],
+      }),
+      svgr(),
       {
         name: "on-rebuild",
         setup(build) {

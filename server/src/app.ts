@@ -68,7 +68,7 @@ export const app = new Elysia({
   .use(staticPlugin())
   .get("/*", async ({ params }) => {
     // create our react App component
-    const app = createElement(App, { path: params })
+    const app = createElement(App, { path: params["*"] })
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
