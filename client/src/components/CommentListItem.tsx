@@ -153,10 +153,10 @@ const CommentListItemInner: FC<CommentProps> = ({
       setScrollToFirstReply(false)
       replyListRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "start",
       })
     }
-  }, [ scrollToFirstReply]) 
+  }, [scrollToFirstReply])
 
   return (
     <li className={cn("block", className)}>
