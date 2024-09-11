@@ -14,8 +14,4 @@
       @apply fill-current w-full h-full m-auto;
     }    
   }
-
-  .theme-light-button, .theme-dark-button {
-    @apply w-8 h-8 p-1 bg-info text-info-content;
-  }
 }
