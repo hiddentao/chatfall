@@ -24,7 +24,8 @@ export default defineConfig(({ command }) => {
           "process.env.NODE_ENV": '"production"',
         },
         build: {
-          cssMinify: false,
+          cssMinify: true,
+          minify: "esbuild",
           outDir: "./dist/lib",
           lib: {
             entry: "src/scaffold/index.tsx",

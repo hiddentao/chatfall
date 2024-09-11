@@ -4,8 +4,9 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun src/index.ts",
-    "dev": "bun --hot src/index.ts",
+    "dev": "NODE_ENV=development node scripts/build-client.js & bun --hot --watch src/index.ts",
+    "build": "NODE_ENV=production node scripts/build-client.js && bun build src/index.ts --outfile=dist/index.js",
+    "start": "bun run dist/index.js",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
     "db:check": "drizzle-kit check",
@@ -26,13 +27,19 @@
     "@fakerjs/faker": "^3.0.0",
     "@types/bun": "^1.1.6",
     "@types/pg": "^8.11.6",
-    "drizzle-kit": "^0.23.2"
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/webpack-env": "^1.18.5",
+    "drizzle-kit": "^0.23.2",
+    "esbuild": "^0.23.1",
+    "esbuild-node-externals": "^1.14.0"
   },
   "peerDependencies": {
     "typescript": "^5.5.3"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.0.4",
+    "@elysiajs/static": "^1.1.1",
     "@elysiajs/swagger": "^1.0.5",
     "@libsql/client": "^0.7.0",
     "@sinclair/typebox": "^0.32.34",
@@ -49,7 +56,9 @@
     "mailgun.js": "^10.2.3",
     "normalize-url": "^8.0.1",
     "pg": "^8.12.0",
-    "picocolors": "^1.0.1"
+    "picocolors": "^1.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "trustedDependencies": ["@biomejs/biome", "pg"],
   "exports": {

@@ -117,9 +117,12 @@ export const createRequestLogger = (log: LogInterface) => {
     .onRequest(({ store }) => {
       store.__requestStartTime = process.hrtime()
     })
-    .onResponse({ as: "global" }, ({ request, set, store, error }) =>
-      logResult(true, { request, set, store, error }),
-    )
+    .onResponse({ as: "global" }, ({ request, set, store, error }) => {
+      if (request.url.includes("/public/")) {
+        return
+      }
+      return logResult(true, { request, set, store, error })
+    })
     .onError({ as: "global" }, ({ request, error, store }) =>
       logResult(false, { request, error, store }),
     )

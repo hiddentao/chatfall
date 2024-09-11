@@ -5,6 +5,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
+
     "jsx": "react-jsx",
     "allowJs": true,
 
@@ -22,6 +23,8 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+
+    "types": ["webpack-env"]
   }
 }
