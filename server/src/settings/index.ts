@@ -7,28 +7,28 @@ import type { LogInterface } from "../lib/logger"
 export enum Setting {
   CommentsPerPage = "commentsPerPage",
   UserNextCommentDelayMs = "userNextCommentDelayMs",
-  // BlacklistedWords = "blacklistedWords",
-  // BlacklistedEmails = "blacklistedEmails",
-  // BlacklistedDomains = "blacklistedDomains",
-  // FlaggedWords = "flaggedWords",
-  // ModerateAllComments = "moderateAllComments",
+  BlacklistedWords = "blacklistedWords",
+  BlacklistedEmails = "blacklistedEmails",
+  BlacklistedDomains = "blacklistedDomains",
+  FlaggedWords = "flaggedWords",
+  ModerateAllComments = "moderateAllComments",
 }
 
 // Define a mapped type for setting values
-type SettingValueMap = {
+export type Settings = {
   [Setting.CommentsPerPage]: number
   [Setting.UserNextCommentDelayMs]: number
-  // [Setting.BlacklistedWords]: string[]
-  // [Setting.BlacklistedEmails]: string[]
-  // [Setting.BlacklistedDomains]: string[]
-  // [Setting.FlaggedWords]: string[]
-  // [Setting.ModerateAllComments]: boolean
+  [Setting.BlacklistedWords]: string[]
+  [Setting.BlacklistedEmails]: string[]
+  [Setting.BlacklistedDomains]: string[]
+  [Setting.FlaggedWords]: string[]
+  [Setting.ModerateAllComments]: boolean
 }
 
 // Create a type that maps the enum to its corresponding value type
-type SettingValue<T extends Setting> = SettingValueMap[T]
+export type SettingValue<T extends Setting> = Settings[T]
 
-type SettingValueRaw = boolean | number | string | string[]
+export type SettingValueRaw = boolean | number | string | string[]
 
 export class SettingsManager {
   private log: LogInterface
@@ -36,11 +36,11 @@ export class SettingsManager {
   private settings: Record<string, SettingValueRaw> = {
     [Setting.CommentsPerPage]: 10,
     [Setting.UserNextCommentDelayMs]: 60000,
-    // [Setting.BlacklistedWords]: [],
-    // [Setting.BlacklistedEmails]: [],
-    // [Setting.BlacklistedDomains]: [],
-    // [Setting.FlaggedWords]: [],
-    // [Setting.ModerateAllComments]: false,
+    [Setting.BlacklistedWords]: [],
+    [Setting.BlacklistedEmails]: [],
+    [Setting.BlacklistedDomains]: [],
+    [Setting.FlaggedWords]: [],
+    [Setting.ModerateAllComments]: false,
   }
 
   constructor(cfg: { db: Database; log: LogInterface; cron: Cron }) {
@@ -66,6 +66,10 @@ export class SettingsManager {
     return this.settings[key] as SettingValue<K>
   }
 
+  public getSettings(): Settings {
+    return { ...this.settings } as Settings
+  }
+
   public async setSetting<K extends Setting>(key: K, value: SettingValue<K>) {
     await this.db
       .update(settings)
@@ -73,5 +77,7 @@ export class SettingsManager {
       .where(eq(settings.key, key))
 
     this.settings[key] = value
+
+    this.log.info(`Setting updated: ${key} = ${value}`)
   }
 }

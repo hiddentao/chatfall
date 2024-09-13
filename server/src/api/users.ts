@@ -124,8 +124,6 @@ export const createUserRoutes = (ctx: GlobalContext) => {
               name: users.name,
             })
 
-          let message = ""
-
           // if there is only 1 user then this user is an admin
           const numUsers = await db
             .select({ count: countDistinct(users.id) })

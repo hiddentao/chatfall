@@ -2,7 +2,7 @@ import { FC } from "react"
 import { CommentList } from "./components/CommentList"
 import "./global.css"
 import { GlobalProvider } from "./contexts/global"
-import { createStore } from "./shared/comments.store"
+import { createStore } from "./store/comments.store"
 import { Config, ThemeMode } from "./types"
 import { updateCSSVariables } from "./utils/ui"
 

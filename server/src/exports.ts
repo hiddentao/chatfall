@@ -24,3 +24,5 @@ export type {
   SocketNewCommentEvent,
   SocketLikeCommentEvent,
 } from "./ws/types"
+
+export type { Settings } from "./settings"

@@ -1,43 +1,23 @@
-import { LoginEmailForm } from "@chatfall/client"
-import { useGlobalContext } from "@chatfall/client"
-import React, { useState, useEffect } from "react"
+import { type FC } from "react"
 
-const Home: React.FC = () => {
-  const { store } = useGlobalContext()
-  const { loggedInUser, hasAdmin } = store.useStore()
-  const [creatingAdmin, setCreatingAdmin] = useState(false)
-
-  const handleLoginComplete = () => {
-    console.log("Login completed")
-  }
-
-  useEffect(() => {
-    ;(async () => {
-      setCreatingAdmin(!(await hasAdmin()))
-    })()
-  }, [hasAdmin])
+export const Home: FC = () => {
+  //   const { store } = useGlobalContext()
+  //   const { getSettings } = store.useStore()
 
   return (
-    <div>
-      <h1>Welcome to Chatfall!</h1>
-      {loggedInUser ? (
-        <p>Hello, {loggedInUser.name}!</p>
-      ) : (
-        <>
-          {creatingAdmin ? (
-            <p className="bg-info text-info-content">
-              Since you are the first user to sign up, you will become the
-              administrator of this Chatfall instance!
-            </p>
-          ) : null}
-          <LoginEmailForm
-            adminOnly={true}
-            onEmailVerified={handleLoginComplete}
-          />
-        </>
-      )}
+    <div className="mt-4">
+      <h2 className="text-xl font-semibold mb-2">General Settings</h2>
+      <div className="form-control">
+        <label className="label cursor-pointer">
+          <span className="label-text">Flag all comments for moderation</span>
+          {/* <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={settings.flagAllComments}
+            onChange={handleFlagAllCommentsChange}
+          /> */}
+        </label>
+      </div>
     </div>
   )
 }
-
-export default Home

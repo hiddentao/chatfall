@@ -4,6 +4,7 @@ import {
   type CommentUser,
   type LoggedInUser,
   PostCommentResponse,
+  Settings,
   SocketEvent,
   SocketEventTypeEnum,
   SocketNewCommentEvent,
@@ -14,9 +15,9 @@ import { produce } from "immer"
 import { create } from "zustand"
 import { jwt } from "../lib/jwt"
 
-type CommentId = number
+export type ClientCommentId = number
 
-type CommentList = {
+export type ClientCommentList = {
   sort: Sort
   parentDepth: number
   parentPath: string
@@ -28,19 +29,19 @@ type CommentList = {
   myNewItems: number[]
 }
 
-type State = {
-  canonicalUrl: string | null
-  users: Record<CommentId, CommentUser>
-  liked: Record<CommentId, boolean>
-  comments: Record<number, Comment>
-  replies: Record<CommentId, CommentList>
-  rootList: CommentList
+export type ClientState = {
+  users: Record<ClientCommentId, CommentUser>
+  liked: Record<ClientCommentId, boolean>
+  comments: Record<ClientCommentId, Comment>
+  replies: Record<ClientCommentId, ClientCommentList>
+  rootList: ClientCommentList
   loggedInUser?: LoggedInUser
 }
 
-type Actions = {
+export type ClientActions = {
   getCanonicalUrl: () => string
   logout: () => void
+  getSettings: () => Promise<Settings>
   checkAuth: () => Promise<void>
   hasAdmin: () => Promise<boolean>
   addComment: (
@@ -54,7 +55,7 @@ type Actions = {
   verifyEmail: (blob: string, code: string) => Promise<void>
 }
 
-export type CommentStoreProps = {
+export type ClientStoreProps = {
   server: string
   initialSort?: Sort
 }
@@ -111,7 +112,7 @@ const getPageUrl = () => {
   return window.location.href
 }
 
-export const createStore = (props: CommentStoreProps) => {
+export const createStore = (props: ClientStoreProps) => {
   const app = createApp(props.server)
 
   // websocket
@@ -119,12 +120,15 @@ export const createStore = (props: CommentStoreProps) => {
 
   const _updateLoginState = (
     set: (
-      fn: (state: State) => (State & Actions) | Partial<State & Actions>,
+      fn: (
+        state: ClientState,
+      ) => (ClientState & ClientActions) | Partial<ClientState & ClientActions>,
     ) => void,
     loggedInUser?: LoggedInUser,
   ) => {
     set(
       produce((state) => {
+        state.checkingAuth = false
         state.loggedInUser = loggedInUser
         ws.onceReady((ws) => {
           const token = jwt.getToken()?.token
@@ -150,13 +154,14 @@ export const createStore = (props: CommentStoreProps) => {
     }
   }
 
-  const useStore = create<State & Actions>()((set, get) => ({
+  const useStore = create<ClientState & ClientActions>()((set, get) => ({
     canonicalUrl: null,
     users: {},
     liked: {},
     comments: {},
     replies: {},
     rootList: createCommentList(-1, "", props.initialSort),
+    checkingAuth: true,
     loggedInUser: undefined,
     getCanonicalUrl: () => {
       return get().canonicalUrl || getPageUrl()
@@ -165,7 +170,20 @@ export const createStore = (props: CommentStoreProps) => {
       jwt.removeToken()
       _updateLoginState(set)
     },
+    getSettings: async () => {
+      const { data, error } = await app.api.settings.index.get()
+      if (error) {
+        throw error
+      }
+      return data
+    },
     checkAuth: async () => {
+      set(
+        produce((state) => {
+          state.checkingAuth = true
+        }),
+      )
+
       if (jwt.getToken()) {
         const { data, error } = await app.api.users.check.get()
         if (error) {
@@ -440,12 +458,12 @@ const commentListToMap = (comments: Comment[]) => {
       acc[c.id] = c
       return acc
     },
-    {} as Record<CommentId, Comment>,
+    {} as Record<ClientCommentId, Comment>,
   )
 }
 
 const replaceCommentList = (
-  list: CommentList,
+  list: ClientCommentList,
   data: {
     comments: Comment[]
     totalComments: number
@@ -459,7 +477,7 @@ const replaceCommentList = (
 }
 
 const appendCommentList = (
-  list: CommentList,
+  list: ClientCommentList,
   data: {
     comments: Comment[]
     totalComments: number

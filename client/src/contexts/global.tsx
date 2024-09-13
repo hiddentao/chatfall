@@ -5,7 +5,7 @@ import {
   useContext,
   useEffect,
 } from "react"
-import { CommentStore } from "../shared/comments.store"
+import { CommentStore } from "../store/comments.store"
 import { Config } from "../types"
 
 export interface StoreContextValue {
