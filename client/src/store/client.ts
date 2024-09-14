@@ -8,7 +8,7 @@ import {
   Sort,
 } from "@chatfall/server"
 import { produce } from "immer"
-import { StoreApi, UseBoundStore } from "zustand"
+import {} from "zustand"
 import { CoreState, StoreProps, createBaseStore } from "./base"
 
 // Export types
@@ -189,7 +189,7 @@ export const createStore = (props: ClientStoreProps) => {
           )
         },
       }) as Omit<ClientState, keyof CoreState>,
-    (useStore: UseBoundStore<StoreApi<ClientState>>, data: SocketEvent) => {
+    (useStore, data: SocketEvent) => {
       // console.debug(`Received socket event`, data)
 
       switch (data.type) {

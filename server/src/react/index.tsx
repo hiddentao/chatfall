@@ -5,7 +5,3 @@ import { App } from "./App.js"
 import "./styles.css"
 
 hydrateRoot(document, <App path="/" />)
-
-// if (module.hot) {
-//   module.hot.accept()
-// }

@@ -3,10 +3,13 @@ import {
   type StoreProps,
   createBaseStore,
 } from "@chatfall/client"
-import type { SocketEvent } from "../../exports"
+import { produce } from "immer"
+import type { Settings, SocketEvent } from "../../exports"
 
 export type ServerState = CoreState & {
+  settings?: Settings
   hasAdmin: () => Promise<boolean>
+  loadSettings: () => Promise<void>
 }
 
 export type ServerStoreProps = StoreProps & {}
@@ -14,15 +17,34 @@ export type ServerStoreProps = StoreProps & {}
 export const createStore = (props: ServerStoreProps) => {
   return createBaseStore<ServerState>(
     props,
-    (_set, _get, app) =>
+    (set, _get, app) =>
       ({
+        settings: undefined,
         hasAdmin: async () => {
-          const res = await app.api.users.has_admin.get()
-          return res.data
+          const { data, error } = await app.api.users.has_admin.get()
+
+          if (error) {
+            throw error
+          }
+
+          return data
+        },
+        loadSettings: async () => {
+          const { data, error } = await app.api.settings.index.get()
+
+          if (error) {
+            throw error
+          }
+
+          set(
+            produce((state) => {
+              state.settings = data
+            }),
+          )
         },
       }) as Omit<ServerState, keyof CoreState>,
-    (data: SocketEvent) => {
-      console.log(data)
+    (useStore, data: SocketEvent) => {
+      console.log(useStore, data)
     },
   )
 }

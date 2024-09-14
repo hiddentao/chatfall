@@ -2,15 +2,17 @@ import cors from "@elysiajs/cors"
 import { staticPlugin } from "@elysiajs/static"
 import swagger from "@elysiajs/swagger"
 import { Elysia } from "elysia"
-// import { renderToReadableStream } from "react-dom/server.browser"
+import { renderToReadableStream } from "react-dom/server.browser"
 
 import { Cron } from "cron-async"
+import { createElement } from "react"
 import { createApi } from "./api"
 import { db } from "./db"
 import { env, isProd } from "./env"
 import { verifyJwt } from "./lib/jwt"
 import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
+import { App } from "./react/App"
 import { SettingsManager } from "./settings"
 import { pluginConditionally } from "./utils/elysia"
 import { SocketManager, createSocket } from "./ws"
@@ -64,17 +66,17 @@ export const app = new Elysia({
   .use(createApi(ctx))
   .use(createSocket(ctx))
   .use(staticPlugin())
-// .get("/*", async ({ params }) => {
-// // create our react App component
-// const app = createElement(App, { path: params["*"] })
-// // render the app component to a readable stream
-// const stream = await renderToReadableStream(app, {
-//   bootstrapModules: ["/public/client.js"],
-// })
-// // output the stream as the response
-// return new Response(stream, {
-//   headers: { "Content-Type": "text/html" },
-// })
-// })
+  .get("/*", async ({ params }) => {
+    // create our react App component
+    const app = createElement(App, { path: params["*"] })
+    // render the app component to a readable stream
+    const stream = await renderToReadableStream(app, {
+      bootstrapModules: ["/public/client.js"],
+    })
+    // output the stream as the response
+    return new Response(stream, {
+      headers: { "Content-Type": "text/html" },
+    })
+  })
 
 export type ServerApp = typeof app

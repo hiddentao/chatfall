@@ -1,6 +1,6 @@
 import { type Config, LoginEmailForm, LogoutSvg } from "@chatfall/client"
 import { Button } from "@chatfall/client"
-import { type FC, useEffect, useMemo, useState } from "react"
+import { type FC, useCallback, useEffect, useMemo, useState } from "react"
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
 import { useGlobalContext } from "../contexts/global"
@@ -32,12 +32,32 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
   config,
 }) => {
   const { store } = useGlobalContext()
-  const { checkingAuth, loggedInUser, hasAdmin, logout } = store.useStore()
+  const {
+    settings,
+    checkingAuth,
+    loggedInUser,
+    hasAdmin,
+    loadSettings,
+    logout,
+  } = store.useStore()
   const [creatingAdmin, setCreatingAdmin] = useState(false)
 
-  const onEmailVerified = () => {
-    console.log("Email verified")
-  }
+  const onEmailVerified = useCallback(async () => {
+    // do nothing
+  }, [])
+
+  // load settings if user is logged in and settings are not loaded
+  useEffect(() => {
+    if (loggedInUser && !settings) {
+      ;(async () => {
+        try {
+          await loadSettings()
+        } catch (error) {
+          console.error(error)
+        }
+      })()
+    }
+  }, [loadSettings, loggedInUser, settings])
 
   useEffect(() => {
     ;(async () => {
@@ -84,9 +104,17 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
         ) : (
           <>
             {loggedInUser ? (
-              <Router location={path}>
-                <AppRoutes />
-              </Router>
+              <>
+                {settings ? (
+                  <Router location={path}>
+                    <AppRoutes />
+                  </Router>
+                ) : (
+                  <div className="flex flex-row justify-center items-center w-full">
+                    <div className="skeleton h-32 w-5/6" />
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center">
                 {creatingAdmin ? (

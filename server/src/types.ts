@@ -5,10 +5,6 @@ import type { Mailer } from "./lib/mailer"
 import type { SettingsManager } from "./settings"
 import type { SocketManager } from "./ws"
 
-export type Settings = {
-  userNextCommentDelayMs: number
-}
-
 export type GlobalContext = {
   cron: Cron
   db: Database

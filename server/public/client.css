@@ -1762,6 +1762,9 @@ html {
 .w-4 {
   width: 1rem;
 }
+.w-5\/6 {
+  width: 83.333333%;
+}
 .w-6 {
   width: 1.5rem;
 }
