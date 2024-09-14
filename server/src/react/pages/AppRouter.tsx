@@ -1,9 +1,9 @@
-import { type Config, LoginEmailForm, useGlobalContext } from "@chatfall/client"
+import { type Config, LoginEmailForm, LogoutSvg } from "@chatfall/client"
 import { Button } from "@chatfall/client"
 import { type FC, useEffect, useMemo, useState } from "react"
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
-import { LogoutSvg } from "../../../../client/src/components/Svg"
+import { useGlobalContext } from "../contexts/global"
 import { Home } from "./Home"
 
 const AppRoutes = () => (

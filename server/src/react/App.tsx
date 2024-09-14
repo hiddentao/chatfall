@@ -1,7 +1,9 @@
-import { type Config, GlobalProvider, createStore } from "@chatfall/client"
+import { type Config } from "@chatfall/client"
 import { useEffect, useState } from "react"
 import {} from "react-router-dom"
+import { GlobalProvider } from "./contexts/global"
 import { AppRouter } from "./pages/AppRouter"
+import { createStore } from "./store/server"
 
 const config: Config = {
   server: "http://localhost:3000",

@@ -1,5 +1,11 @@
 import { PostCommentResponse } from "@chatfall/server"
-import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react"
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
 import { PropsWithClassname } from "../types"
@@ -30,7 +36,7 @@ export type CommentInputFormHandle = {
 }
 
 export const CommentInputForm = forwardRef<
-CommentInputFormHandle,
+  CommentInputFormHandle,
   CommentInputFormProps
 >(
   (
@@ -52,20 +58,24 @@ CommentInputFormHandle,
       useState<PostCommentResponse>()
     const divRef = useRef<HTMLDivElement>(null)
 
-    useImperativeHandle(ref, () => {
-      return {
-        scrollIntoViewAndFocus () {
-          if (divRef.current) {
-            divRef.current.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            })
-            divRef.current.querySelector("textarea")?.focus()
-          }
-        },
-      };
-    }, []);
-            
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          scrollIntoViewAndFocus() {
+            if (divRef.current) {
+              divRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              })
+              divRef.current.querySelector("textarea")?.focus()
+            }
+          },
+        }
+      },
+      [],
+    )
+
     const [commentText] = [
       useField({
         name: "commentText",

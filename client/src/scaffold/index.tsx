@@ -9,7 +9,7 @@ export type ChatfallProps = Config & {
 
 export const Chatfall = {
   init: (props: ChatfallProps) => {
-    ;['rootElement', 'server'].forEach((key) => {
+    ;["rootElement", "server"].forEach((key) => {
       if (!(props as any)[key]) {
         throw new Error(`Config '${key}' is required`)
       }

@@ -1,6 +1,4 @@
-import type { app } from "./app"
-
-export type App = typeof app
+export type { ServerApp } from "./app"
 
 export type {
   UserToInsert,

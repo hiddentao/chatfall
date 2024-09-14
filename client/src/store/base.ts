@@ -1,15 +1,19 @@
-import { type App, type LoggedInUser, SocketEvent } from "@chatfall/server"
+import {
+  type LoggedInUser,
+  type ServerApp,
+  SocketEvent,
+} from "@chatfall/server"
 import { treaty } from "@elysiajs/eden"
 import { produce } from "immer"
-import { create } from "zustand"
+import { StoreApi, UseBoundStore, create } from "zustand"
 import { jwt } from "../lib/jwt"
 
 export type StoreProps = {
   server: string
 }
 
-const createApp = (server: string): ReturnType<typeof treaty<App>> => {
-  return treaty<App>(server, {
+const createApp = (server: string): ReturnType<typeof treaty<ServerApp>> => {
+  return treaty<ServerApp>(server, {
     headers: () => {
       const jwtToken = jwt.getToken()
       if (jwtToken?.token) {
@@ -79,7 +83,10 @@ export const createBaseStore = <State extends CoreState>(
     get: () => State,
     app: TreatyApp,
   ) => Omit<State, keyof CoreState>,
-  onSocketMessage: (data: SocketEvent) => void,
+  onSocketMessage: (
+    useStore: UseBoundStore<StoreApi<State>>,
+    data: SocketEvent,
+  ) => void,
 ) => {
   const app = createApp(props.server)
 
@@ -101,7 +108,7 @@ export const createBaseStore = <State extends CoreState>(
     )
   }
 
-  const useStore = create<State>(
+  const useStore = create<State>()(
     (set, get) =>
       ({
         loggedInUser: undefined,
@@ -173,7 +180,11 @@ export const createBaseStore = <State extends CoreState>(
       }) as State,
   )
 
-  ws.onMessage(onSocketMessage)
+  ws.onMessage((data) => {
+    onSocketMessage(useStore, data)
+  })
 
   return { useStore }
 }
+
+export type BaseStore = ReturnType<typeof createBaseStore>
