@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { ClientStore } from "../store/client"
 import { PropsWithClassname } from "../types"
 import { cn, formatPlural } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
@@ -32,7 +33,7 @@ const CommentListItemInner: FC<CommentProps> = ({
   user,
   liked,
 }) => {
-  const { store } = useGlobalContext()
+  const { store } = useGlobalContext<ClientStore>()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
   const [showingReplies, setShowingReplies] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)

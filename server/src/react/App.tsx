@@ -1,7 +1,8 @@
-import { type Config } from "@chatfall/client"
-import { useEffect, useState } from "react"
+"use client"
+
+import { type Config, GlobalProvider, ThemeNames } from "@chatfall/client"
 import {} from "react-router-dom"
-import { GlobalProvider } from "./contexts/global"
+import { ThemeConsumer, ThemeProvider } from "./contexts/theme"
 import { AppRouter } from "./pages/AppRouter"
 import { createStore } from "./store/server"
 
@@ -10,26 +11,25 @@ const config: Config = {
 }
 
 export const App = ({ path }: { path: string }) => {
-  const [themeName, setThemeName] = useState<string>("")
-
-  useEffect(() => {
-    const darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
-    setThemeName(darkMode ? "cDark" : "cLight")
-  }, [])
-
   return (
     <GlobalProvider store={createStore(config)} config={config}>
-      <html data-theme={themeName}>
-        <head>
-          <meta charSet="utf-8" />
-          <title>Chatfall admin</title>
-          <meta name="description" content="Bun, Elysia & React" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="stylesheet" href="/public/client.css" />
-          <script
-            type="text/javascript"
-            dangerouslySetInnerHTML={{
-              __html: `
+      <ThemeProvider>
+        <ThemeConsumer>
+          {({ themeMode }) => (
+            <html data-theme={ThemeNames[themeMode]}>
+              <head>
+                <meta charSet="utf-8" />
+                <title>Chatfall admin</title>
+                <meta name="description" content="Bun, Elysia & React" />
+                <meta
+                  name="viewport"
+                  content="width=device-width, initial-scale=1"
+                />
+                <link rel="stylesheet" href="/public/client.css" />
+                <script
+                  type="text/javascript"
+                  dangerouslySetInnerHTML={{
+                    __html: `
 function checkForRebuild() {
   fetch('/public/rebuild-trigger.json?' + new Date().getTime())
     .then(response => response.json())
@@ -43,13 +43,16 @@ function checkForRebuild() {
 }
 setInterval(checkForRebuild, 2000);
             `,
-            }}
-          />
-        </head>
-        <body>
-          <AppRouter path={path} config={config} />
-        </body>
-      </html>
+                  }}
+                />
+              </head>
+              <body>
+                <AppRouter path={path} config={config} />
+              </body>
+            </html>
+          )}
+        </ThemeConsumer>
+      </ThemeProvider>
     </GlobalProvider>
   )
 }

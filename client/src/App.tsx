@@ -3,21 +3,24 @@ import { CommentList } from "./components/CommentList"
 import "./global.css"
 import { GlobalProvider } from "./contexts/global"
 import { createStore } from "./store/client"
-import { Config, ThemeMode } from "./types"
+import { Config, ThemeMode, ThemeNames } from "./types"
 import { updateCSSVariables } from "./utils/ui"
-
-const LightThemeName = "cLight"
-const DarkThemeName = "cDark"
 
 export const createApp = (config: Config) => {
   const store = createStore(config)
 
   // override theme variables
   if (config.darkThemeOverride?.colors) {
-    updateCSSVariables(DarkThemeName, config.darkThemeOverride.colors)
+    updateCSSVariables(
+      ThemeNames[ThemeMode.Dark],
+      config.darkThemeOverride.colors,
+    )
   }
   if (config.lightThemeOverride?.colors) {
-    updateCSSVariables(LightThemeName, config.lightThemeOverride.colors)
+    updateCSSVariables(
+      ThemeNames[ThemeMode.Light],
+      config.lightThemeOverride.colors,
+    )
   }
 
   // set light/dark mode theme
@@ -26,8 +29,8 @@ export const createApp = (config: Config) => {
     (config.mode === undefined &&
       window.matchMedia("(prefers-color-scheme: dark)").matches)
   document.documentElement.dataset.theme = useDarkMode
-    ? DarkThemeName
-    : LightThemeName
+    ? ThemeNames[ThemeMode.Dark]
+    : ThemeNames[ThemeMode.Light]
 
   const App: FC = () => {
     return (

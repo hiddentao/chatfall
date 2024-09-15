@@ -5,6 +5,11 @@ export enum ThemeMode {
   Dark = "dark",
 }
 
+export const ThemeNames: Record<ThemeMode, string> = {
+  [ThemeMode.Light]: "cLight",
+  [ThemeMode.Dark]: "cDark",
+}
+
 export type ThemeConfig = {
   /**
    * Theme colours.

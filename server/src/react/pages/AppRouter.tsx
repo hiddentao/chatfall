@@ -1,9 +1,23 @@
-import { type Config, LoginEmailForm, LogoutSvg } from "@chatfall/client"
+import {
+  type Config,
+  LoginEmailForm,
+  ThemeMode,
+  useGlobalContext,
+} from "@chatfall/client"
 import { Button } from "@chatfall/client"
-import { type FC, useCallback, useEffect, useMemo, useState } from "react"
+import {
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
-import { useGlobalContext } from "../contexts/global"
+import { DarkSvg, LightSvg, LogoutSvg } from "../components/Svg"
+import { useThemeContext } from "../contexts/theme"
+import { type ServerStore } from "../store/server"
 import { Home } from "./Home"
 
 const AppRoutes = () => (
@@ -31,7 +45,9 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
   path,
   config,
 }) => {
-  const { store } = useGlobalContext()
+  const { store } = useGlobalContext<ServerStore>()
+  const { themeMode, toggleTheme } = useThemeContext()
+  const [modeSwitcherBtn, setModeSwitcherBtn] = useState<ReactNode | null>(null)
   const {
     settings,
     checkingAuth,
@@ -70,20 +86,40 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     [],
   )
 
+  useEffect(() => {
+    setModeSwitcherBtn(
+      <Button
+        onClick={toggleTheme}
+        variant="icon"
+        title={
+          themeMode === ThemeMode.Dark
+            ? "Switch to Light Mode"
+            : "Switch to Dark Mode"
+        }
+        tooltipClassName="tooltip-left tooltip-bottom"
+        className="w-6 h-6 ml-4"
+      >
+        {themeMode === ThemeMode.Dark ? <LightSvg /> : <DarkSvg />}
+      </Button>,
+    )
+  }, [themeMode, toggleTheme])
+
   return (
     <div className="w-full h-full">
       <div className="flex flex-row  p-2 justify-between items-center bg-info text-info-content">
-        <a href="/" className="flex-0">
-          <h1 className="text-2xl font-heading">
-            Chatfall Admin
-            <strong className=" block text-xs text-info-content/50">
-              {config.server}
-            </strong>
-          </h1>
-        </a>
+        <div className="flex flex-row items-center">
+          <a href="/" className="flex-0">
+            <h1 className="text-2xl font-heading">
+              Chatfall Admin
+              <strong className="block text-xs text-info-content/50">
+                {config.server}
+              </strong>
+            </h1>
+          </a>
+          {modeSwitcherBtn}
+        </div>
         {loggedInUser && (
           <div className="text-right flex items-center">
-            <span className="mr-4">{loggedInUser.name}</span>
             <Button
               onClick={logout}
               variant="icon"

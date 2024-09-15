@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { type ClientStore } from "../store/client"
 import { cn } from "../utils/ui"
 import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
@@ -15,7 +16,7 @@ export const CommentList: FC = () => {
   const {
     store,
     config: { title = "Comments" },
-  } = useGlobalContext()
+  } = useGlobalContext<ClientStore>()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")

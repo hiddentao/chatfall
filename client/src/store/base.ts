@@ -120,7 +120,7 @@ export const createBaseStore = <State extends CoreState>(
 
         logout: () => {
           jwt.removeToken()
-          _updateLoginState
+          _updateLoginState(set)
         },
 
         checkAuth: async () => {

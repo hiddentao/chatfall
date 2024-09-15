@@ -8,6 +8,7 @@ import React, {
 } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
+import { type ClientStore } from "../store/client"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
@@ -49,7 +50,7 @@ export const CommentInputForm = forwardRef<
     },
     ref,
   ) => {
-    const { store } = useGlobalContext()
+    const { store } = useGlobalContext<ClientStore>()
     const { loggedInUser, addComment, logout } = store.useStore()
     const [focused, setFocused] = useState<boolean>(!!initiallyFocused)
     const [error, setError] = useState<string>("")

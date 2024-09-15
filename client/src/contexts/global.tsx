@@ -5,18 +5,18 @@ import {
   useContext,
   useEffect,
 } from "react"
-import { type ClientStore } from "../store/client"
+import { BaseStore } from "../exports"
 import { type Config } from "../types"
 
-export interface StoreContextValue {
-  store: ClientStore
+export interface StoreContextValue<T extends BaseStore> {
+  store: T
   config: Config
 }
 
-export const GlobalContext = createContext({} as StoreContextValue)
+export const GlobalContext = createContext({} as StoreContextValue<BaseStore>)
 
 export const GlobalProvider: FC<
-  PropsWithChildren & { store: ClientStore; config: Config }
+  PropsWithChildren & { store: BaseStore; config: Config }
 > = ({ children, store, config }) => {
   const { loggedInUser, checkAuth } = store.useStore()
 
@@ -41,6 +41,6 @@ export const GlobalProvider: FC<
 
 export const GlobalConsumer = GlobalContext.Consumer
 
-export const useGlobalContext = () => {
-  return useContext(GlobalContext)
+export const useGlobalContext = <T extends BaseStore>() => {
+  return useContext(GlobalContext) as StoreContextValue<T>
 }

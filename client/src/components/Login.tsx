@@ -1,6 +1,7 @@
 import React, { FC, PropsWithChildren, useCallback, useState } from "react"
 import { isEmail } from "validator"
 import { useGlobalContext } from "../contexts/global"
+import { BaseStore } from "../exports"
 import { useField, useForm } from "../hooks/form"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
@@ -27,7 +28,7 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
   onVerified,
   onCancelVerification,
 }) => {
-  const { store } = useGlobalContext()
+  const { store } = useGlobalContext<BaseStore>()
   const { verifyEmail } = store.useStore()
 
   const [code] = [
@@ -148,7 +149,7 @@ export const EmailTextInput: FC<
 export const LoginEmailForm: FC<
   PropsWithClassname & { onEmailVerified: () => void; adminOnly?: boolean }
 > = ({ onEmailVerified, adminOnly, className }) => {
-  const { store } = useGlobalContext()
+  const { store } = useGlobalContext<BaseStore>()
   const { loginEmail } = store.useStore()
 
   const [email] = [
@@ -243,7 +244,7 @@ export const LoginForm: FC<
 }
 
 export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
-  const { store } = useGlobalContext()
+  const { store } = useGlobalContext<BaseStore>()
   const { loggedInUser } = store.useStore()
 
   const [showLoginForm, setShowLoginForm] = useState<boolean>(false)

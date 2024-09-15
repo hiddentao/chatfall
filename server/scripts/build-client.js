@@ -32,7 +32,9 @@ async function watch() {
         ],
         cssModulesExcludePaths: ["styles.css"],
       }),
-      svgr(),
+      svgr({
+        typescript: true,
+      }),
       {
         name: "on-rebuild",
         setup(build) {
