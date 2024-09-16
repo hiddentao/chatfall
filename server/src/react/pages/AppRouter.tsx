@@ -29,15 +29,16 @@ import {
 } from "../components/Svg"
 import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
+import { BlockedEmails } from "./BlockedEmails"
 import { Home } from "./Home"
 
 const navLinks = [
-  { to: "/", text: "General settings" },
-  { to: "/blocked-emails", text: "Blocked Emails" },
-  { to: "/blocked-domains", text: "Blocked Domains" },
-  { to: "/blocked-words", text: "Blocked Words" },
-  { to: "/flagged-words", text: "Flagged Words" },
-  { to: "/comments", text: "All Comments" },
+  { to: "/", text: "General settings", element: <Home /> },
+  { to: "/blocked-emails", text: "Blocked Emails", element: <BlockedEmails /> },
+  // { to: "/blocked-domains", text: "Blocked Domains", element: <BlockedDomains /> },
+  // { to: "/blocked-words", text: "Blocked Words", element: <BlockedWords /> },
+  // { to: "/flagged-words", text: "Flagged Words", element: <FlaggedWords /> },
+  // { to: "/comments", text: "All Comments", element: <Comments /> },
 ]
 
 const AppRoutes = () => {
@@ -56,11 +57,11 @@ const AppRoutes = () => {
     <>
       <nav className="flex flex-col sm:flex-row">
         <div className="tabs tabs-boxed hidden sm:flex">
-          {navLinks.map((link, index) => (
+          {navLinks.map((link) => (
             <Link
-              key={index}
+              key={link.to}
               to={link.to}
-              className={`tab ${index === 0 ? "tab-active" : ""} min-h-[3rem] h-auto py-2`}
+              className={`tab ${location.pathname === link.to ? "tab-active" : ""} min-h-[3rem] h-auto py-2`}
             >
               {link.text}
             </Link>
@@ -86,12 +87,9 @@ const AppRoutes = () => {
         </div>
       </nav>
       <Routes>
-        <Route path="/" element={<Home />} />
-        {/* <Route path="/blocked-emails" element={<BlockedEmails />} />
-        <Route path="/blocked-domains" element={<BlockedDomains />} />
-        <Route path="/blocked-words" element={<BlockedWords />} />
-        <Route path="/flagged-words" element={<FlaggedWords />} />
-        <Route path="/comments" element={<Comments />} /> */}
+        {navLinks.map((link) => (
+          <Route key={link.to} path={link.to} element={link.element} />
+        ))}
       </Routes>
     </>
   )

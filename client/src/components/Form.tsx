@@ -191,7 +191,7 @@ export const TextInput = (
 
 export const TextAreaInput = (
   props: TextFieldProps & {
-    onFocus: () => void
+    onFocus?: () => void
     rows?: number
   },
 ) => {

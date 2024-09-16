@@ -7,6 +7,7 @@ import {
   verifyCodeWithBlob,
 } from "../lib/emailVerification"
 import { signJwt } from "../lib/jwt"
+import { Setting } from "../settings"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
 import { generateUsernameFromEmail, isSameEmail } from "../utils/string"
@@ -56,6 +57,13 @@ export const createUserRoutes = (ctx: GlobalContext) => {
       async ({ body }) => {
         return await execHandler(async () => {
           const { email, adminOnly } = body
+
+          const blockedEmails = ctx.settings.getSetting(
+            Setting.BlacklistedEmails,
+          )
+          if (blockedEmails.find((e) => isSameEmail(e, email))) {
+            throw new Error("This email address has been blacklisted")
+          }
 
           if (adminOnly) {
             const [user] = await db

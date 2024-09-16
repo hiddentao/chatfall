@@ -12,9 +12,9 @@ export type ValidateAsyncFunction<T = any> = (
   extraArgs?: any,
 ) => Promise<string | undefined>
 
-export interface FieldApi {
+export interface FieldApi<T> {
   name: string
-  value: any
+  value: T | undefined
   valid: boolean
   error?: string
   version: number
@@ -41,7 +41,7 @@ const _calculateIsSet = <T = any>(options: FieldOptions<T>): boolean => {
   return options.optional ? true : !!options.initialValue
 }
 
-export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
+export const useField = <T = any>(options: FieldOptions<T>): FieldApi<T> => {
   const [version, setVersion] = useState<number>(0)
   const [value, setValue] = useState<T | undefined>(options.initialValue)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -86,7 +86,7 @@ export const useField = <T = any>(options: FieldOptions<T>): FieldApi => {
     setValue(options.initialValue)
     setIsSet(_calculateIsSet(options))
     setError(undefined)
-  }, [options.initialValue, options.optional])
+  }, [options.initialValue, options])
 
   const valid = useMemo(() => !error && !isValidating, [error, isValidating])
 
@@ -114,8 +114,8 @@ export interface FormApi {
 }
 
 export interface FormOptions {
-  fields: FieldApi[]
-  isValidFn?: (fields: FieldApi[], formError?: string) => boolean
+  fields: FieldApi<any>[]
+  isValidFn?: (fields: FieldApi<any>[], formError?: string) => boolean
   validate?: ValidateFunction
   validateAsync?: ValidateAsyncFunction
   validateExtraArgs?: any
@@ -140,7 +140,7 @@ export const useForm = (options: FormOptions): FormApi => {
       }
       return fields.reduce((m: boolean, f) => m && f.valid && f.isSet, true)
     }
-  }, [fields, formError])
+  }, [fields, formError, options.isValidFn])
 
   const errors = useMemo(() => {
     const fieldErrors = fields.reduce(
@@ -176,7 +176,7 @@ export const useForm = (options: FormOptions): FormApi => {
   )
 
   const validate = useCallback(
-    async (f: FieldApi[]) => {
+    async (f: FieldApi<any>[]) => {
       setIsValidating(true)
 
       const map = f.reduce((m: Record<string, any>, f) => {

@@ -1,7 +1,7 @@
 import type { Cron } from "cron-async"
-import { eq } from "drizzle-orm"
 import type { Database } from "../db"
 import { settings } from "../db/schema"
+import { dateNow } from "../exports"
 import type { LogInterface } from "../lib/logger"
 
 export enum Setting {
@@ -71,10 +71,23 @@ export class SettingsManager {
   }
 
   public async setSetting<K extends Setting>(key: K, value: SettingValue<K>) {
+    const now = dateNow()
+
     await this.db
-      .update(settings)
-      .set({ value: JSON.stringify(value) })
-      .where(eq(settings.key, key))
+      .insert(settings)
+      .values({
+        key,
+        value: JSON.stringify(value),
+        createdAt: now,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: settings.key,
+        set: {
+          value: JSON.stringify(value),
+          updatedAt: now,
+        },
+      })
 
     this.settings[key] = value
 
