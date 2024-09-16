@@ -5,7 +5,7 @@ import {
 } from "@chatfall/client"
 import { produce } from "immer"
 import type { Settings, SocketEvent } from "../../exports"
-import type { Setting, SettingValue } from "../../settings"
+import type { Setting, SettingValue } from "../../settings/types"
 
 export type ServerState = CoreState & {
   settings?: Settings
@@ -51,10 +51,16 @@ export const createStore = (props: ServerStoreProps) => {
           )
 
           try {
-            await tryCatchApiCall<Settings>(set, () =>
+            const newSettings = await tryCatchApiCall<Settings>(set, () =>
               app.api.settings.index.put({
                 key,
                 value,
+              }),
+            )
+
+            set(
+              produce((state) => {
+                state.settings = newSettings
               }),
             )
           } catch (error) {

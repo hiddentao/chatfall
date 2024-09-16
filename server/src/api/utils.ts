@@ -14,6 +14,16 @@ export const execHandler = async (fn: any, delayMs: number = 2000) => {
   return fn()
 }
 
+export const getAdminUser = async (db: GlobalContext["db"]) => {
+  const [admin] = await db.select().from(users).orderBy(asc(users.id)).limit(1)
+
+  if (!admin) {
+    throw new Error("No admin user found")
+  }
+
+  return admin
+}
+
 export const getLoggedInUser = (props: any): LoggedInUser | undefined => {
   const { user } = props as { user: LoggedInUser }
   return user
@@ -36,16 +46,8 @@ export const getLoggedInUserAndAssertAdmin = async (
     throw new Error("You must be logged in")
   }
   //  check is admin by checking the db
-  const [admin] = await ctx.db
-    .select({
-      id: users.id,
-    })
-    .from(users)
-    .orderBy(asc(users.id))
-    .limit(1)
-  if (!admin) {
-    throw new Error("No admin user found")
-  }
+  const admin = await getAdminUser(ctx.db)
+
   if (user.id !== admin.id) {
     throw new Error("You are not authorized to access this resource")
   }

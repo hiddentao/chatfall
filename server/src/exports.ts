@@ -23,4 +23,4 @@ export type {
   SocketLikeCommentEvent,
 } from "./ws/types"
 
-export type { Settings } from "./settings"
+export type { Settings } from "./settings/types"

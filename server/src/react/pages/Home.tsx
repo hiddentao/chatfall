@@ -1,6 +1,6 @@
 import { useGlobalContext } from "@chatfall/client"
 import { type ChangeEvent, type FC, useCallback } from "react"
-import { Setting } from "../../settings"
+import { Setting } from "../../settings/types"
 import type { ServerStore } from "../store/server"
 
 export const Home: FC = () => {

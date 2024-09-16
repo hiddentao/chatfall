@@ -1,13 +1,13 @@
-import { asc, countDistinct, eq } from "drizzle-orm"
+import { and, asc, countDistinct, eq } from "drizzle-orm"
 
 import Elysia, { t } from "elysia"
-import { users } from "../db/schema"
+import { userStatusEnum, users } from "../db/schema"
 import {
   generateVerificationCodeAndBlob,
   verifyCodeWithBlob,
 } from "../lib/emailVerification"
 import { signJwt } from "../lib/jwt"
-import { Setting } from "../settings"
+import { Setting } from "../settings/types"
 import type { GlobalContext } from "../types"
 import { dateNow } from "../utils/date"
 import { generateUsernameFromEmail, isSameEmail } from "../utils/string"
@@ -26,13 +26,18 @@ export const createUserRoutes = (ctx: GlobalContext) => {
       return await execHandler(async () => {
         const user = getLoggedInUser(props)
         if (user) {
-          // check that user actually exists
+          // check that user actually exists and is active
           const [userExists] = await db
             .select({
               id: users.id,
             })
             .from(users)
-            .where(eq(users.id, user.id))
+            .where(
+              and(
+                eq(users.id, user.id),
+                eq(users.status, userStatusEnum.active),
+              ),
+            )
             .limit(1)
           return userExists ? { user: { id: user.id, name: user.name } } : {}
         }
@@ -116,6 +121,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             .values({
               name,
               email,
+              status: userStatusEnum.active,
               lastLoggedIn: dateNow(),
               createdAt: dateNow(),
               updatedAt: dateNow(),

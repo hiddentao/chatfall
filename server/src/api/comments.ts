@@ -8,7 +8,7 @@ import {
   posts,
   users,
 } from "../db/schema"
-import { Setting } from "../settings"
+import { Setting } from "../settings/types"
 import { type CommentUser, type GlobalContext, Sort } from "../types"
 import { dateDiff, dateFormatDiff, dateNow } from "../utils/date"
 import { generateCanonicalUrl } from "../utils/string"

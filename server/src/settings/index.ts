@@ -1,34 +1,17 @@
 import type { Cron } from "cron-async"
+import { and, eq, inArray, ne } from "drizzle-orm"
+import { getAdminUser } from "../api/utils"
 import type { Database } from "../db"
-import { settings } from "../db/schema"
+import { settings, userStatusEnum, users } from "../db/schema"
 import { dateNow } from "../exports"
 import type { LogInterface } from "../lib/logger"
-
-export enum Setting {
-  CommentsPerPage = "commentsPerPage",
-  UserNextCommentDelayMs = "userNextCommentDelayMs",
-  BlacklistedWords = "blacklistedWords",
-  BlacklistedEmails = "blacklistedEmails",
-  BlacklistedDomains = "blacklistedDomains",
-  FlaggedWords = "flaggedWords",
-  ModerateAllComments = "moderateAllComments",
-}
-
-// Define a mapped type for setting values
-export type Settings = {
-  [Setting.CommentsPerPage]: number
-  [Setting.UserNextCommentDelayMs]: number
-  [Setting.BlacklistedWords]: string[]
-  [Setting.BlacklistedEmails]: string[]
-  [Setting.BlacklistedDomains]: string[]
-  [Setting.FlaggedWords]: string[]
-  [Setting.ModerateAllComments]: boolean
-}
-
-// Create a type that maps the enum to its corresponding value type
-export type SettingValue<T extends Setting> = Settings[T]
-
-export type SettingValueRaw = boolean | number | string | string[]
+import { isSameEmail } from "../utils/string"
+import {
+  Setting,
+  type SettingValue,
+  type SettingValueRaw,
+  type Settings,
+} from "./types"
 
 export class SettingsManager {
   private log: LogInterface
@@ -72,6 +55,37 @@ export class SettingsManager {
 
   public async setSetting<K extends Setting>(key: K, value: SettingValue<K>) {
     const now = dateNow()
+
+    const admin = await getAdminUser(this.db)
+
+    switch (key) {
+      case Setting.BlacklistedEmails: {
+        if (
+          (value as SettingValue<Setting.BlacklistedEmails>).find((v) =>
+            isSameEmail(v, admin.email),
+          )
+        ) {
+          throw new Error(`Cannot blacklist admin user: ${admin.email}`)
+        }
+
+        await this.db
+          .update(users)
+          .set({ status: userStatusEnum.deleted, updatedAt: dateNow() })
+          .where(
+            and(
+              inArray(
+                users.email,
+                (value as SettingValue<Setting.BlacklistedEmails>).map((v) =>
+                  v.toLowerCase(),
+                ),
+              ),
+              eq(users.status, userStatusEnum.active),
+              ne(users.id, admin.id),
+            ),
+          )
+        break
+      }
+    }
 
     await this.db
       .insert(settings)

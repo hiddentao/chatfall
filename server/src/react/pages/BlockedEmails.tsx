@@ -8,7 +8,7 @@ import {
   useGlobalContext,
 } from "@chatfall/client"
 import { type FC, useCallback, useState } from "react"
-import { Setting } from "../../settings"
+import { Setting } from "../../settings/types"
 import type { ServerStore } from "../store/server"
 
 const validateEmails = (value: string): string | undefined => {
@@ -53,24 +53,29 @@ export const BlockedEmails: FC = () => {
   }, [form.valid, blockedEmailsField.value, setSetting])
 
   return (
-    <FormDiv className="mt-4 p-4 w-full md:max-w-[800px]">
-      <TextAreaInput
-        field={blockedEmailsField}
-        label="Blocked Email Addresses"
-        placeholder="Enter one email address per line"
-        rows={10}
-        className="mb-4"
-        inputClassname="w-full p-2 border rounded"
-        hideValidationIndicator={true}
-      />
-      <FieldError error={form.formError} />
-      <Button
-        onClick={handleSave}
-        disabled={!form.valid}
-        inProgress={inProgress}
-      >
-        Save
-      </Button>
-    </FormDiv>
+    <>
+      <p className="mt-6 mb-4 text-3xl">
+        Users with these email addresses will not be able to post comments.
+      </p>
+      <FormDiv className="mt-4 p-4 w-full md:max-w-[800px]">
+        <TextAreaInput
+          field={blockedEmailsField}
+          label="Blocked Email Addresses"
+          placeholder="Enter one email address per line"
+          rows={10}
+          className="mb-4"
+          inputClassname="w-full p-2 border rounded"
+          hideValidationIndicator={true}
+        />
+        <FieldError error={form.formError} />
+        <Button
+          onClick={handleSave}
+          disabled={!form.valid}
+          inProgress={inProgress}
+        >
+          Save
+        </Button>
+      </FormDiv>
+    </>
   )
 }

@@ -34,7 +34,11 @@ import { Home } from "./Home"
 
 const navLinks = [
   { to: "/", text: "General settings", element: <Home /> },
-  { to: "/blocked-emails", text: "Blocked Emails", element: <BlockedEmails /> },
+  {
+    to: "/blocked-emails",
+    text: "Blacklisted Emails",
+    element: <BlockedEmails />,
+  },
   // { to: "/blocked-domains", text: "Blocked Domains", element: <BlockedDomains /> },
   // { to: "/blocked-words", text: "Blocked Words", element: <BlockedWords /> },
   // { to: "/flagged-words", text: "Flagged Words", element: <FlaggedWords /> },
@@ -119,7 +123,7 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
   }, [clearLastError])
 
   const onEmailVerified = useCallback(async () => {
-    // do nothing
+    setCreatingAdmin(false)
   }, [])
 
   // load settings if user is logged in and settings are not loaded
@@ -212,7 +216,7 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
             ) : (
               <div className="flex flex-col items-center justify-center">
                 {creatingAdmin ? (
-                  <p className="bg-info text-info-content mb-4">
+                  <p className="border-gray-500 border rounded-md p-4 text-lg mb-4">
                     Since you are the first user to sign up, you will become the
                     administrator of this Chatfall instance!
                   </p>
