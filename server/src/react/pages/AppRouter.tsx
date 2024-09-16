@@ -13,33 +13,89 @@ import {
   useMemo,
   useState,
 } from "react"
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
-import { DarkSvg, LightSvg, LogoutSvg } from "../components/Svg"
+import {
+  DarkSvg,
+  DropdownArrowSvg,
+  LightSvg,
+  LogoutSvg,
+} from "../components/Svg"
 import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
 import { Home } from "./Home"
 
-const AppRoutes = () => (
-  <>
-    <nav>
-      <Link to="/">Dashboard</Link>
-      <Link to="/blocked-emails">Blocked Emails</Link>
-      <Link to="/blocked-domains">Blocked Domains</Link>
-      <Link to="/blocked-words">Blocked Words</Link>
-      <Link to="/flagged-words">Flagged Words</Link>
-      <Link to="/comments">Comments</Link>
-    </nav>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      {/* <Route path="/blocked-emails" element={<BlockedEmails />} />
-      <Route path="/blocked-domains" element={<BlockedDomains />} />
-      <Route path="/blocked-words" element={<BlockedWords />} />
-      <Route path="/flagged-words" element={<FlaggedWords />} />
-      <Route path="/comments" element={<Comments />} /> */}
-    </Routes>
-  </>
-)
+const navLinks = [
+  { to: "/", text: "General settings" },
+  { to: "/blocked-emails", text: "Blocked Emails" },
+  { to: "/blocked-domains", text: "Blocked Domains" },
+  { to: "/blocked-words", text: "Blocked Words" },
+  { to: "/flagged-words", text: "Flagged Words" },
+  { to: "/comments", text: "All Comments" },
+]
+
+const AppRoutes = () => {
+  const location = useLocation()
+
+  const handleDropdownClick = useCallback(() => {
+    const dropdown = document.activeElement as HTMLElement
+    dropdown.blur()
+  }, [])
+
+  const menuText = useMemo(() => {
+    return navLinks.find((link) => link.to === location.pathname)?.text
+  }, [location.pathname])
+
+  return (
+    <>
+      <nav className="flex flex-col sm:flex-row">
+        <div className="tabs tabs-boxed hidden sm:flex">
+          {navLinks.map((link, index) => (
+            <Link
+              key={index}
+              to={link.to}
+              className={`tab ${index === 0 ? "tab-active" : ""} min-h-[3rem] h-auto py-2`}
+            >
+              {link.text}
+            </Link>
+          ))}
+        </div>
+        <div className="dropdown dropdown-bottom sm:hidden">
+          <label tabIndex={0} className="btn m-1">
+            {menuText}
+            <DropdownArrowSvg />
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+          >
+            {navLinks.map((link, index) => (
+              <li key={index}>
+                <Link to={link.to} onClick={handleDropdownClick}>
+                  {link.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        {/* <Route path="/blocked-emails" element={<BlockedEmails />} />
+        <Route path="/blocked-domains" element={<BlockedDomains />} />
+        <Route path="/blocked-words" element={<BlockedWords />} />
+        <Route path="/flagged-words" element={<FlaggedWords />} />
+        <Route path="/comments" element={<Comments />} /> */}
+      </Routes>
+    </>
+  )
+}
 
 export const AppRouter: FC<{ path: string; config: Config }> = ({
   path,
@@ -55,8 +111,14 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     hasAdmin,
     loadSettings,
     logout,
+    lastError,
+    clearLastError,
   } = store.useStore()
   const [creatingAdmin, setCreatingAdmin] = useState(false)
+
+  const handleErrorDismiss = useCallback(() => {
+    clearLastError()
+  }, [clearLastError])
 
   const onEmailVerified = useCallback(async () => {
     // do nothing
@@ -108,14 +170,12 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     <div className="w-full h-full">
       <div className="flex flex-row  p-2 justify-between items-center bg-info text-info-content">
         <div className="flex flex-row items-center">
-          <a href="/" className="flex-0">
-            <h1 className="text-2xl font-heading">
-              Chatfall Admin
-              <strong className="block text-xs text-info-content/50">
-                {config.server}
-              </strong>
-            </h1>
-          </a>
+          <h1 className="text-2xl font-heading">
+            Chatfall Admin
+            <strong className="block text-xs text-info-content/50">
+              {config.server}
+            </strong>
+          </h1>
           {modeSwitcherBtn}
         </div>
         {loggedInUser && (
@@ -132,7 +192,7 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center mt-2 px-4 py-8">
+      <div className="flex-1 flex flex-col items-center justify-center mt-2 px-4 py-4">
         {checkingAuth ? (
           <div className={"flex flex-row justify-center items-center w-full"}>
             <div className="skeleton h-32 w-1/2" />
@@ -168,6 +228,16 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
           </>
         )}
       </div>
+      {lastError ? (
+        <div className="toast toast-bottom toast-end">
+          <div
+            className="alert alert-error cursor-pointer"
+            onClick={handleErrorDismiss}
+          >
+            <span>{lastError.message}</span>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

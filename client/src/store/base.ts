@@ -64,7 +64,9 @@ export type CoreState = {
   canonicalUrl: string | null
   loggedInUser?: LoggedInUser
   checkingAuth: boolean
+  lastError?: Error
 
+  clearLastError: () => void
   getCanonicalUrl: () => string
   logout: () => void
   checkAuth: () => Promise<void>
@@ -76,11 +78,40 @@ const getPageUrl = () => {
   return window.location.href
 }
 
+type StoreSetMethod = (fn: (state: any) => any | Partial<any>) => void
+
+const tryCatchApiCall = async <T = any>(
+  set: StoreSetMethod,
+  apiCall: () => Promise<any>,
+) => {
+  set(
+    produce((state) => {
+      state.lastError = undefined
+    }),
+  )
+
+  const { data, error } = await apiCall()
+
+  if (error) {
+    set(
+      produce((state) => {
+        state.lastError = error
+      }),
+    )
+    throw error
+  }
+
+  return data as T
+}
+
+export type TryCatchApiCall = typeof tryCatchApiCall
+
 export const createBaseStore = <State extends CoreState>(
   props: StoreProps,
   createAdditionalState: (
     set: (fn: (state: State) => State | Partial<State>) => void,
     get: () => State,
+    tryCatchApiCall: TryCatchApiCall,
     app: TreatyApp,
   ) => Omit<State, keyof CoreState>,
   onSocketMessage: (
@@ -113,6 +144,15 @@ export const createBaseStore = <State extends CoreState>(
       ({
         loggedInUser: undefined,
         checkingAuth: true,
+
+        lastError: undefined,
+        clearLastError: () => {
+          set(
+            produce((state) => {
+              state.lastError = undefined
+            }),
+          )
+        },
 
         getCanonicalUrl: () => {
           return get().canonicalUrl || getPageUrl()
@@ -150,33 +190,29 @@ export const createBaseStore = <State extends CoreState>(
         },
 
         verifyEmail: async (blob: string, code: string) => {
-          const { data, error } = await app.api.users.verify_email.post({
-            blob,
-            code,
-          })
-
-          if (error) {
-            throw error
-          }
+          const data = await tryCatchApiCall(set, () =>
+            app.api.users.verify_email.post({
+              blob,
+              code,
+            }),
+          )
 
           jwt.setToken({ token: data.jwt })
 
           _updateLoginState(set, data.user)
         },
         loginEmail: async (email: string, adminOnly?: boolean) => {
-          const { data, error } = await app.api.users.login_email.post({
-            email,
-            adminOnly,
-          })
-
-          if (error) {
-            throw error
-          }
+          const data = await tryCatchApiCall(set, () =>
+            app.api.users.login_email.post({
+              email,
+              adminOnly,
+            }),
+          )
 
           return data
         },
 
-        ...createAdditionalState(set, get, app),
+        ...createAdditionalState(set, get, tryCatchApiCall, app),
       }) as State,
   )
 

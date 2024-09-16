@@ -1,6 +1,7 @@
 import ChatSvg from "../images/chat.svg?react"
 import CrossSvg from "../images/cross.svg?react"
 import DarkSvg from "../images/dark.svg?react"
+import DropdownArrowSvg from "../images/dropdown-arrow.svg?react"
 import LeftSvg from "../images/left.svg?react"
 import LightSvg from "../images/light.svg?react"
 import LikeSvg from "../images/like.svg?react"
@@ -13,6 +14,7 @@ import WarningSvg from "../images/warning.svg?react"
 import WaterfallSvg from "../images/waterfall-svgrepo-com.svg?react"
 
 export {
+  DropdownArrowSvg,
   WaterfallSvg,
   RefreshSvg,
   LikeSvg,

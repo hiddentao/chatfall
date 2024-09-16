@@ -26,7 +26,7 @@ export const createSettingsRoutes = (ctx: GlobalContext) => {
             const { key } = body
             const value = body.value as SettingValue<typeof body.key>
             await ctx.settings.setSetting(key, value)
-            return { message: "Setting updated successfully" }
+            return ctx.settings.getSettings()
           })
         },
         {

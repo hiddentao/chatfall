@@ -28,3 +28,9 @@ export const LightSvg = () => (
     <Svg.LightSvg />
   </SvgWrapper>
 )
+
+export const DropdownArrowSvg = () => (
+  <SvgWrapper>
+    <Svg.DropdownArrowSvg />
+  </SvgWrapper>
+)

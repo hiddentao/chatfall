@@ -64,7 +64,7 @@ export type ClientStoreProps = StoreProps & {
 export const createStore = (props: ClientStoreProps) => {
   return createBaseStore<ClientState>(
     props,
-    (set, get, app) =>
+    (set, get, tryCatchApiCall, app) =>
       ({
         users: {},
         liked: {},
@@ -72,27 +72,23 @@ export const createStore = (props: ClientStoreProps) => {
         replies: {},
         rootList: createCommentList(-1, "", props.initialSort),
         likeComment: async (commentId: number, like: boolean) => {
-          const { error } = await app.api.comments.like.post({
-            commentId,
-            like,
-          })
-
-          if (error) {
-            throw error
-          }
+          return await tryCatchApiCall(set, () =>
+            app.api.comments.like.post({
+              commentId,
+              like,
+            }),
+          )
         },
         addComment: async (comment: string, parentCommentId?: number) => {
-          const { data, error } = await app.api.comments.index.post({
-            comment,
-            parentCommentId: parentCommentId ? `${parentCommentId}` : undefined,
-            url: get().getCanonicalUrl(),
-          })
-
-          if (error) {
-            throw error
-          }
-
-          return data
+          return await tryCatchApiCall(set, () =>
+            app.api.comments.index.post({
+              comment,
+              parentCommentId: parentCommentId
+                ? `${parentCommentId}`
+                : undefined,
+              url: get().getCanonicalUrl(),
+            }),
+          )
         },
         fetchComments: async (
           sort = get().rootList.sort,
@@ -104,18 +100,16 @@ export const createStore = (props: ClientStoreProps) => {
               ? skipOverride
               : get().rootList.items.length
 
-          const { data, error } = await app.api.comments.index.get({
-            query: {
-              url: get().getCanonicalUrl(),
-              depth: `0`,
-              skip: `${skip}`,
-              sort,
-            },
-          })
-
-          if (error) {
-            throw error
-          }
+          const data = await tryCatchApiCall(set, () =>
+            app.api.comments.index.get({
+              query: {
+                url: get().getCanonicalUrl(),
+                depth: `0`,
+                skip: `${skip}`,
+                sort,
+              },
+            }),
+          )
 
           set(
             produce((state) => {
@@ -153,19 +147,17 @@ export const createStore = (props: ClientStoreProps) => {
 
           const skip = existing ? existing.items.length : 0
 
-          const { data, error } = await app.api.comments.index.get({
-            query: {
-              url: get().getCanonicalUrl(),
-              depth: `${parentDepth + 1}`,
-              pathPrefix: `${parentPath}.`,
-              skip: `${skip}`,
-              sort: Sort.oldestFirst,
-            },
-          })
-
-          if (error) {
-            throw error
-          }
+          const data = await tryCatchApiCall(set, () =>
+            app.api.comments.index.get({
+              query: {
+                url: get().getCanonicalUrl(),
+                depth: `${parentDepth + 1}`,
+                pathPrefix: `${parentPath}.`,
+                skip: `${skip}`,
+                sort: Sort.oldestFirst,
+              },
+            }),
+          )
 
           set(
             produce((state) => {
