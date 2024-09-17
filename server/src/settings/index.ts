@@ -2,7 +2,7 @@ import type { Cron } from "cron-async"
 import { and, eq, inArray, like, ne, or } from "drizzle-orm"
 import { getAdminUser } from "../api/utils"
 import type { Database } from "../db"
-import { settings, userStatusEnum, users } from "../db/schema"
+import { UserStatus, settings, users } from "../db/schema"
 import { dateNow } from "../exports"
 import type { LogInterface } from "../lib/logger"
 import { isSameEmail } from "../utils/string"
@@ -69,7 +69,7 @@ export class SettingsManager {
 
         await this.db
           .update(users)
-          .set({ status: userStatusEnum.blacklisted, updatedAt: dateNow() })
+          .set({ status: UserStatus.blacklisted, updatedAt: dateNow() })
           .where(
             and(
               inArray(
@@ -78,7 +78,7 @@ export class SettingsManager {
                   v.toLowerCase(),
                 ),
               ),
-              eq(users.status, userStatusEnum.active),
+              eq(users.status, UserStatus.active),
               ne(users.id, admin.id),
             ),
           )
@@ -101,7 +101,7 @@ export class SettingsManager {
 
         await this.db
           .update(users)
-          .set({ status: userStatusEnum.blacklisted, updatedAt: dateNow() })
+          .set({ status: UserStatus.blacklisted, updatedAt: dateNow() })
           .where(
             and(
               or(
@@ -109,7 +109,7 @@ export class SettingsManager {
                   like(users.email, `%@${domain}`),
                 ),
               ),
-              eq(users.status, userStatusEnum.active),
+              eq(users.status, UserStatus.active),
               ne(users.id, admin.id),
             ),
           )

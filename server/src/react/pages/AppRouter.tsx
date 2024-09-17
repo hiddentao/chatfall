@@ -31,6 +31,7 @@ import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
 import { BlacklistedDomains } from "./BlacklistedDomains"
 import { BlacklistedEmails } from "./BlacklistedEmails"
+import { BlacklistedWords } from "./BlacklistedWords"
 import { Home } from "./Home"
 
 const navLinks = [
@@ -45,8 +46,11 @@ const navLinks = [
     text: "Blacklisted Domains",
     element: <BlacklistedDomains />,
   },
-  // { to: "/blocked-words", text: "Blocked Words", element: <BlockedWords /> },
-  // { to: "/flagged-words", text: "Flagged Words", element: <FlaggedWords /> },
+  {
+    to: "/blacklisted-words",
+    text: "Blacklisted Words",
+    element: <BlacklistedWords />,
+  },
   // { to: "/comments", text: "All Comments", element: <Comments /> },
 ]
 

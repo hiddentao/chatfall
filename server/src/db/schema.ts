@@ -10,6 +10,12 @@ import {
 } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-typebox"
 
+const enumToPgEnum = <T extends Record<string, any>>(
+  myEnum: T,
+): [T[keyof T], ...T[keyof T][]] => {
+  return Object.values(myEnum).map((value: any) => `${value}`) as any
+}
+
 export const settings = pgTable(
   "settings",
   {
@@ -32,12 +38,12 @@ export const settings = pgTable(
   },
 )
 
-export const userStatus = pgEnum("status", ["active", "blacklisted", "deleted"])
-export enum userStatusEnum {
+export enum UserStatus {
   active = "active",
   blacklisted = "blacklisted",
   deleted = "deleted",
 }
+export const userStatus = pgEnum("userStatus", enumToPgEnum(UserStatus))
 
 export const users = pgTable(
   "users",
@@ -45,7 +51,7 @@ export const users = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    status: userStatus("status").notNull().default(userStatusEnum.active),
+    status: userStatus("status").notNull().default(UserStatus.active),
     lastLoggedIn: timestamp("last_logged_in", { mode: "string" }),
     createdAt: timestamp("created_at", { mode: "string" })
       .defaultNow()
@@ -90,12 +96,15 @@ export const posts = pgTable(
 export type Post = InferSelectModel<typeof posts>
 export type PostToInsert = InferInsertModel<typeof posts>
 
-export const commentStatus = pgEnum("status", ["shown", "hidden", "flagged"])
-export enum commentStatusEnum {
+export enum CommentStatus {
   shown = "shown",
   hidden = "hidden",
   flagged = "flagged",
 }
+export const commentStatus = pgEnum(
+  "commentStatus",
+  enumToPgEnum(CommentStatus),
+)
 
 export const comments = pgTable(
   "comments",
@@ -107,7 +116,7 @@ export const comments = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id),
-    status: commentStatus("status").notNull(),
+    status: commentStatus("status").notNull().default(CommentStatus.shown),
     body: text("body").notNull(),
     depth: integer("depth").notNull().default(0),
     path: text("path").notNull(),

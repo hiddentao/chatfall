@@ -2,8 +2,8 @@ import { and, asc, count, desc, eq, like, sql } from "drizzle-orm"
 import Elysia, { t } from "elysia"
 import {
   type Comment,
+  CommentStatus,
   commentRatings,
-  commentStatusEnum,
   comments,
   posts,
   users,
@@ -133,6 +133,19 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             throw new Error("User not logged in")
           }
 
+          // check that comment doesn't contain blacklisted words
+          const blacklistedWords = ctx.settings.getSetting(
+            Setting.BlacklistedWords,
+          )
+          const commentToCheck = comment.toLowerCase()
+          if (blacklistedWords?.length) {
+            for (const word of blacklistedWords) {
+              if (commentToCheck.includes(word)) {
+                throw new Error(`Blacklisted word detected: ${word}`)
+              }
+            }
+          }
+
           const inserted = await db.transaction(async (tx) => {
             // check if post exists
             let postId: number
@@ -240,7 +253,6 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 userId: user.id,
                 postId: postId,
                 body: comment,
-                status: "shown",
                 depth,
                 path,
                 createdAt,
@@ -410,7 +422,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               userId: t.Number(),
               postId: t.Number(),
               body: t.String(),
-              status: t.Enum(commentStatusEnum),
+              status: t.Enum(CommentStatus),
               depth: t.Number(),
               rating: t.Number(),
               replyCount: t.Number(),

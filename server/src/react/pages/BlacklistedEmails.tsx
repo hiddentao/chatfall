@@ -19,7 +19,7 @@ export const BlacklistedEmails: FC = () => {
       title="Blacklisted emails"
       settingKey={Setting.BlacklistedEmails}
       validateItems={validateEmails}
-      placeholder="Enter one email address per line"
+      placeholder="Enter one email address per line (e.g., user@example.com)"
     >
       <ul className="list-disc ml-4">
         <li className="mb-2">

@@ -1,7 +1,7 @@
 import { and, asc, countDistinct, eq } from "drizzle-orm"
 
 import Elysia, { t } from "elysia"
-import { userStatusEnum, users } from "../db/schema"
+import { UserStatus, users } from "../db/schema"
 import {
   generateVerificationCodeAndBlob,
   verifyCodeWithBlob,
@@ -33,10 +33,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             })
             .from(users)
             .where(
-              and(
-                eq(users.id, user.id),
-                eq(users.status, userStatusEnum.active),
-              ),
+              and(eq(users.id, user.id), eq(users.status, UserStatus.active)),
             )
             .limit(1)
           return userExists ? { user: { id: user.id, name: user.name } } : {}
@@ -121,7 +118,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             .values({
               name,
               email,
-              status: userStatusEnum.active,
+              status: UserStatus.active,
               lastLoggedIn: dateNow(),
               createdAt: dateNow(),
               updatedAt: dateNow(),
