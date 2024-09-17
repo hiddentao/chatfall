@@ -64,7 +64,7 @@ export type CoreState = {
   canonicalUrl: string | null
   loggedInUser?: LoggedInUser
   checkingAuth: boolean
-  lastError?: Error
+  lastError?: string
 
   clearLastError: () => void
   getCanonicalUrl: () => string
@@ -95,7 +95,14 @@ const tryCatchApiCall = async <T = any>(
   if (error) {
     set(
       produce((state) => {
-        state.lastError = error
+        if (error.message) {
+          try {
+            const parsedError = JSON.parse(error.message)
+            state.lastError = parsedError?.message || `${parsedError}`
+          } catch (_e) {
+            state.lastError = `${error}`
+          }
+        }
       }),
     )
     throw error

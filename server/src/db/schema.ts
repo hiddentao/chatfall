@@ -45,7 +45,7 @@ export const users = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    status: userStatus("status").notNull(),
+    status: userStatus("status").notNull().default(userStatusEnum.active),
     lastLoggedIn: timestamp("last_logged_in", { mode: "string" }),
     createdAt: timestamp("created_at", { mode: "string" })
       .defaultNow()
