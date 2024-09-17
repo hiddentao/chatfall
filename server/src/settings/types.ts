@@ -1,11 +1,10 @@
 export enum Setting {
+  ModerateAllComments = "moderateAllComments",
   CommentsPerPage = "commentsPerPage",
   UserNextCommentDelayMs = "userNextCommentDelayMs",
   BlacklistedWords = "blacklistedWords",
   BlacklistedEmails = "blacklistedEmails",
   BlacklistedDomains = "blacklistedDomains",
-  FlaggedWords = "flaggedWords",
-  ModerateAllComments = "moderateAllComments",
 }
 
 // Define a mapped type for setting values
@@ -15,7 +14,6 @@ export type Settings = {
   [Setting.BlacklistedWords]: string[]
   [Setting.BlacklistedEmails]: string[]
   [Setting.BlacklistedDomains]: string[]
-  [Setting.FlaggedWords]: string[]
   [Setting.ModerateAllComments]: boolean
 }
 

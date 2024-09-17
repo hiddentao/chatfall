@@ -1,8 +1,8 @@
 import { useGlobalContext } from "@chatfall/client"
 import { type ChangeEvent, type FC, useCallback } from "react"
 import { Setting } from "../../settings/types"
+import { PageWrapper } from "../components/PageWrapper"
 import type { ServerStore } from "../store/server"
-import { PageWrapper } from "./PageWrapper"
 
 export const Home: FC = () => {
   const { store } = useGlobalContext<ServerStore>()

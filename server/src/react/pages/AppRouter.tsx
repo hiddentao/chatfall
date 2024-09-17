@@ -29,6 +29,7 @@ import {
 } from "../components/Svg"
 import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
+import { BlacklistedDomains } from "./BlacklistedDomains"
 import { BlacklistedEmails } from "./BlacklistedEmails"
 import { Home } from "./Home"
 
@@ -39,7 +40,11 @@ const navLinks = [
     text: "Blacklisted Emails",
     element: <BlacklistedEmails />,
   },
-  // { to: "/blocked-domains", text: "Blocked Domains", element: <BlockedDomains /> },
+  {
+    to: "/blacklisted-domains",
+    text: "Blacklisted Domains",
+    element: <BlacklistedDomains />,
+  },
   // { to: "/blocked-words", text: "Blocked Words", element: <BlockedWords /> },
   // { to: "/flagged-words", text: "Flagged Words", element: <FlaggedWords /> },
   // { to: "/comments", text: "All Comments", element: <Comments /> },
@@ -263,7 +268,7 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
             className="alert alert-error cursor-pointer"
             onClick={handleErrorDismiss}
           >
-            <span>{lastError.message}</span>
+            <span>{lastError}</span>
           </div>
         </div>
       ) : null}

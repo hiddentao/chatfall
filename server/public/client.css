@@ -425,34 +425,6 @@ html {
   --tw-contain-paint: ;
   --tw-contain-style: ;
 }
-.container {
-  width: 100%;
-}
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-  }
-}
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-  }
-}
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
 .alert {
   display: grid;
   width: 100%;
@@ -2399,9 +2371,6 @@ input.tab:checked + .tab-content,
 .w-8 {
   width: 2rem;
 }
-.w-8\/12 {
-  width: 66.666667%;
-}
 .w-full {
   width: 100%;
 }
@@ -2517,10 +2486,6 @@ input.tab:checked + .tab-content,
   --tw-bg-opacity: 1;
   background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
 }
-.bg-error-content {
-  --tw-bg-opacity: 1;
-  background-color: var(--fallback-erc,oklch(var(--erc)/var(--tw-bg-opacity)));
-}
 .bg-green-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(187 247 208 / var(--tw-bg-opacity));
@@ -2596,9 +2561,6 @@ input.tab:checked + .tab-content,
 }
 .pr-4 {
   padding-right: 1rem;
-}
-.text-center {
-  text-align: center;
 }
 .text-right {
   text-align: right;
@@ -2787,10 +2749,6 @@ input.tab:checked + .tab-content,
 .disabled\:pointer-events-none:disabled {
   pointer-events: none;
 }
-.disabled\:bg-gray-200:disabled {
-  --tw-bg-opacity: 1;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
-}
 .disabled\:opacity-50:disabled {
   opacity: 0.5;
 }
@@ -2806,20 +2764,14 @@ input.tab:checked + .tab-content,
   }
 }
 @media (min-width: 768px) {
-  .md\:w-8\/12 {
-    width: 66.666667%;
-  }
-  .md\:max-w-\[800px\] {
-    max-width: 800px;
+  .md\:max-w-\[500px\] {
+    max-width: 500px;
   }
   .md\:max-w-\[600px\] {
     max-width: 600px;
   }
-  .md\:max-w-\[700px\] {
-    max-width: 700px;
-  }
-  .md\:max-w-\[500px\] {
-    max-width: 500px;
+  .md\:max-w-\[800px\] {
+    max-width: 800px;
   }
 }
 /*# sourceMappingURL=client.css.map */

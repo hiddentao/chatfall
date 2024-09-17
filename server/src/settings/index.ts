@@ -1,5 +1,5 @@
 import type { Cron } from "cron-async"
-import { and, eq, inArray, ne } from "drizzle-orm"
+import { and, eq, inArray, like, ne, or } from "drizzle-orm"
 import { getAdminUser } from "../api/utils"
 import type { Database } from "../db"
 import { settings, userStatusEnum, users } from "../db/schema"
@@ -17,13 +17,12 @@ export class SettingsManager {
   private log: LogInterface
   private db: Database
   private settings: Record<string, SettingValueRaw> = {
+    [Setting.ModerateAllComments]: false,
     [Setting.CommentsPerPage]: 10,
     [Setting.UserNextCommentDelayMs]: 60000,
     [Setting.BlacklistedWords]: [],
     [Setting.BlacklistedEmails]: [],
     [Setting.BlacklistedDomains]: [],
-    [Setting.FlaggedWords]: [],
-    [Setting.ModerateAllComments]: false,
   }
 
   constructor(cfg: { db: Database; log: LogInterface; cron: Cron }) {
@@ -70,13 +69,44 @@ export class SettingsManager {
 
         await this.db
           .update(users)
-          .set({ status: userStatusEnum.deleted, updatedAt: dateNow() })
+          .set({ status: userStatusEnum.blacklisted, updatedAt: dateNow() })
           .where(
             and(
               inArray(
                 users.email,
                 (value as SettingValue<Setting.BlacklistedEmails>).map((v) =>
                   v.toLowerCase(),
+                ),
+              ),
+              eq(users.status, userStatusEnum.active),
+              ne(users.id, admin.id),
+            ),
+          )
+        break
+      }
+      case Setting.BlacklistedDomains: {
+        if (
+          (value as SettingValue<Setting.BlacklistedDomains>).find((domain) =>
+            admin.email.toLowerCase().endsWith(`@${domain.toLowerCase()}`),
+          )
+        ) {
+          throw new Error(
+            `Cannot blacklist domain of admin user: ${admin.email}`,
+          )
+        }
+
+        const blacklistedDomains = (
+          value as SettingValue<Setting.BlacklistedDomains>
+        ).map((domain) => domain.toLowerCase())
+
+        await this.db
+          .update(users)
+          .set({ status: userStatusEnum.blacklisted, updatedAt: dateNow() })
+          .where(
+            and(
+              or(
+                ...blacklistedDomains.map((domain) =>
+                  like(users.email, `%@${domain}`),
                 ),
               ),
               eq(users.status, userStatusEnum.active),
