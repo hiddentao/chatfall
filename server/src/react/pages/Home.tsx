@@ -2,6 +2,7 @@ import { useGlobalContext } from "@chatfall/client"
 import { type ChangeEvent, type FC, useCallback } from "react"
 import { Setting } from "../../settings/types"
 import type { ServerStore } from "../store/server"
+import { PageWrapper } from "./PageWrapper"
 
 export const Home: FC = () => {
   const { store } = useGlobalContext<ServerStore>()
@@ -16,7 +17,7 @@ export const Home: FC = () => {
   )
 
   return (
-    <div className="mt-4">
+    <PageWrapper title="General settings">
       <div className="form-control">
         <label className="label cursor-pointer">
           <span className="label-text mr-4">
@@ -30,6 +31,6 @@ export const Home: FC = () => {
           />
         </label>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

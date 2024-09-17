@@ -35,7 +35,7 @@ export const FieldError = ({
   return error ? (
     <em
       className={cn(
-        "block px-1 bg-red-500 text-white font-bold mt-2 rounded-md break-all",
+        "block px-1 bg-error border border-error text-error-content font-bold mt-2 rounded-md break-all",
         className,
       )}
     >
@@ -47,7 +47,7 @@ export const FieldError = ({
 export const FieldSuffix = ({
   field,
   hideValidationIndicator,
-}: { field: FieldApi; hideValidationIndicator?: boolean }) => {
+}: { field: FieldApi<any>; hideValidationIndicator?: boolean }) => {
   return (
     <>
       {field.isValidating && !hideValidationIndicator ? (
@@ -74,7 +74,7 @@ export const FieldLabel = ({
   return label ? (
     <label
       className={cn(
-        "flex flex-row justify-between items-end mb-1 text-slate-600",
+        "flex flex-row justify-between items-end mb-1 text-base-content",
       )}
       onClick={dummyOnClick}
     >
@@ -87,7 +87,7 @@ export const FieldLabel = ({
 export interface FieldProps extends FieldLabelProps {
   className?: string
   inputClassname?: string
-  field: FieldApi
+  field: FieldApi<any>
   hideTooltip?: boolean
   hideError?: boolean
 }
@@ -95,7 +95,7 @@ export interface FieldProps extends FieldLabelProps {
 export const FieldCharLimitIndicator = ({
   field,
   charLimit,
-}: { field: FieldApi; charLimit?: number }) => {
+}: { field: FieldApi<any>; charLimit?: number }) => {
   return charLimit ? (
     <span className="text-red italic ml-2">
       {field.value.length}/{charLimit}
@@ -169,7 +169,7 @@ export const TextInput = (
       <div className="flex flex-row justify-start items-center">
         <input
           tabIndex={tabIndex}
-          className={cn("disabled:bg-gray-200", inputClassname)}
+          className={cn("input input-bordered", inputClassname)}
           maxLength={maxChars}
           name={field.name}
           value={field.value}
@@ -223,7 +223,7 @@ export const TextAreaInput = (
           tabIndex={tabIndex}
           minRows={rows}
           placeholder={placeholder}
-          className={cn("disabled:bg-gray-200", inputClassname)}
+          className={cn("textarea textarea-bordered", inputClassname)}
           onChange={onInputChange}
           value={field.value}
           onFocus={onFocus}

@@ -12,6 +12,9 @@ export type ServerState = CoreState & {
   hasAdmin: () => Promise<boolean>
   loadSettings: () => Promise<void>
   setSetting: (key: Setting, value: SettingValue<typeof key>) => Promise<void>
+
+  settingUpdated?: boolean
+  clearSettingUpdatedFlag: () => void
 }
 
 export type ServerStoreProps = StoreProps & {}
@@ -22,6 +25,14 @@ export const createStore = (props: ServerStoreProps) => {
     (set, get, tryCatchApiCall, app) =>
       ({
         settings: undefined,
+        settingUpdated: false,
+        clearSettingUpdatedFlag: () => {
+          set(
+            produce((state) => {
+              state.settingUpdated = false
+            }),
+          )
+        },
         hasAdmin: async () => {
           const data = await tryCatchApiCall<boolean>(set, () =>
             app.api.users.has_admin.get(),
@@ -61,6 +72,7 @@ export const createStore = (props: ServerStoreProps) => {
             set(
               produce((state) => {
                 state.settings = newSettings
+                state.settingUpdated = true
               }),
             )
           } catch (error) {

@@ -425,6 +425,34 @@ html {
   --tw-contain-paint: ;
   --tw-contain-style: ;
 }
+.container {
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
 .alert {
   display: grid;
   width: 100%;
@@ -552,6 +580,16 @@ html {
 .card:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+.card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--padding-card, 2rem);
+  gap: 0.5rem;
+}
+.card-body :where(p) {
+  flex-grow: 1;
 }
 .card figure {
   display: flex;
@@ -1077,6 +1115,13 @@ input.tab:checked + .tab-content,
     0 0 0 2px var(--tglbg) inset,
     var(--togglehandleborder);
 }
+.alert-success {
+  border-color: var(--fallback-su,oklch(var(--su)/0.2));
+  --tw-text-opacity: 1;
+  color: var(--fallback-suc,oklch(var(--suc)/var(--tw-text-opacity)));
+  --alert-bg: var(--fallback-su,oklch(var(--su)/1));
+  --alert-bg-mix: var(--fallback-b1,oklch(var(--b1)/1));
+}
 .alert-error {
   border-color: var(--fallback-er,oklch(var(--er)/0.2));
   --tw-text-opacity: 1;
@@ -1298,6 +1343,9 @@ input.tab:checked + .tab-content,
 }
 .input[list]::-webkit-calendar-picker-indicator {
   line-height: 1em;
+}
+.input-bordered {
+  border-color: var(--fallback-bc,oklch(var(--bc)/0.2));
 }
 .input:focus,
 .input:focus-within {
@@ -1764,6 +1812,9 @@ input.tab:checked + .tab-content,
   --tw-text-opacity: 1;
   color: var(--fallback-pc,oklch(var(--pc)/var(--tw-text-opacity)));
 }
+.textarea-bordered {
+  border-color: var(--fallback-bc,oklch(var(--bc)/0.2));
+}
 .textarea:focus {
   box-shadow: none;
   border-color: var(--fallback-bc,oklch(var(--bc)/0.2));
@@ -2027,6 +2078,11 @@ input.tab:checked + .tab-content,
 .card-compact .card-title {
   margin-bottom: 0.25rem;
 }
+.card-normal .card-body {
+  padding: var(--padding-card, 2rem);
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
 .join.join-vertical > :where(*:not(:first-child)) {
   margin-left: 0px;
   margin-right: 0px;
@@ -2171,6 +2227,9 @@ input.tab:checked + .tab-content,
   right: calc(var(--tooltip-tail-offset) + 0.0625rem);
   bottom: auto;
 }
+.visible {
+  visibility: visible;
+}
 .absolute {
   position: absolute;
 }
@@ -2206,6 +2265,10 @@ input.tab:checked + .tab-content,
 .mx-6 {
   margin-left: 1.5rem;
   margin-right: 1.5rem;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
 }
 .mb-1 {
   margin-bottom: 0.25rem;
@@ -2257,6 +2320,9 @@ input.tab:checked + .tab-content,
 }
 .mt-6 {
   margin-top: 1.5rem;
+}
+.mt-8 {
+  margin-top: 2rem;
 }
 .block {
   display: block;
@@ -2333,6 +2399,9 @@ input.tab:checked + .tab-content,
 .w-8 {
   width: 2rem;
 }
+.w-8\/12 {
+  width: 66.666667%;
+}
 .w-full {
   width: 100%;
 }
@@ -2360,6 +2429,9 @@ input.tab:checked + .tab-content,
 }
 .resize {
   resize: both;
+}
+.list-disc {
+  list-style-type: disc;
 }
 .flex-row {
   flex-direction: row;
@@ -2393,9 +2465,6 @@ input.tab:checked + .tab-content,
 }
 .break-all {
   word-break: break-all;
-}
-.rounded {
-  border-radius: 0.25rem;
 }
 .rounded-box {
   border-radius: var(--rounded-box, 1rem);
@@ -2440,9 +2509,17 @@ input.tab:checked + .tab-content,
   --tw-bg-opacity: 1;
   background-color: var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity)));
 }
+.bg-base-300 {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-bg-opacity)));
+}
 .bg-error {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-er,oklch(var(--er)/var(--tw-bg-opacity)));
+}
+.bg-error-content {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-erc,oklch(var(--erc)/var(--tw-bg-opacity)));
 }
 .bg-green-200 {
   --tw-bg-opacity: 1;
@@ -2459,10 +2536,6 @@ input.tab:checked + .tab-content,
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
-}
-.bg-red-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
 }
 .bg-secondary {
   --tw-bg-opacity: 1;
@@ -2524,6 +2597,9 @@ input.tab:checked + .tab-content,
 .pr-4 {
   padding-right: 1rem;
 }
+.text-center {
+  text-align: center;
+}
 .text-right {
   text-align: right;
 }
@@ -2559,6 +2635,10 @@ input.tab:checked + .tab-content,
 }
 .italic {
   font-style: italic;
+}
+.text-base-content {
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
 .text-black {
   --tw-text-opacity: 1;
@@ -2599,14 +2679,6 @@ input.tab:checked + .tab-content,
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
 }
-.text-slate-600 {
-  --tw-text-opacity: 1;
-  color: rgb(71 85 105 / var(--tw-text-opacity));
-}
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
 .placeholder-gray-400::-moz-placeholder {
   --tw-placeholder-opacity: 1;
   color: rgb(156 163 175 / var(--tw-placeholder-opacity));
@@ -2624,6 +2696,14 @@ input.tab:checked + .tab-content,
 .shadow {
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow:
+    var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000),
+    var(--tw-shadow);
+}
+.shadow-xl {
+  --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow:
     var(--tw-ring-offset-shadow, 0 0 #0000),
     var(--tw-ring-shadow, 0 0 #0000),
@@ -2726,8 +2806,20 @@ input.tab:checked + .tab-content,
   }
 }
 @media (min-width: 768px) {
+  .md\:w-8\/12 {
+    width: 66.666667%;
+  }
   .md\:max-w-\[800px\] {
     max-width: 800px;
+  }
+  .md\:max-w-\[600px\] {
+    max-width: 600px;
+  }
+  .md\:max-w-\[700px\] {
+    max-width: 700px;
+  }
+  .md\:max-w-\[500px\] {
+    max-width: 500px;
   }
 }
 /*# sourceMappingURL=client.css.map */

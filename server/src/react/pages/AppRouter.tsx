@@ -29,15 +29,15 @@ import {
 } from "../components/Svg"
 import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
-import { BlockedEmails } from "./BlockedEmails"
+import { BlacklistedEmails } from "./BlacklistedEmails"
 import { Home } from "./Home"
 
 const navLinks = [
   { to: "/", text: "General settings", element: <Home /> },
   {
-    to: "/blocked-emails",
+    to: "/blacklisted-emails",
     text: "Blacklisted Emails",
-    element: <BlockedEmails />,
+    element: <BlacklistedEmails />,
   },
   // { to: "/blocked-domains", text: "Blocked Domains", element: <BlockedDomains /> },
   // { to: "/blocked-words", text: "Blocked Words", element: <BlockedWords /> },
@@ -115,12 +115,29 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     logout,
     lastError,
     clearLastError,
+    settingUpdated,
+    clearSettingUpdatedFlag,
   } = store.useStore()
   const [creatingAdmin, setCreatingAdmin] = useState(false)
 
   const handleErrorDismiss = useCallback(() => {
     clearLastError()
   }, [clearLastError])
+
+  const handleSettingUpdatedDismiss = useCallback(() => {
+    clearSettingUpdatedFlag()
+  }, [clearSettingUpdatedFlag])
+
+  // clear setting updated flag after 3 seconds
+  useEffect(() => {
+    if (settingUpdated) {
+      const timer = setTimeout(() => {
+        clearSettingUpdatedFlag()
+      }, 3000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [settingUpdated, clearSettingUpdatedFlag])
 
   const onEmailVerified = useCallback(async () => {
     setCreatingAdmin(false)
@@ -230,6 +247,16 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
           </>
         )}
       </div>
+      {settingUpdated ? (
+        <div className="toast toast-bottom toast-end">
+          <div
+            className="alert alert-success cursor-pointer"
+            onClick={handleSettingUpdatedDismiss}
+          >
+            Setting updated!
+          </div>
+        </div>
+      ) : null}
       {lastError ? (
         <div className="toast toast-bottom toast-end">
           <div

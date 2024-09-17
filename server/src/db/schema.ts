@@ -32,9 +32,10 @@ export const settings = pgTable(
   },
 )
 
-export const userStatus = pgEnum("status", ["active", "deleted"])
+export const userStatus = pgEnum("status", ["active", "blacklisted", "deleted"])
 export enum userStatusEnum {
   active = "active",
+  blacklisted = "blacklisted",
   deleted = "deleted",
 }
 
