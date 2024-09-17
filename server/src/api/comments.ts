@@ -193,9 +193,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 latestComment.createdAt,
               ).getTime()
               const now = new Date(dateNow()).getTime()
-              const minDelay = ctx.settings.getSetting(
-                Setting.UserNextCommentDelayMs,
-              )
+              const minDelay =
+                ctx.settings.getSetting(Setting.UserNextCommentDelaySeconds) *
+                1000
               if (dateDiff(latestCommentTime, now) < minDelay) {
                 throw new Error(
                   `You must wait ${dateFormatDiff(now, latestCommentTime + minDelay)} before commenting again!`,

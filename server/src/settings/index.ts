@@ -19,7 +19,7 @@ export class SettingsManager {
   private settings: Record<string, SettingValueRaw> = {
     [Setting.ModerateAllComments]: false,
     [Setting.CommentsPerPage]: 10,
-    [Setting.UserNextCommentDelayMs]: 60000,
+    [Setting.UserNextCommentDelaySeconds]: 60,
     [Setting.BlacklistedWords]: [],
     [Setting.BlacklistedEmails]: [],
     [Setting.BlacklistedDomains]: [],

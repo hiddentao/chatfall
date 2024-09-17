@@ -22,7 +22,7 @@ export const BlacklistedWords: FC = () => {
     >
       <ul className="list-disc ml-4">
         <li className="mb-2">
-          Comments containing these words will be automatically rejected.
+          New comments containing these words will be automatically rejected.
         </li>
         <li className="mb-2">The blacklist is case-insensitive.</li>
         <li className="mb-2">

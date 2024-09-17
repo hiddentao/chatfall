@@ -32,10 +32,10 @@ import { type ServerStore } from "../store/server"
 import { BlacklistedDomains } from "./BlacklistedDomains"
 import { BlacklistedEmails } from "./BlacklistedEmails"
 import { BlacklistedWords } from "./BlacklistedWords"
-import { Home } from "./Home"
+import { GeneralSettings } from "./GeneralSettings"
 
 const navLinks = [
-  { to: "/", text: "General settings", element: <Home /> },
+  { to: "/", text: "General settings", element: <GeneralSettings /> },
   {
     to: "/blacklisted-emails",
     text: "Blacklisted Emails",
