@@ -2,6 +2,7 @@ import ChatSvg from "../images/chat.svg?react"
 import CrossSvg from "../images/cross.svg?react"
 import DarkSvg from "../images/dark.svg?react"
 import DropdownArrowSvg from "../images/dropdown-arrow.svg?react"
+import InfoSvg from "../images/info.svg?react"
 import LeftSvg from "../images/left.svg?react"
 import LightSvg from "../images/light.svg?react"
 import LikeSvg from "../images/like.svg?react"
@@ -28,4 +29,5 @@ export {
   LightSvg,
   DarkSvg,
   LogoutSvg,
+  InfoSvg,
 }

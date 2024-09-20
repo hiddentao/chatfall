@@ -1,5 +1,5 @@
-import { Svg } from "@chatfall/client"
-import { type ReactNode, useEffect, useState } from "react"
+import { type PropsWithClassname, Svg } from "@chatfall/client"
+import { type FC, type ReactNode, useEffect, useState } from "react"
 
 const SvgWrapper = ({ children }: { children: ReactNode }) => {
   const [mounted, setMounted] = useState(false)
@@ -13,24 +13,30 @@ const SvgWrapper = ({ children }: { children: ReactNode }) => {
   return children
 }
 
-export const LogoutSvg = () => (
+export const LogoutSvg: FC<PropsWithClassname> = ({ className }) => (
   <SvgWrapper>
-    <Svg.LogoutSvg />
+    <Svg.LogoutSvg className={className} />
   </SvgWrapper>
 )
-export const DarkSvg = () => (
+export const DarkSvg: FC<PropsWithClassname> = ({ className }) => (
   <SvgWrapper>
-    <Svg.DarkSvg />
+    <Svg.DarkSvg className={className} />
   </SvgWrapper>
 )
-export const LightSvg = () => (
+export const LightSvg: FC<PropsWithClassname> = ({ className }) => (
   <SvgWrapper>
-    <Svg.LightSvg />
+    <Svg.LightSvg className={className} />
   </SvgWrapper>
 )
 
-export const DropdownArrowSvg = () => (
+export const DropdownArrowSvg: FC<PropsWithClassname> = ({ className }) => (
   <SvgWrapper>
-    <Svg.DropdownArrowSvg />
+    <Svg.DropdownArrowSvg className={className} />
+  </SvgWrapper>
+)
+
+export const InfoSvg: FC<PropsWithClassname> = ({ className }) => (
+  <SvgWrapper>
+    <Svg.InfoSvg className={className} />
   </SvgWrapper>
 )

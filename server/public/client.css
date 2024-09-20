@@ -1304,6 +1304,12 @@ input.tab:checked + .tab-content,
   --tw-text-opacity: 1;
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
+.label-text-alt {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  --tw-text-opacity: 1;
+  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
+}
 .input input {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
@@ -1487,6 +1493,11 @@ input.tab:checked + .tab-content,
 .menu :where(li > .menu-dropdown-toggle.menu-dropdown-show):after {
   transform: rotate(225deg);
   margin-top: 0;
+}
+.mockup-phone .display {
+  overflow: hidden;
+  border-radius: 40px;
+  margin-top: -25px;
 }
 .mockup-browser .mockup-browser-toolbar .input {
   position: relative;
@@ -2042,6 +2053,13 @@ input.tab:checked + .tab-content,
   right: var(--tooltip-offset);
   bottom: auto;
 }
+.tooltip-right:before {
+  transform: translateY(-50%);
+  top: 50%;
+  left: var(--tooltip-offset);
+  right: auto;
+  bottom: auto;
+}
 .card-compact .card-body {
   padding: 1rem;
   font-size: 0.875rem;
@@ -2197,6 +2215,14 @@ input.tab:checked + .tab-content,
   top: 50%;
   left: auto;
   right: calc(var(--tooltip-tail-offset) + 0.0625rem);
+  bottom: auto;
+}
+.tooltip-right:after {
+  transform: translateY(-50%);
+  border-color: transparent var(--tooltip-color) transparent transparent;
+  top: 50%;
+  left: calc(var(--tooltip-tail-offset) + 0.0625rem);
+  right: auto;
   bottom: auto;
 }
 .visible {
@@ -2519,6 +2545,12 @@ input.tab:checked + .tab-content,
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+.fill-primary {
+  fill: var(--fallback-p,oklch(var(--p)/1));
+}
+.stroke-current {
+  stroke: currentColor;
 }
 .p-0 {
   padding: 0px;
