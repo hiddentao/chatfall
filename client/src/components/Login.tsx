@@ -51,7 +51,7 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
       try {
         setIsSubmitting(true)
         setError("")
-        await verifyEmail(blob, code.value)
+        await verifyEmail(blob, code.value!)
         reset()
         onVerified()
       } catch (err: any) {
@@ -175,7 +175,7 @@ export const LoginEmailForm: FC<
         try {
           setIsSubmitting(true)
           setError("")
-          setVerifyEmailBlob((await loginEmail(email.value, adminOnly)).blob)
+          setVerifyEmailBlob((await loginEmail(email.value!, adminOnly)).blob)
           reset()
         } catch (err: any) {
           setError(err.toString())

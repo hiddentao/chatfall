@@ -24,8 +24,7 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
     "types": [
-      "webpack-env",
-      "./src/custom.d.ts"
+      "webpack-env"
     ]
   }
 }

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "bunx --bun vite",
-    "lib:build": "tsc -b && vite build",
+    "lib:build": "tsc -b && vite build && cp -rf ./dist/* ../server/public/lib/",
     "lib:analyze": "npx vite-bundle-visualizer",
     "format": "biome format",
     "format:write": "biome format --write",
