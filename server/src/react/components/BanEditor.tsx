@@ -11,7 +11,7 @@ import { Setting } from "../../settings/types"
 import type { ServerStore } from "../store/server"
 import { PageWrapper } from "./PageWrapper"
 
-interface BlacklistEditorProps {
+interface BanEditorProps {
   title: string
   settingKey: Setting
   validateItems: (value: string) => string | undefined
@@ -19,7 +19,7 @@ interface BlacklistEditorProps {
   children: ReactNode
 }
 
-export const BlacklistEditor: FC<BlacklistEditorProps> = ({
+export const BanEditor: FC<BanEditorProps> = ({
   title,
   settingKey,
   validateItems,
@@ -30,21 +30,21 @@ export const BlacklistEditor: FC<BlacklistEditorProps> = ({
   const { settings, setSetting } = store.useStore()
   const [inProgress, setInProgress] = useState(false)
 
-  const blockedItemsField = useField<string>({
-    name: "blockedItems",
+  const bannedItemsField = useField<string>({
+    name: "bannedItems",
     initialValue: (settings?.[settingKey] as string[]).join("\n") || "",
     validate: validateItems,
   })
 
   const form = useForm({
-    fields: [blockedItemsField],
+    fields: [bannedItemsField],
   })
 
   const handleSave = useCallback(async () => {
     if (form.valid) {
       setInProgress(true)
       try {
-        const items = blockedItemsField
+        const items = bannedItemsField
           .value!.split("\n")
           .filter((item) => item.trim() !== "")
         await setSetting(settingKey, items)
@@ -52,7 +52,7 @@ export const BlacklistEditor: FC<BlacklistEditorProps> = ({
         setInProgress(false)
       }
     }
-  }, [form.valid, blockedItemsField.value, setSetting, settingKey])
+  }, [form.valid, bannedItemsField.value, setSetting, settingKey])
 
   return (
     <PageWrapper title={title}>
@@ -60,7 +60,7 @@ export const BlacklistEditor: FC<BlacklistEditorProps> = ({
         <div className="card-body p-4">{children}</div>
       </div>
       <TextAreaInput
-        field={blockedItemsField}
+        field={bannedItemsField}
         label={title}
         placeholder={placeholder}
         rows={10}

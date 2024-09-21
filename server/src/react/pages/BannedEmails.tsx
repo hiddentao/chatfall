@@ -1,6 +1,6 @@
 import { type FC } from "react"
 import { Setting } from "../../settings/types"
-import { BlacklistEditor } from "../components/BlacklistEditor"
+import { BanEditor } from "../components/BanEditor"
 
 const validateEmails = (value: string): string | undefined => {
   const emails = value.split("\n").filter((email) => email.trim() !== "")
@@ -13,10 +13,10 @@ const validateEmails = (value: string): string | undefined => {
   return undefined
 }
 
-export const BlacklistedEmails: FC = () => {
+export const BannedEmails: FC = () => {
   return (
-    <BlacklistEditor
-      title="Blacklisted emails"
+    <BanEditor
+      title="Banned emails"
       settingKey={Setting.BlacklistedEmails}
       validateItems={validateEmails}
       placeholder="Enter one email address per line (e.g., user@example.com)"
@@ -27,13 +27,13 @@ export const BlacklistedEmails: FC = () => {
           addresses.
         </li>
         <li className="mb-2">
-          Existing users with these email addresses will be blacklisted.{" "}
+          Existing users with these email addresses will be banned.{" "}
           <strong>Note: This cannot be undone!</strong>
         </li>
         <li className="mb-2">
-          Existing comments from blacklisted users will remain visible.
+          Existing comments from banned users will remain visible.
         </li>
       </ul>
-    </BlacklistEditor>
+    </BanEditor>
   )
 }

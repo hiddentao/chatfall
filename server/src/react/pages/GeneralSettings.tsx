@@ -72,11 +72,11 @@ export const GeneralSettings: FC = () => {
 
       <div className="form-control mt-4">
         <label className="label">
-          <span className="label-text">Comments per batch</span>
+          <span className="label-text">Comments per page</span>
           <span className="label-text-alt">
             <span
               className="tooltip tooltip-top"
-              data-tip="The number of comments to display per batch that gets loaded from the server"
+              data-tip="The number of comments to display per page that gets loaded from the server"
             >
               <InfoSvg className="w-4 h-4 fill-primary" />
             </span>

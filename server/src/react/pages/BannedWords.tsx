@@ -1,6 +1,6 @@
 import { type FC } from "react"
 import { Setting } from "../../settings/types"
-import { BlacklistEditor } from "../components/BlacklistEditor"
+import { BanEditor } from "../components/BanEditor"
 
 const validateWords = (value: string): string | undefined => {
   const words = value.split("\n").filter((word) => word.trim() !== "")
@@ -12,10 +12,10 @@ const validateWords = (value: string): string | undefined => {
   return undefined
 }
 
-export const BlacklistedWords: FC = () => {
+export const BannedWords: FC = () => {
   return (
-    <BlacklistEditor
-      title="Blacklisted words"
+    <BanEditor
+      title="Banned words"
       settingKey={Setting.BlacklistedWords}
       validateItems={validateWords}
       placeholder="Enter one word per line"
@@ -24,7 +24,7 @@ export const BlacklistedWords: FC = () => {
         <li className="mb-2">
           New comments containing these words will be automatically rejected.
         </li>
-        <li className="mb-2">The blacklist is case-insensitive.</li>
+        <li className="mb-2">The ban list is case-insensitive.</li>
         <li className="mb-2">
           Words should only contain letters, numbers, underscores, or hyphens.
         </li>
@@ -32,6 +32,6 @@ export const BlacklistedWords: FC = () => {
           Be cautious when adding common words to avoid over-filtering.
         </li>
       </ul>
-    </BlacklistEditor>
+    </BanEditor>
   )
 }

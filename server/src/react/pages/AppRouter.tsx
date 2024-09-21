@@ -29,27 +29,27 @@ import {
 } from "../components/Svg"
 import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
-import { BlacklistedDomains } from "./BlacklistedDomains"
-import { BlacklistedEmails } from "./BlacklistedEmails"
-import { BlacklistedWords } from "./BlacklistedWords"
+import { BannedDomains } from "./BannedDomains"
+import { BannedEmails } from "./BannedEmails"
+import { BannedWords } from "./BannedWords"
 import { GeneralSettings } from "./GeneralSettings"
 
 const navLinks = [
   { to: "/", text: "General settings", element: <GeneralSettings /> },
   {
     to: "/blacklisted-emails",
-    text: "Blacklisted Emails",
-    element: <BlacklistedEmails />,
+    text: "Banned Emails",
+    element: <BannedEmails />,
   },
   {
     to: "/blacklisted-domains",
-    text: "Blacklisted Domains",
-    element: <BlacklistedDomains />,
+    text: "Banned Domains",
+    element: <BannedDomains />,
   },
   {
     to: "/blacklisted-words",
-    text: "Blacklisted Words",
-    element: <BlacklistedWords />,
+    text: "Banned Words",
+    element: <BannedWords />,
   },
   // { to: "/comments", text: "All Comments", element: <Comments /> },
 ]
