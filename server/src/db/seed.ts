@@ -5,6 +5,7 @@ import { Pool } from "pg"
 import { env } from "../env"
 import { generateCanonicalUrl } from "../utils/string.ts"
 import {
+  CommentStatus,
   type CommentToInsert,
   type UserToInsert,
   commentRatings,
@@ -53,7 +54,7 @@ const main = async () => {
 
   await db.insert(posts).values([
     {
-      url: generateCanonicalUrl("http://localhost:5173/lib/index.html"),
+      url: generateCanonicalUrl("http://localhost:5173/"),
     },
   ])
   const p = (await db.select().from(posts).limit(1))[0]
@@ -69,7 +70,7 @@ const main = async () => {
       path: `${i}`,
       rating: faker.number.int({ min: 0, max: 100 }),
       replyCount: i === 1 ? 20 : 0,
-      status: Math.random() > 0.9 ? "flagged" : "shown",
+      status: Math.random() > 0.9 ? CommentStatus.flagged : CommentStatus.shown,
       createdAt: faker.date
         .between({
           from: "2023-01-01T00:00:00.000Z",
@@ -94,7 +95,8 @@ const main = async () => {
         path: `${pathPrefixStr}.${j}`,
         replyCount: j === 1 && depth < maxDepth ? 20 : 0,
         rating: faker.number.int({ min: 0, max: 100 }),
-        status: j > 1 && Math.random() > 0.9 ? "flagged" : "shown",
+        status:
+          Math.random() > 0.9 ? CommentStatus.flagged : CommentStatus.shown,
         createdAt: d,
         updatedAt: d,
       })

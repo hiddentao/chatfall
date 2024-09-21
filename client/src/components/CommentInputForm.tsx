@@ -121,7 +121,7 @@ export const CommentInputForm = forwardRef<
         try {
           setIsPosting(true)
           setError("")
-          await postComment(commentText.value)
+          await postComment(commentText.value!)
           reset()
         } catch (err: any) {
           setError(err.toString())
@@ -182,7 +182,7 @@ export const CommentInputForm = forwardRef<
               placeholder={commentFieldPlaceholder || "Add comment..."}
               hideValidationIndicator={true}
               inputClassname={cn("self-stretch w-full", {
-                "bg-transparent border-0 italic": !focused,
+                "bg-transparent border-0 italic p-0 min-h-1": !focused,
                 [standardInputStyle]: focused,
               })}
               onFocus={onFocusForm}

@@ -2352,6 +2352,9 @@ input.tab:checked + .tab-content,
 .max-h-full {
   max-height: 100%;
 }
+.min-h-1 {
+  min-height: 0.25rem;
+}
 .min-h-\[3rem\] {
   min-height: 3rem;
 }
@@ -2555,6 +2558,10 @@ input.tab:checked + .tab-content,
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+}
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 .px-4 {
   padding-left: 1rem;

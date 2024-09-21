@@ -109,11 +109,11 @@ export const CommentList: FC = () => {
           </div>
         </div>
       </div>
-      <div className="px-1">
+      <div className="px-2">
         {canonicalUrl ? <CommentInputForm className="mt-4 mb-8 mx-6" /> : null}
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {!isLoading && !error && rootList.items.length === 0 ? (
-          <p>No comments yet!</p>
+          <p className="italic">No comments yet!</p>
         ) : null}
         {rootList.otherUserNewItems.length ? (
           <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">
