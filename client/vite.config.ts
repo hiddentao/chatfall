@@ -32,6 +32,14 @@ export default defineConfig(({ command }) => {
             formats: ["es"],
             fileName: (format) => `chatfall.${format}.js`,
           },
+          rollupOptions: {
+            output: {
+              assetFileNames: (assetInfo) => {
+                if (assetInfo.name === 'style.css') return 'chatfall.css';
+                return assetInfo.name!;
+              },
+            },
+          },          
         },
       }
       break
