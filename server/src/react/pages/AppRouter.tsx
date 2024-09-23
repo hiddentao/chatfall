@@ -160,10 +160,12 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
           await loadSettings()
         } catch (error) {
           console.error(error)
+          // if not allowed then logout
+          await logout()
         }
       })()
     }
-  }, [loadSettings, loggedInUser, settings])
+  }, [loadSettings, loggedInUser, settings, logout])
 
   useEffect(() => {
     ;(async () => {
