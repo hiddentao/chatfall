@@ -1,10 +1,11 @@
 import {
+  type BaseStoreProps,
   type CoreState,
-  type StoreProps,
   createBaseStore,
 } from "@chatfall/client"
 import { produce } from "immer"
-import type { Settings, SocketEvent } from "../../exports"
+import type { CommentStatus } from "../../db/schema"
+import { type Settings, type SocketEvent, Sort } from "../../exports"
 import type { Setting, SettingValue } from "../../settings/types"
 
 export type ServerState = CoreState & {
@@ -15,14 +16,18 @@ export type ServerState = CoreState & {
 
   settingUpdated?: boolean
   clearSettingUpdatedFlag: () => void
+
+  updateCommentStatus: (
+    commentId: number,
+    status: CommentStatus,
+  ) => Promise<void>
+  getCanonicalUrls: () => Promise<string[]>
 }
 
-export type ServerStoreProps = StoreProps & {}
-
-export const createStore = (props: ServerStoreProps) => {
-  return createBaseStore<ServerState>(
+export const createStore = (props: BaseStoreProps) => {
+  return createBaseStore<ServerState>({
     props,
-    (set, get, tryCatchApiCall, app) =>
+    createAdditionalState: (set, get, tryCatchApiCall, app) =>
       ({
         settings: undefined,
         settingUpdated: false,
@@ -84,11 +89,49 @@ export const createStore = (props: ServerStoreProps) => {
             throw error
           }
         },
+        updateCommentStatus: async (commentId, status) => {
+          await tryCatchApiCall<{ success: boolean }>(set, () =>
+            app.api.comments.admin.comment_status.put({ commentId, status }),
+          )
+        },
+        getCanonicalUrls: async () => {
+          const data = await tryCatchApiCall<string[]>(set, () =>
+            app.api.comments.admin.urls.get(),
+          )
+          return data
+        },
       }) as Omit<ServerState, keyof CoreState>,
-    (useStore, data: SocketEvent) => {
+    fetchCommentsImplementation: async ({ app, url, sort, skip }) => {
+      return await app.api.comments.admin.comments.get({
+        query: {
+          url,
+          depth: `0`,
+          skip: `${skip}`,
+          sort,
+        },
+      })
+    },
+    fetchRepliesImplementation: async ({
+      app,
+      url,
+      parentDepth,
+      parentPath,
+      skip,
+    }) => {
+      return await app.api.comments.admin.comments.get({
+        query: {
+          url,
+          depth: `${parentDepth + 1}`,
+          pathPrefix: `${parentPath}.`,
+          skip: `${skip}`,
+          sort: Sort.oldestFirst,
+        },
+      })
+    },
+    onSocketMessage: (useStore, data: SocketEvent) => {
       console.log(useStore, data)
     },
-  )
+  })
 }
 
 export type ServerStore = ReturnType<typeof createStore>

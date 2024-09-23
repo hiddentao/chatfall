@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, like, sql } from "drizzle-orm"
+import { and, count, desc, eq, sql } from "drizzle-orm"
 import Elysia, { t } from "elysia"
 import {
   type Comment,
@@ -6,14 +6,22 @@ import {
   commentRatings,
   comments,
   posts,
-  users,
 } from "../db/schema"
 import { Setting } from "../settings/types"
-import { type CommentUser, type GlobalContext, Sort } from "../types"
+import { type GlobalContext } from "../types"
 import { dateDiff, dateFormatDiff, dateNow } from "../utils/date"
 import { generateCanonicalUrl } from "../utils/string"
 import { SocketEventTypeEnum } from "../ws/types"
-import { execHandler, getLoggedInUser, getLoggedInUserAndAssert } from "./utils"
+import {
+  AdminCommentQuerySchema,
+  CommentQuerySchema,
+  CommentResponseSchema,
+  execHandler,
+  fetchComments,
+  getLoggedInUser,
+  getLoggedInUserAndAssert,
+  getLoggedInUserAndAssertAdmin,
+} from "./utils"
 
 export const createCommentRoutes = (ctx: GlobalContext) => {
   const { db } = ctx
@@ -304,134 +312,107 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           const { url: _url, skip, sort, depth, pathPrefix } = query
 
           const canonicalUrl = generateCanonicalUrl(_url)
-
-          const order_by = {
-            [Sort.newestFirst]: desc(comments.createdAt),
-            [Sort.oldestFirst]: asc(comments.createdAt),
-            [Sort.highestScore]: desc(comments.rating),
-            [Sort.lowestScore]: asc(comments.rating),
-            [Sort.mostReplies]: desc(comments.replyCount),
-            [Sort.leastReplies]: asc(comments.replyCount),
-          }[sort]
-
           const limit = ctx.settings.getSetting(Setting.CommentsPerPage)
 
-          const result = await db
-            .select({
-              id: comments.id,
-              userId: comments.userId,
-              postId: comments.postId,
-              body: comments.body,
-              createdAt: comments.createdAt,
-              updatedAt: comments.updatedAt,
-              rating: comments.rating,
-              depth: comments.depth,
-              replyCount: comments.replyCount,
-              path: comments.path,
-              status: comments.status,
-              users_name: users.name,
-              userRatings_rating: commentRatings.rating,
-              totalCount: sql<number>`count(*) over()`.as("total_count"),
-            })
-            .from(posts)
-            .leftJoin(comments, eq(posts.id, comments.postId))
-            .leftJoin(users, eq(users.id, comments.userId))
-            .leftJoin(
-              commentRatings,
-              and(
-                eq(commentRatings.commentId, comments.id),
-                eq(commentRatings.userId, user?.id || 0),
-              ),
-            )
-            .where(
-              and(
-                eq(posts.url, canonicalUrl),
-                eq(comments.depth, Number(depth)),
-                like(comments.path, `${pathPrefix || ""}%`),
-              ),
-            )
-            .orderBy(order_by)
-            .limit(limit)
-            .offset(Number(skip))
-
-          // Extract total count from the first row
-          const totalComments = Number(result[0]?.totalCount ?? 0)
-
-          // Remove totalCount from each row
-          const list = result.map(({ totalCount, ...item }) => item)
-
-          const ret = {
+          const ret = await fetchComments(db, {
             canonicalUrl,
-            totalComments,
-            users: {} as Record<number, CommentUser>,
-            comments: [] as Comment[],
-            liked: {} as Record<number, boolean>,
-          }
+            depth: Number(depth),
+            pathPrefix,
+            skip: Number(skip),
+            sort,
+            limit,
+            userId: user?.id,
+            status: [CommentStatus.shown, CommentStatus.flagged],
+          })
 
-          for (const c of list) {
-            if (c.id) {
-              ret.comments.push({
-                id: c.id,
-                body: c.body!,
-                userId: c.userId!,
-                postId: c.postId!,
-                createdAt: c.createdAt!,
-                updatedAt: c.updatedAt!,
-                rating: c.rating!,
-                depth: c.depth!,
-                replyCount: c.replyCount!,
-                path: c.path!,
-                status: c.status!,
-              })
-
-              ret.users[c.userId!] = {
-                id: c.userId!,
-                name: c.users_name!,
-              }
-
-              if (c.userRatings_rating) {
-                ret.liked[c.id] = true
-              }
+          // - if it's flagged then set its content to [awaiting moderation]
+          ret.comments.forEach((c) => {
+            if (c.status === CommentStatus.flagged) {
+              c.body = "[awaiting moderation]"
             }
-          }
+          })
 
           return ret
         })
       },
       {
-        query: t.Object({
-          url: t.String(),
-          depth: t.String(),
-          pathPrefix: t.Optional(t.String()),
-          skip: t.String(),
-          sort: t.Enum(Sort),
-        }),
-        response: t.Object({
-          canonicalUrl: t.String(),
-          totalComments: t.Number(),
-          users: t.Record(
-            t.Number(),
-            t.Object({
-              id: t.Number(),
-              name: t.String(),
-            }),
-          ),
-          comments: t.Array(
-            t.Object({
-              id: t.Number(),
-              userId: t.Number(),
-              postId: t.Number(),
-              body: t.String(),
-              status: t.Enum(CommentStatus),
-              depth: t.Number(),
-              rating: t.Number(),
-              replyCount: t.Number(),
-              path: t.String(),
-              createdAt: t.String(),
-              updatedAt: t.String(),
-            }),
-          ),
-          liked: t.Record(t.Number(), t.Boolean()),
+        query: CommentQuerySchema,
+        response: CommentResponseSchema,
+      },
+    )
+    .get(
+      "/admin/urls",
+      async ({ ...props }) => {
+        return await execHandler(async () => {
+          await getLoggedInUserAndAssertAdmin(ctx, props)
+          const urls = await db
+            .selectDistinct({ url: posts.url })
+            .from(posts)
+            .innerJoin(comments, eq(comments.postId, posts.id))
+            .orderBy(posts.url)
+
+          return urls.map(({ url }) => url)
+        })
+      },
+      {
+        response: t.Array(t.String()),
+      },
+    )
+    .get(
+      "/admin/comments",
+      async ({ query, ...props }) => {
+        return await execHandler(async () => {
+          await getLoggedInUserAndAssertAdmin(ctx, props)
+
+          const {
+            url: _url,
+            skip,
+            sort,
+            depth,
+            pathPrefix,
+            status,
+            search,
+          } = query
+
+          const canonicalUrl = generateCanonicalUrl(_url)
+          const limit = ctx.settings.getSetting(Setting.CommentsPerPage)
+
+          return fetchComments(db, {
+            canonicalUrl,
+            depth: Number(depth),
+            pathPrefix,
+            skip: Number(skip),
+            sort,
+            limit,
+            status: status as CommentStatus[] | undefined,
+            search,
+          })
+        })
+      },
+      {
+        query: AdminCommentQuerySchema,
+        response: CommentResponseSchema,
+      },
+    )
+    .put(
+      "/admin/comment_status",
+      async ({ body, ...props }) => {
+        return await execHandler(async () => {
+          await getLoggedInUserAndAssertAdmin(ctx, props)
+          const { commentId, status } = body
+
+          await db
+            .update(comments)
+            .set({ status, updatedAt: dateNow() })
+            .where(eq(comments.id, commentId))
+
+          return { success: true }
+        })
+      },
+      {
+        body: t.Object({
+          commentId: t.Number(),
+          status: t.Enum(CommentStatus),
         }),
       },
     )

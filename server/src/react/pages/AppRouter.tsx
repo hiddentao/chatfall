@@ -32,6 +32,7 @@ import { type ServerStore } from "../store/server"
 import { BannedDomains } from "./BannedDomains"
 import { BannedEmails } from "./BannedEmails"
 import { BannedWords } from "./BannedWords"
+import { CommentsAdmin } from "./CommentsAdmin"
 import { GeneralSettings } from "./GeneralSettings"
 
 const navLinks = [
@@ -51,7 +52,11 @@ const navLinks = [
     text: "Banned Words",
     element: <BannedWords />,
   },
-  // { to: "/comments", text: "All Comments", element: <Comments /> },
+  {
+    to: "/comments",
+    text: "Comments Admin",
+    element: <CommentsAdmin />,
+  },
 ]
 
 const AppRoutes = () => {

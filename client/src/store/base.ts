@@ -1,14 +1,18 @@
 import {
+  type Comment,
+  CommentUser,
   type LoggedInUser,
   type ServerApp,
   SocketEvent,
+  Sort,
 } from "@chatfall/server"
 import { treaty } from "@elysiajs/eden"
 import { produce } from "immer"
 import { StoreApi, UseBoundStore, create } from "zustand"
 import { jwt } from "../lib/jwt"
 
-export type StoreProps = {
+export type BaseStoreProps = {
+  initialSort?: Sort
   server: string
 }
 
@@ -60,18 +64,50 @@ export class Socket {
   }
 }
 
+export type StoreCommentId = number
+
+export type StoreCommentList = {
+  sort: Sort
+  parentDepth: number
+  parentPath: string
+  items: number[]
+  total: number
+  otherUserNewItems: number[]
+  myNewItems: number[]
+}
+
+export type StoreComment = Comment & {
+  url: string
+}
+
 export type CoreState = {
   canonicalUrl: string | null
   loggedInUser?: LoggedInUser
   checkingAuth: boolean
   lastError?: string
 
+  users: Record<StoreCommentId, CommentUser>
+  liked: Record<StoreCommentId, boolean>
+  comments: Record<StoreCommentId, StoreComment>
+  replies: Record<StoreCommentId, StoreCommentList>
+  rootList: StoreCommentList
+
   clearLastError: () => void
   getCanonicalUrl: () => string
+
   logout: () => void
   checkAuth: () => Promise<void>
   loginEmail: (email: string, adminOnly?: boolean) => Promise<{ blob: string }>
   verifyEmail: (blob: string, code: string) => Promise<void>
+
+  fetchComments: (props: {
+    url?: string
+    sort?: Sort
+    skipOverride?: number
+  }) => Promise<void>
+  fetchReplies: (props: {
+    parentCommentId: number
+  }) => Promise<void>
 }
 
 const getPageUrl = () => {
@@ -113,19 +149,40 @@ const tryCatchApiCall = async <T = any>(
 
 export type TryCatchApiCall = typeof tryCatchApiCall
 
-export const createBaseStore = <State extends CoreState>(
-  props: StoreProps,
+export const createBaseStore = <State extends CoreState>({
+  props,
+  createAdditionalState,
+  fetchCommentsImplementation,
+  fetchRepliesImplementation,
+  onSocketMessage,
+}: {
+  props: BaseStoreProps
   createAdditionalState: (
     set: (fn: (state: State) => State | Partial<State>) => void,
     get: () => State,
     tryCatchApiCall: TryCatchApiCall,
     app: TreatyApp,
-  ) => Omit<State, keyof CoreState>,
+  ) => Omit<State, keyof CoreState>
+  fetchCommentsImplementation: (props: {
+    app: TreatyApp
+    get: () => State
+    url: string
+    sort: Sort
+    skip: number
+  }) => ReturnType<TreatyApp["api"]["comments"]["index"]["get"]>
+  fetchRepliesImplementation: (props: {
+    app: TreatyApp
+    get: () => State
+    url: string
+    parentDepth: number
+    parentPath: string
+    skip: number
+  }) => ReturnType<TreatyApp["api"]["comments"]["index"]["get"]>
   onSocketMessage: (
     useStore: UseBoundStore<StoreApi<State>>,
     data: SocketEvent,
-  ) => void,
-) => {
+  ) => void
+}) => {
   const app = createApp(props.server)
 
   const ws = new Socket(app)
@@ -149,10 +206,17 @@ export const createBaseStore = <State extends CoreState>(
   const useStore = create<State>()(
     (set, get) =>
       ({
+        canonicalUrl: null,
         loggedInUser: undefined,
         checkingAuth: true,
-
         lastError: undefined,
+
+        users: {},
+        liked: {},
+        comments: {},
+        replies: {},
+        rootList: createCommentList(-1, "", props.initialSort),
+
         clearLastError: () => {
           set(
             produce((state) => {
@@ -160,16 +224,13 @@ export const createBaseStore = <State extends CoreState>(
             }),
           )
         },
-
         getCanonicalUrl: () => {
           return get().canonicalUrl || getPageUrl()
         },
-
         logout: () => {
           jwt.removeToken()
           _updateLoginState(set)
         },
-
         checkAuth: async () => {
           set(
             produce((state) => {
@@ -195,7 +256,6 @@ export const createBaseStore = <State extends CoreState>(
 
           _updateLoginState(set)
         },
-
         verifyEmail: async (blob: string, code: string) => {
           const data = await tryCatchApiCall(set, () =>
             app.api.users.verify_email.post({
@@ -218,7 +278,90 @@ export const createBaseStore = <State extends CoreState>(
 
           return data
         },
+        fetchComments: async ({
+          url = get().getCanonicalUrl(),
+          sort = get().rootList.sort,
+          skipOverride,
+        }) => {
+          const skip =
+            typeof skipOverride === "number"
+              ? skipOverride
+              : get().rootList.items.length
 
+          const data = await tryCatchApiCall(set, () =>
+            fetchCommentsImplementation({ app, get, url, sort, skip }),
+          )
+
+          set(
+            produce((state) => {
+              state.canonicalUrl = data.canonicalUrl
+
+              if (skip) {
+                Object.assign(state.users, data.users)
+                Object.assign(state.liked, data.liked)
+                Object.assign(
+                  state.comments,
+                  commentListToMap(data.comments, url),
+                )
+                appendCommentList(state.rootList, data)
+              } else {
+                state.users = data.users
+                state.liked = data.liked
+                state.comments = commentListToMap(data.comments, url)
+                state.replies = {}
+                replaceCommentList(state.rootList, data)
+                state.rootList.sort = sort
+              }
+            }),
+          )
+        },
+        fetchReplies: async ({ parentCommentId }) => {
+          const existing = get().replies[parentCommentId]
+
+          const parentDepth = existing
+            ? existing.parentDepth
+            : get().comments[parentCommentId].depth
+
+          const parentPath = existing
+            ? existing.parentPath
+            : get().comments[parentCommentId].path
+
+          const skip = existing ? existing.items.length : 0
+
+          const url = get().comments[parentCommentId].url
+
+          const data = await tryCatchApiCall(set, () =>
+            fetchRepliesImplementation({
+              app,
+              get,
+              url,
+              parentDepth,
+              parentPath,
+              skip,
+            }),
+          )
+
+          set(
+            produce((state) => {
+              Object.assign(state.users, data.users)
+              Object.assign(state.liked, data.liked)
+              Object.assign(
+                state.comments,
+                commentListToMap(data.comments, url),
+              )
+
+              if (skip) {
+                appendCommentList(state.replies[parentCommentId], data)
+              } else {
+                state.replies[parentCommentId] = createCommentList(
+                  parentDepth,
+                  parentPath,
+                )
+                replaceCommentList(state.replies[parentCommentId], data)
+              }
+            }),
+          )
+        },
         ...createAdditionalState(set, get, tryCatchApiCall, app),
       }) as State,
   )
@@ -231,3 +374,64 @@ export const createBaseStore = <State extends CoreState>(
 }
 
 export type BaseStore = ReturnType<typeof createBaseStore>
+
+const createCommentList = (
+  parentDepth: number,
+  parentPath: string,
+  sort: Sort = Sort.newestFirst,
+) => {
+  return {
+    sort,
+    parentDepth,
+    parentPath,
+    items: [],
+    total: 0,
+    otherUserNewItems: [],
+    myNewItems: [],
+  } as StoreCommentList
+}
+
+const commentListToMap = (comments: Comment[], url: string) => {
+  return comments.reduce(
+    (acc, c) => {
+      acc[c.id] = { ...c, url }
+      return acc
+    },
+    {} as Record<StoreCommentId, StoreComment>,
+  )
+}
+
+const replaceCommentList = (
+  list: StoreCommentList,
+  data: {
+    comments: Comment[]
+    totalComments: number
+  },
+) => {
+  const { comments, totalComments } = data
+  list.items = comments.map((c) => c.id)
+  list.total = totalComments
+  list.otherUserNewItems = []
+  list.myNewItems = []
+}
+
+const appendCommentList = (
+  list: StoreCommentList,
+  data: {
+    comments: Comment[]
+    totalComments: number
+  },
+) => {
+  const { comments, totalComments } = data
+  const newItems = comments
+    .filter((c) => !list.items.includes(c.id))
+    .map((c) => c.id)
+  list.items = list.items.concat(newItems)
+  list.total = totalComments
+  list.otherUserNewItems = list.otherUserNewItems.filter(
+    (c: number) => !list.items.includes(c),
+  )
+  list.myNewItems = list.myNewItems.filter(
+    (c: number) => !list.items.includes(c),
+  )
+}

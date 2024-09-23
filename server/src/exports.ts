@@ -24,3 +24,5 @@ export type {
 } from "./ws/types"
 
 export type { Settings } from "./settings/types"
+
+export type { CommentResponseSchema } from "./api/utils"

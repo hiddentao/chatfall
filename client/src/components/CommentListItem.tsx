@@ -25,6 +25,8 @@ export type CommentProps = PropsWithClassname & {
   comment: Comment
   user: CommentUser
   liked: boolean
+  renderExtraControls?: (comment: Comment) => React.ReactNode
+  disableActions?: boolean // New prop to disable like and reply buttons
 }
 
 const CommentListItemInner: FC<CommentProps> = ({
@@ -32,6 +34,8 @@ const CommentListItemInner: FC<CommentProps> = ({
   comment: c,
   user,
   liked,
+  renderExtraControls,
+  disableActions, // Destructure the new prop
 }) => {
   const { store } = useGlobalContext<ClientStore>()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
@@ -66,7 +70,7 @@ const CommentListItemInner: FC<CommentProps> = ({
     try {
       setLoadingReplies(true)
       setError("")
-      await fetchReplies(c.id)
+      await fetchReplies({ parentCommentId: c.id })
     } catch (err: any) {
       setError(err.toString())
     } finally {
@@ -180,6 +184,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             variant="iconMeta"
             title="Like/unlike"
             onClick={handleLike}
+            disabled={disableActions}
           >
             {updatingLike ? (
               <Loading className="w-4 h-4" />
@@ -190,17 +195,19 @@ const CommentListItemInner: FC<CommentProps> = ({
             )}
           </ButtonWithLogin>
         </span>
-        <Button
-          variant="link"
-          className="ml-4 inline-flex justify-start items-center"
-          title="Reply"
-          onClick={showReplyForm}
-        >
-          <div className="svg-container w-4 h-4 mx-1">
-            <ReplySvg />
-          </div>
-          Reply
-        </Button>
+        {!disableActions && (
+          <Button
+            variant="link"
+            className="ml-4 inline-flex justify-start items-center"
+            title="Reply"
+            onClick={showReplyForm}
+          >
+            <div className="svg-container w-4 h-4 mx-1">
+              <ReplySvg />
+            </div>
+            Reply
+          </Button>
+        )}
         {c.replyCount ? (
           <Button
             variant="link"
@@ -215,6 +222,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             &nbsp;{formatPlural(c.replyCount, "reply", "replies")}
           </Button>
         ) : null}
+        {renderExtraControls && renderExtraControls(c)}
       </div>
       {showingReplies ? (
         <div className="mt-3 p-4 flex flex-row">
@@ -230,6 +238,7 @@ const CommentListItemInner: FC<CommentProps> = ({
                       comment={s.comments[r]}
                       user={s.users[s.comments[r].userId]}
                       liked={s.liked[r]}
+                      disableActions={disableActions}
                     />
                   ))}
                 </ul>
@@ -273,6 +282,8 @@ export const CommentListItem: FC<CommentProps> = ({
   comment: c,
   user,
   liked,
+  renderExtraControls,
+  disableActions, // Destructure the new prop
 }) => {
   return (
     <CommentListItemInner
@@ -280,6 +291,8 @@ export const CommentListItem: FC<CommentProps> = ({
       comment={c}
       user={user}
       liked={liked}
+      renderExtraControls={renderExtraControls}
+      disableActions={disableActions} // Pass the disableActions prop to CommentListItemInner
     />
   )
 }

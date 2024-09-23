@@ -3,6 +3,7 @@ export * from "./store/base"
 export * from "./contexts/global"
 
 // UI Components
+export * from "./components/CommentListBase"
 export * from "./components/Form"
 export * from "./components/Login"
 export * from "./components/CommentPlaceholder"
