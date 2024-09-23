@@ -35,11 +35,11 @@ export default defineConfig(({ command }) => {
           rollupOptions: {
             output: {
               assetFileNames: (assetInfo) => {
-                if (assetInfo.name === 'style.css') return 'chatfall.css';
-                return assetInfo.name!;
+                if (assetInfo.name === "style.css") return "chatfall.css"
+                return assetInfo.name!
               },
             },
-          },          
+          },
         },
       }
       break
