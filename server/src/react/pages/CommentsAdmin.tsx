@@ -4,11 +4,20 @@ import {
   type FC,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react"
+import Select from "react-select"
 import { CommentStatus } from "../../db/schema"
 import { PageWrapper } from "../components/PageWrapper"
 import type { ServerStore } from "../store/server"
+
+const selectStyles = {
+  container: (provided: any) => ({
+    ...provided,
+    minWidth: "400px",
+  }),
+}
 
 export const CommentsAdmin: FC = () => {
   const { store } = useGlobalContext<ServerStore>()
@@ -46,12 +55,41 @@ export const CommentsAdmin: FC = () => {
     [],
   )
 
-  const handleUrlChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      setSelectedUrl(event.target.value)
-    },
-    [],
-  )
+  const handleUrlChange = useCallback((selectedOption: any) => {
+    setSelectedUrl(selectedOption ? selectedOption.value : "")
+  }, [])
+
+  const urlOptions = useMemo(() => {
+    return urls ? urls.map((url) => ({ value: url, label: url })) : []
+  }, [urls])
+
+  const headerContent = useMemo(() => {
+    if (!selectedUrl) return null
+
+    return (
+      <>
+        <select
+          className="select select-bordered mr-2"
+          value={status}
+          onChange={handleStatusChange}
+        >
+          <option value="">All Statuses</option>
+          {Object.values(CommentStatus).map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Search comments/usernames"
+          className="input input-bordered w-64"
+          value={search}
+          onChange={handleSearchChange}
+        />
+      </>
+    )
+  }, [selectedUrl, status, search, handleStatusChange, handleSearchChange])
 
   return (
     <PageWrapper title="Comments Admin">
@@ -65,41 +103,28 @@ export const CommentsAdmin: FC = () => {
             <p>No comments yet!</p>
           ) : (
             <>
-              <div className="flex space-x-4 mb-4">
-                <select
-                  className="select select-bordered"
-                  value={selectedUrl}
+              <div className="mb-4">
+                <Select
+                  options={urlOptions}
+                  value={urlOptions.find(
+                    (option) => option.value === selectedUrl,
+                  )}
                   onChange={handleUrlChange}
-                >
-                  <option value="">Select URL</option>
-                  {urls.map((url) => (
-                    <option key={url} value={url}>
-                      {url}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="select select-bordered"
-                  value={status}
-                  onChange={handleStatusChange}
-                >
-                  <option value="">All Statuses</option>
-                  {Object.values(CommentStatus).map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  placeholder="Search comments or usernames"
-                  className="input input-bordered flex-grow"
-                  value={search}
-                  onChange={handleSearchChange}
+                  placeholder="Select URL"
+                  isClearable
+                  isSearchable
+                  styles={selectStyles}
                 />
               </div>
               {selectedUrl ? (
-                <CommentListBase disableItemActions={true} />
+                <CommentListBase
+                  title=""
+                  url={selectedUrl}
+                  disableItemActions={true}
+                  disableAnimatedNumber={true}
+                  showHeader={true}
+                  headerContent={headerContent}
+                />
               ) : (
                 <p>Please select a URL</p>
               )}

@@ -3,7 +3,7 @@ import AnimatedNumbers from "react-animated-numbers"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 
-export const AnimatedNumber: FC<PropsWithClassname & { value: number }> = ({
+const AnimatedNumber: FC<PropsWithClassname & { value: number }> = ({
   value,
   className,
 }) => {
@@ -27,4 +27,21 @@ export const AnimatedNumber: FC<PropsWithClassname & { value: number }> = ({
       />
     </span>
   )
+}
+
+interface NumberValueProps extends PropsWithClassname {
+  value: number
+  disableAnimatedNumber?: boolean
+}
+
+export const NumberValue: FC<NumberValueProps> = ({
+  value,
+  className,
+  disableAnimatedNumber,
+}) => {
+  if (!disableAnimatedNumber) {
+    return <AnimatedNumber value={value} className={className} />
+  }
+
+  return <span className={cn("inline-block", className)}>{value}</span>
 }

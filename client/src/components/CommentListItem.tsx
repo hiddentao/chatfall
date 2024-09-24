@@ -11,7 +11,6 @@ import { useGlobalContext } from "../contexts/global"
 import { ClientStore } from "../store/client"
 import { PropsWithClassname } from "../types"
 import { cn, formatPlural } from "../utils/ui"
-import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentBody } from "./CommentBody"
 import { CommentInputForm, CommentInputFormHandle } from "./CommentInputForm"
@@ -19,6 +18,7 @@ import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { ButtonWithLogin } from "./Login"
+import { NumberValue } from "./NumberValue"
 import { ChatSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
 export type CommentProps = PropsWithClassname & {
@@ -26,7 +26,8 @@ export type CommentProps = PropsWithClassname & {
   user: CommentUser
   liked: boolean
   renderExtraControls?: (comment: Comment) => React.ReactNode
-  disableActions?: boolean // New prop to disable like and reply buttons
+  disableActions?: boolean
+  disableAnimatedNumber?: boolean
 }
 
 const CommentListItemInner: FC<CommentProps> = ({
@@ -35,7 +36,8 @@ const CommentListItemInner: FC<CommentProps> = ({
   user,
   liked,
   renderExtraControls,
-  disableActions, // Destructure the new prop
+  disableActions,
+  disableAnimatedNumber,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
@@ -178,7 +180,10 @@ const CommentListItemInner: FC<CommentProps> = ({
       </div>
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
-          <AnimatedNumber value={c.rating} />
+          <NumberValue
+            disableAnimatedNumber={disableAnimatedNumber}
+            value={c.rating}
+          />
           <ButtonWithLogin
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
@@ -218,7 +223,10 @@ const CommentListItemInner: FC<CommentProps> = ({
             <div className="svg-container w-4 h-4 mr-1">
               <ChatSvg />
             </div>
-            <AnimatedNumber value={c.replyCount} />
+            <NumberValue
+              disableAnimatedNumber={disableAnimatedNumber}
+              value={c.replyCount}
+            />
             &nbsp;{formatPlural(c.replyCount, "reply", "replies")}
           </Button>
         ) : null}
@@ -239,6 +247,7 @@ const CommentListItemInner: FC<CommentProps> = ({
                       user={s.users[s.comments[r].userId]}
                       liked={s.liked[r]}
                       disableActions={disableActions}
+                      disableAnimatedNumber={disableAnimatedNumber}
                     />
                   ))}
                 </ul>
@@ -258,13 +267,15 @@ const CommentListItemInner: FC<CommentProps> = ({
             {loadingReplies ? (
               <CommentsBlockPlaceholder className="mb-8" />
             ) : null}
-            <CommentInputForm
-              ref={replyFormRef}
-              className={cn("p-4 w-full")}
-              parentCommentId={c.id}
-              commentFieldPlaceholder="Add reply..."
-              initiallyFocused={true}
-            />
+            {disableActions ? null : (
+              <CommentInputForm
+                ref={replyFormRef}
+                className={cn("p-4 w-full")}
+                parentCommentId={c.id}
+                commentFieldPlaceholder="Add reply..."
+                initiallyFocused={true}
+              />
+            )}
           </div>
         </div>
       ) : null}
@@ -283,7 +294,8 @@ export const CommentListItem: FC<CommentProps> = ({
   user,
   liked,
   renderExtraControls,
-  disableActions, // Destructure the new prop
+  disableActions,
+  disableAnimatedNumber,
 }) => {
   return (
     <CommentListItemInner
@@ -292,7 +304,8 @@ export const CommentListItem: FC<CommentProps> = ({
       user={user}
       liked={liked}
       renderExtraControls={renderExtraControls}
-      disableActions={disableActions} // Pass the disableActions prop to CommentListItemInner
+      disableActions={disableActions}
+      disableAnimatedNumber={disableAnimatedNumber}
     />
   )
 }

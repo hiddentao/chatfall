@@ -5,12 +5,12 @@ import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { BaseStore } from "../exports"
 import { cn } from "../utils/ui"
-import { AnimatedNumber } from "./AnimatedNumber"
 import { Button } from "./Button"
 import { CommentListItem } from "./CommentListItem"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
+import { NumberValue } from "./NumberValue"
 
 interface CommentListBaseProps {
   url?: string
@@ -19,7 +19,8 @@ interface CommentListBaseProps {
   preCommentContent?: React.ReactNode
   title?: string
   renderExtraControls?: (comment: Comment) => React.ReactNode
-  disableItemActions?: boolean // Add the new prop here
+  disableItemActions?: boolean
+  disableAnimatedNumber?: boolean // New prop
 }
 
 export const CommentListBase: FC<CommentListBaseProps> = ({
@@ -29,7 +30,8 @@ export const CommentListBase: FC<CommentListBaseProps> = ({
   preCommentContent,
   title = "Comments",
   renderExtraControls,
-  disableItemActions, // Add the new prop here
+  disableItemActions,
+  disableAnimatedNumber = false, // Default to false
 }) => {
   const { store } = useGlobalContext<BaseStore>()
 
@@ -92,8 +94,8 @@ export const CommentListBase: FC<CommentListBaseProps> = ({
       {showHeader && (
         <div className="flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md">
           <div className="text-xl flex flex-row items-center">
-            {title} {/* Use the title prop */}
-            {isLoading ? <Loading className="ml-4 w-8 h-8" /> : null}
+            {title ? <span className="mr-4">{title}</span> : null}
+            {isLoading ? <Loading className="w-8 h-8 mr-2" /> : null}
           </div>
           <div className="flex flex-row items-center justify-end">
             {headerContent}
@@ -110,8 +112,11 @@ export const CommentListBase: FC<CommentListBaseProps> = ({
           <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">
             <div className="inline-block mr-2">
               <strong>
-                <AnimatedNumber value={rootList.otherUserNewItems.length} /> new
-                comment
+                <NumberValue
+                  disableAnimatedNumber={disableAnimatedNumber}
+                  value={rootList.otherUserNewItems.length}
+                />{" "}
+                new comment
                 {rootList.otherUserNewItems.length > 1 ? "s" : ""}
               </strong>
               <span className="ml-2">available</span>
@@ -134,7 +139,8 @@ export const CommentListBase: FC<CommentListBaseProps> = ({
                 user={users[comments[c].userId]}
                 liked={liked[c]}
                 renderExtraControls={renderExtraControls}
-                disableActions={disableItemActions} // Pass the new prop here
+                disableActions={disableItemActions}
+                disableAnimatedNumber={disableAnimatedNumber}
               />
             ))}
           </ul>
