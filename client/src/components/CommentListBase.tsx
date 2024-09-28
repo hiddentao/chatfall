@@ -30,6 +30,7 @@ export interface CommentListBaseProps {
   disableItemActions?: boolean
   disableAnimatedNumber?: boolean
   headerClassName?: string
+  floatingHeader?: boolean
 }
 
 export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
@@ -43,6 +44,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   disableItemActions,
   disableAnimatedNumber = false,
   headerClassName,
+  floatingHeader,
 }) => {
   const { store } = useGlobalContext<BaseStore>()
   const { comments, rootList, users, liked, fetchComments } = store.useStore()
@@ -105,8 +107,10 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   }, [refetch])
 
   useEffect(() => {
-    setIsHeaderFixed(!inView)
-  }, [inView])
+    if (floatingHeader) {
+      setIsHeaderFixed(!inView)
+    }
+  }, [inView, floatingHeader])
 
   return (
     <div className={cn("flex flex-col", className)}>

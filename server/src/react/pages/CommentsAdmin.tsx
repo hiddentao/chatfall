@@ -99,6 +99,7 @@ export const CommentsAdmin: FC = () => {
                   showHeader={true}
                   renderHeaderContent={renderHeaderContent}
                   headerClassName="justify-center"
+                  floatingHeader={true}
                 />
               ) : (
                 <p className="italic">Please select a URL</p>
