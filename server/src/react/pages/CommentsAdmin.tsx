@@ -2,6 +2,7 @@ import {
   CommentListBase,
   type CommentListBaseProps,
   CommentsBlockPlaceholder,
+  DefaultCommentFilters,
   useGlobalContext,
 } from "@chatfall/client"
 import { type FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -191,28 +192,38 @@ const CommentFilters: FC<CommentFiltersProps> = ({
   }, [searchInput, search, filterBySearch])
 
   return (
-    <>
-      <span className="mr-2">Status:</span>
-      <select
-        className="select select-sm rounded-md text-base-content mr-8"
-        value={selectedStatus}
-        onChange={(e) => filterByStatus(e.target.value as CommentStatus)}
-      >
-        <option value="">All Statuses</option>
-        {Object.values(CommentStatus).map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
-      <span className="mr-2">Search:</span>
-      <input
-        type="text"
-        placeholder="Search comments/usernames"
-        className="input input-sm input-bordered text-base-content md:w-72 w-40"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-    </>
+    <div className="flex flex-row text-sm">
+      <div>
+        <DefaultCommentFilters
+          setIsLoading={setIsLoading}
+          setError={setError}
+        />
+      </div>
+      <div className="ml-8">
+        <span className="mr-2">Status:</span>
+        <select
+          className="select select-sm rounded-md text-base-content"
+          value={selectedStatus}
+          onChange={(e) => filterByStatus(e.target.value as CommentStatus)}
+        >
+          <option value="">All statuses</option>
+          {Object.values(CommentStatus).map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="ml-8">
+        <span className="mr-2">Search:</span>
+        <input
+          type="text"
+          placeholder="Search comments/usernames"
+          className="input input-sm input-bordered text-base-content md:w-72 w-40"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
+    </div>
   )
 }

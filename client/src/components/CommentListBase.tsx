@@ -9,7 +9,6 @@ import { Button } from "./Button"
 import { CommentListItem } from "./CommentListItem"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
-import { Loading } from "./Loading"
 import { NumberValue } from "./NumberValue"
 
 export interface CommentListBaseProps {
@@ -111,7 +110,6 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
         >
           <div className="text-xl flex flex-row items-center">
             {title ? <span className="mr-4">{title}</span> : null}
-            {isLoading ? <Loading className="w-8 h-8 mr-2" /> : null}
           </div>
           <div className="flex flex-row items-center justify-end">
             {renderHeaderContent?.({ setIsLoading, setError })}

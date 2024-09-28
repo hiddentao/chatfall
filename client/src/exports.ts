@@ -4,6 +4,7 @@ export * from "./contexts/global"
 
 // UI Components
 export * from "./components/CommentListBase"
+export { DefaultCommentFilters } from "./components/CommentList"
 export * from "./components/Form"
 export * from "./components/Login"
 export * from "./components/CommentPlaceholder"

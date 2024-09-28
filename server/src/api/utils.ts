@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like, or, sql } from "drizzle-orm"
+import { and, asc, desc, eq, ilike, inArray, like, or, sql } from "drizzle-orm"
 import { t } from "elysia"
 import {
   type Comment,
@@ -155,7 +155,7 @@ export const fetchComments = async (
   if (search) {
     // @ts-ignore
     query = query.where(
-      or(like(users.name, `%${search}%`), like(comments.body, `%${search}%`)),
+      or(ilike(users.name, `%${search}%`), ilike(comments.body, `%${search}%`)),
     )
   }
 

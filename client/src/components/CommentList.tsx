@@ -17,7 +17,12 @@ export const CommentList: FC = () => {
       setIsLoading,
       setError,
     }) => {
-      return <CommentFilters setIsLoading={setIsLoading} setError={setError} />
+      return (
+        <DefaultCommentFilters
+          setIsLoading={setIsLoading}
+          setError={setError}
+        />
+      )
     }
 
     return fn
@@ -52,12 +57,12 @@ interface CommentFiltersProps {
   setError: (error: string) => void
 }
 
-export const CommentFilters: FC<CommentFiltersProps> = ({
+export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
   setIsLoading,
   setError,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
-  const { fetchComments } = store.useStore()
+  const { fetchComments, rootList } = store.useStore()
 
   const fetchNewComments = async (s?: Sort) => {
     setIsLoading(true)
@@ -79,15 +84,16 @@ export const CommentFilters: FC<CommentFiltersProps> = ({
       </label>
       <select
         id="sort-select"
-        className="select select-sm rounded-md bg-neutral text-neutral-content"
+        value={rootList.sort}
+        className="select select-sm rounded-md text-base-content"
         onChange={(e) => fetchNewComments(e.target.value as Sort)}
       >
-        <option value="newestFirst">Newest</option>
-        <option value="oldestFirst">Oldest</option>
-        <option value="highestScore">Highest rated</option>
-        <option value="lowestScore">Lowest rated</option>
-        <option value="mostReplies">Most replies</option>
-        <option value="leastReplies">Least replies</option>
+        <option value={Sort.newestFirst}>Newest</option>
+        <option value={Sort.oldestFirst}>Oldest</option>
+        <option value={Sort.highestScore}>Highest rated</option>
+        <option value={Sort.lowestScore}>Lowest rated</option>
+        <option value={Sort.mostReplies}>Most replies</option>
+        <option value={Sort.leastReplies}>Least replies</option>
       </select>
     </div>
   )
