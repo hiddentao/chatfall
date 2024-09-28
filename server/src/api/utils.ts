@@ -155,7 +155,11 @@ export const fetchComments = async (
   if (search) {
     // @ts-ignore
     query = query.where(
-      or(ilike(users.name, `%${search}%`), ilike(comments.body, `%${search}%`)),
+      or(
+        ilike(users.name, `%${search}%`),
+        ilike(users.email, `%${search}%`),
+        ilike(comments.body, `%${search}%`),
+      ),
     )
   }
 
