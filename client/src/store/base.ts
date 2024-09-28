@@ -288,15 +288,44 @@ export const createBaseStore = <State extends CoreState>({
               ? skipOverride
               : get().rootList.items.length
 
-          const data = await tryCatchApiCall(set, () =>
-            fetchCommentsImplementation({ app, get, url, sort, skip }),
-          )
+          // if skip is 0, we are loading the initial set of comments
+          // so let's temporarily store the current root list and clear the display
+          // so that the user sees the loading state
+          const loadingFreshSet = !skip
+          let currentRootList: any
+          if (loadingFreshSet) {
+            currentRootList = get().rootList
+            set(
+              produce((state) => {
+                state.rootList = createCommentList(-1, "", props.initialSort)
+              }),
+            )
+          }
+
+          let data: any
+
+          try {
+            data = await tryCatchApiCall(set, () =>
+              fetchCommentsImplementation({ app, get, url, sort, skip }),
+            )
+          } catch (e: any) {
+            // restore previous data
+            if (loadingFreshSet && currentRootList) {
+              set(
+                produce((state) => {
+                  state.rootList = currentRootList
+                }),
+              )
+            }
+            // remember to throw e
+            throw e
+          }
 
           set(
             produce((state) => {
               state.canonicalUrl = data.canonicalUrl
 
-              if (skip) {
+              if (!loadingFreshSet) {
                 Object.assign(state.users, data.users)
                 Object.assign(state.liked, data.liked)
                 Object.assign(

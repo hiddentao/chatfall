@@ -1,7 +1,6 @@
 import {
   CommentListBase,
   type CommentListBaseProps,
-  CommentsBlockPlaceholder,
   DefaultCommentFilters,
   useGlobalContext,
 } from "@chatfall/client"
@@ -65,18 +64,6 @@ export const CommentsAdmin: FC = () => {
     return fn
   }, [selectedUrl])
 
-  const renderPreCommentContent = useMemo(() => {
-    const fn: CommentListBaseProps["renderPreCommentContent"] = ({
-      isLoading,
-    }) => {
-      return isLoading ? (
-        <CommentsBlockPlaceholder className="mb-6" numComments={4} />
-      ) : null
-    }
-
-    return fn
-  }, [])
-
   return (
     <PageWrapper title="Comments Admin">
       {!urls ? (
@@ -111,8 +98,7 @@ export const CommentsAdmin: FC = () => {
                   disableAnimatedNumber={true}
                   showHeader={true}
                   renderHeaderContent={renderHeaderContent}
-                  renderPreCommentContent={renderPreCommentContent}
-                  headerClassName="justify-center mb-8"
+                  headerClassName="justify-center"
                 />
               ) : (
                 <p className="italic">Please select a URL</p>

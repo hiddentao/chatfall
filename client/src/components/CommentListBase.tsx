@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import { Comment } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
+import { useInView } from "react-intersection-observer"
 import { useGlobalContext } from "../contexts/global"
 import { BaseStore, PropsWithClassname } from "../exports"
 import { cn } from "../utils/ui"
@@ -44,11 +45,15 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   headerClassName,
 }) => {
   const { store } = useGlobalContext<BaseStore>()
+  const { comments, rootList, users, liked, fetchComments } = store.useStore()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>("")
 
-  const { comments, rootList, users, liked, fetchComments } = store.useStore()
+  const [isHeaderFixed, setIsHeaderFixed] = useState(false)
+  const { ref: headerRef, inView } = useInView({
+    threshold: 0,
+  })
 
   const refetch = useCallback(
     async (s?: Sort, skipOverride?: number) => {
@@ -99,24 +104,36 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
     refetch()
   }, [refetch])
 
+  useEffect(() => {
+    setIsHeaderFixed(!inView)
+  }, [inView])
+
   return (
     <div className={cn("flex flex-col", className)}>
       {showHeader && (
-        <div
-          className={cn(
-            "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
-            headerClassName,
-          )}
-        >
-          <div className="text-xl flex flex-row items-center">
-            {title ? <span className="mr-4">{title}</span> : null}
+        <>
+          <div ref={headerRef} />
+          <div className="h-20">
+            <div
+              className={cn(
+                "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
+                headerClassName,
+                {
+                  "fixed top-0 left-0 right-0 z-10 rounded-none": isHeaderFixed,
+                },
+              )}
+            >
+              <div className="text-xl flex flex-row items-center">
+                {title ? <span className="mr-4">{title}</span> : null}
+              </div>
+              <div className="flex flex-row items-center justify-end">
+                {renderHeaderContent?.({ setIsLoading, setError })}
+              </div>
+            </div>
           </div>
-          <div className="flex flex-row items-center justify-end">
-            {renderHeaderContent?.({ setIsLoading, setError })}
-          </div>
-        </div>
+        </>
       )}
-      <div className="px-2">
+      <div>
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {renderPreCommentContent?.({ isLoading })}
         {!isLoading && !error && rootList.items.length === 0 ? (
