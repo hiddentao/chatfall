@@ -33,7 +33,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             })
             .from(users)
             .where(
-              and(eq(users.id, user.id), eq(users.status, UserStatus.active)),
+              and(eq(users.id, user.id), eq(users.status, UserStatus.Active)),
             )
             .limit(1)
           return userExists ? { user: { id: user.id, name: user.name } } : {}
@@ -118,7 +118,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
             .values({
               name,
               email,
-              status: UserStatus.active,
+              status: UserStatus.Active,
               lastLoggedIn: dateNow(),
               createdAt: dateNow(),
               updatedAt: dateNow(),

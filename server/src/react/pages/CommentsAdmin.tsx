@@ -1,12 +1,10 @@
-import { CommentListBase, useGlobalContext } from "@chatfall/client"
 import {
-  type ChangeEvent,
-  type FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+  CommentListBase,
+  type CommentListBaseProps,
+  CommentsBlockPlaceholder,
+  useGlobalContext,
+} from "@chatfall/client"
+import { type FC, useCallback, useEffect, useMemo, useState } from "react"
 import Select from "react-select"
 import { CommentStatus } from "../../db/schema"
 import { PageWrapper } from "../components/PageWrapper"
@@ -23,8 +21,6 @@ export const CommentsAdmin: FC = () => {
   const { store } = useGlobalContext<ServerStore>()
   const { getCanonicalUrls } = store.useStore()
 
-  const [status, setStatus] = useState<CommentStatus | "">("")
-  const [search, setSearch] = useState("")
   const [selectedUrl, setSelectedUrl] = useState<string>("")
   const [urls, setUrls] = useState<string[] | undefined>()
 
@@ -41,20 +37,6 @@ export const CommentsAdmin: FC = () => {
     fetchUrlsList()
   }, [fetchUrlsList])
 
-  const handleStatusChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      setStatus(event.target.value as CommentStatus | "")
-    },
-    [],
-  )
-
-  const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setSearch(event.target.value)
-    },
-    [],
-  )
-
   const handleUrlChange = useCallback((selectedOption: any) => {
     setSelectedUrl(selectedOption ? selectedOption.value : "")
   }, [])
@@ -63,33 +45,36 @@ export const CommentsAdmin: FC = () => {
     return urls ? urls.map((url) => ({ value: url, label: url })) : []
   }, [urls])
 
-  const headerContent = useMemo(() => {
-    if (!selectedUrl) return null
+  const renderHeaderContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderHeaderContent"] = ({
+      setIsLoading,
+      setError,
+    }) => {
+      if (!selectedUrl) return null
 
-    return (
-      <>
-        <select
-          className="select select-bordered mr-2"
-          value={status}
-          onChange={handleStatusChange}
-        >
-          <option value="">All Statuses</option>
-          {Object.values(CommentStatus).map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Search comments/usernames"
-          className="input input-bordered w-64"
-          value={search}
-          onChange={handleSearchChange}
+      return (
+        <CommentFilters
+          setIsLoading={setIsLoading}
+          setError={setError}
+          selectedUrl={selectedUrl}
         />
-      </>
-    )
-  }, [selectedUrl, status, search, handleStatusChange, handleSearchChange])
+      )
+    }
+
+    return fn
+  }, [selectedUrl])
+
+  const renderPreCommentContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderPreCommentContent"] = ({
+      isLoading,
+    }) => {
+      return isLoading ? (
+        <CommentsBlockPlaceholder className="mb-6" numComments={4} />
+      ) : null
+    }
+
+    return fn
+  }, [])
 
   return (
     <PageWrapper title="Comments Admin">
@@ -100,7 +85,7 @@ export const CommentsAdmin: FC = () => {
       ) : (
         <>
           {!urls.length ? (
-            <p>No comments yet!</p>
+            <p className="italic">No comments found!</p>
           ) : (
             <>
               <div className="mb-4">
@@ -119,19 +104,115 @@ export const CommentsAdmin: FC = () => {
               {selectedUrl ? (
                 <CommentListBase
                   title=""
+                  className="w-full"
                   url={selectedUrl}
                   disableItemActions={true}
                   disableAnimatedNumber={true}
                   showHeader={true}
-                  headerContent={headerContent}
+                  renderHeaderContent={renderHeaderContent}
+                  renderPreCommentContent={renderPreCommentContent}
+                  headerClassName="justify-center mb-8"
                 />
               ) : (
-                <p>Please select a URL</p>
+                <p className="italic">Please select a URL</p>
               )}
             </>
           )}
         </>
       )}
     </PageWrapper>
+  )
+}
+
+interface CommentFiltersProps {
+  selectedUrl: string
+  setIsLoading: (isLoading: boolean) => void
+  setError: (error: string) => void
+}
+
+const CommentFilters: FC<CommentFiltersProps> = ({
+  selectedUrl,
+  setIsLoading,
+  setError,
+}) => {
+  const { store } = useGlobalContext<ServerStore>()
+  const {
+    fetchComments,
+    selectedStatus,
+    setSelectedStatus,
+    search,
+    setSearch,
+  } = store.useStore()
+
+  const [searchInput, setSearchInput] = useState<string>("")
+
+  const filterByStatus = useCallback(
+    async (newStatus: CommentStatus | "") => {
+      setIsLoading(true)
+      setError("")
+
+      try {
+        await setSelectedStatus(newStatus || undefined)
+        await fetchComments({ url: selectedUrl, skipOverride: 0 })
+      } catch (error: any) {
+        setError(error.toString())
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [fetchComments, selectedUrl, setSelectedStatus, setIsLoading, setError],
+  )
+
+  const filterBySearch = useCallback(
+    async (newSearch: string) => {
+      setIsLoading(true)
+      setError("")
+
+      try {
+        await setSearch(newSearch)
+        await fetchComments({ url: selectedUrl, skipOverride: 0 })
+      } catch (error: any) {
+        setError(error.toString())
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [fetchComments, selectedUrl, setSearch, setIsLoading, setError],
+  )
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== search) {
+        filterBySearch(searchInput)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchInput, search, filterBySearch])
+
+  return (
+    <>
+      <span className="mr-2">Status:</span>
+      <select
+        className="select select-sm rounded-md text-base-content mr-8"
+        value={selectedStatus}
+        onChange={(e) => filterByStatus(e.target.value as CommentStatus)}
+      >
+        <option value="">All Statuses</option>
+        {Object.values(CommentStatus).map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+      <span className="mr-2">Search:</span>
+      <input
+        type="text"
+        placeholder="Search comments/usernames"
+        className="input input-sm input-bordered text-base-content md:w-72 w-40"
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+      />
+    </>
   )
 }

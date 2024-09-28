@@ -70,7 +70,8 @@ const main = async () => {
       path: `${i}`,
       rating: faker.number.int({ min: 0, max: 100 }),
       replyCount: i === 1 ? 20 : 0,
-      status: Math.random() > 0.9 ? CommentStatus.flagged : CommentStatus.shown,
+      status:
+        Math.random() > 0.9 ? CommentStatus.Moderation : CommentStatus.Visible,
       createdAt: faker.date
         .between({
           from: "2023-01-01T00:00:00.000Z",
@@ -96,7 +97,9 @@ const main = async () => {
         replyCount: j === 1 && depth < maxDepth ? 20 : 0,
         rating: faker.number.int({ min: 0, max: 100 }),
         status:
-          Math.random() > 0.9 ? CommentStatus.flagged : CommentStatus.shown,
+          Math.random() > 0.9
+            ? CommentStatus.Moderation
+            : CommentStatus.Visible,
         createdAt: d,
         updatedAt: d,
       })

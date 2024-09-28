@@ -3,6 +3,7 @@ import Elysia, { t } from "elysia"
 import {
   type Comment,
   CommentStatus,
+  UserStatus,
   commentRatings,
   comments,
   posts,
@@ -322,13 +323,22 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             sort,
             limit,
             userId: user?.id,
-            status: [CommentStatus.shown, CommentStatus.flagged],
+            status: [CommentStatus.Visible, CommentStatus.Moderation],
           })
 
-          // - if it's flagged then set its content to [awaiting moderation]
           ret.comments.forEach((c) => {
-            if (c.status === CommentStatus.flagged) {
+            if (c.status === CommentStatus.Moderation) {
               c.body = "[awaiting moderation]"
+            } else if (c.status === CommentStatus.Deleted) {
+              c.body = "[deleted]"
+            }
+          })
+
+          Object.entries(ret.users).forEach(([_, u]) => {
+            if (u.status === UserStatus.Blacklisted) {
+              u.name = "[banned]"
+            } else if (u.status === UserStatus.Deleted) {
+              u.name = "[deleted]"
             }
           })
 
@@ -384,7 +394,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             skip: Number(skip),
             sort,
             limit,
-            status: status as CommentStatus[] | undefined,
+            status: status ? [status as CommentStatus] : undefined,
             search,
           })
         })

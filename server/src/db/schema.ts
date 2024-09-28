@@ -39,9 +39,9 @@ export const settings = pgTable(
 )
 
 export enum UserStatus {
-  active = "active",
-  blacklisted = "blacklisted",
-  deleted = "deleted",
+  Active = "Active",
+  Blacklisted = "Blacklisted",
+  Deleted = "Deleted",
 }
 export const userStatus = pgEnum("userStatus", enumToPgEnum(UserStatus))
 
@@ -51,7 +51,7 @@ export const users = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    status: userStatus("status").notNull().default(UserStatus.active),
+    status: userStatus("status").notNull().default(UserStatus.Active),
     lastLoggedIn: timestamp("last_logged_in", { mode: "string" }),
     createdAt: timestamp("created_at", { mode: "string" })
       .defaultNow()
@@ -97,9 +97,9 @@ export type Post = InferSelectModel<typeof posts>
 export type PostToInsert = InferInsertModel<typeof posts>
 
 export enum CommentStatus {
-  shown = "shown",
-  hidden = "hidden",
-  flagged = "flagged",
+  Visible = "Visible",
+  Moderation = "Moderation",
+  Deleted = "Deleted",
 }
 export const commentStatus = pgEnum(
   "commentStatus",
@@ -116,7 +116,7 @@ export const comments = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id),
-    status: commentStatus("status").notNull().default(CommentStatus.shown),
+    status: commentStatus("status").notNull().default(CommentStatus.Visible),
     body: text("body").notNull(),
     depth: integer("depth").notNull().default(0),
     path: text("path").notNull(),

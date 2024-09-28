@@ -69,7 +69,7 @@ export class SettingsManager {
 
         await this.db
           .update(users)
-          .set({ status: UserStatus.blacklisted, updatedAt: dateNow() })
+          .set({ status: UserStatus.Blacklisted, updatedAt: dateNow() })
           .where(
             and(
               inArray(
@@ -78,7 +78,7 @@ export class SettingsManager {
                   v.toLowerCase(),
                 ),
               ),
-              eq(users.status, UserStatus.active),
+              eq(users.status, UserStatus.Active),
               ne(users.id, admin.id),
             ),
           )
@@ -101,7 +101,7 @@ export class SettingsManager {
 
         await this.db
           .update(users)
-          .set({ status: UserStatus.blacklisted, updatedAt: dateNow() })
+          .set({ status: UserStatus.Blacklisted, updatedAt: dateNow() })
           .where(
             and(
               or(
@@ -109,7 +109,7 @@ export class SettingsManager {
                   like(users.email, `%@${domain}`),
                 ),
               ),
-              eq(users.status, UserStatus.active),
+              eq(users.status, UserStatus.Active),
               ne(users.id, admin.id),
             ),
           )

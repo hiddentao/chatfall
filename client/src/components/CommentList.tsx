@@ -1,8 +1,9 @@
+import { Sort } from "@chatfall/server"
 import { FC, useMemo } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { type ClientStore } from "../store/client"
 import { CommentInputForm } from "./CommentInputForm"
-import { CommentListBase } from "./CommentListBase"
+import { CommentListBase, CommentListBaseProps } from "./CommentListBase"
 
 export const CommentList: FC = () => {
   const {
@@ -11,33 +12,27 @@ export const CommentList: FC = () => {
   } = useGlobalContext<ClientStore>()
   const { canonicalUrl } = store.useStore()
 
-  const headerContent = (
-    <>
-      <div>
-        <label htmlFor="sort-select" className="mr-2">
-          Sort:
-        </label>
-        <select
-          id="sort-select"
-          className="select select-sm rounded-md bg-neutral text-neutral-content"
-        >
-          <option value="newestFirst">Newest</option>
-          <option value="oldestFirst">Oldest</option>
-          <option value="highestScore">Highest rated</option>
-          <option value="lowestScore">Lowest rated</option>
-          <option value="mostReplies">Most replies</option>
-          <option value="leastReplies">Least replies</option>
-        </select>
-      </div>
-    </>
-  )
+  const renderHeaderContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderHeaderContent"] = ({
+      setIsLoading,
+      setError,
+    }) => {
+      return <CommentFilters setIsLoading={setIsLoading} setError={setError} />
+    }
 
-  const preCommentContent = useMemo(() => {
-    return canonicalUrl ? (
-      <>
-        <CommentInputForm className="mt-4 mb-8 mx-6" />
-      </>
-    ) : null
+    return fn
+  }, [])
+
+  const renderPreCommentContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
+      return canonicalUrl ? (
+        <>
+          <CommentInputForm className="mt-4 mb-8 mx-6" />
+        </>
+      ) : null
+    }
+
+    return fn
   }, [canonicalUrl])
 
   return (
@@ -45,9 +40,55 @@ export const CommentList: FC = () => {
       <CommentListBase
         title={title}
         showHeader={true}
-        headerContent={headerContent}
-        preCommentContent={preCommentContent}
+        renderHeaderContent={renderHeaderContent}
+        renderPreCommentContent={renderPreCommentContent}
       />
     </>
+  )
+}
+
+interface CommentFiltersProps {
+  setIsLoading: (isLoading: boolean) => void
+  setError: (error: string) => void
+}
+
+export const CommentFilters: FC<CommentFiltersProps> = ({
+  setIsLoading,
+  setError,
+}) => {
+  const { store } = useGlobalContext<ClientStore>()
+  const { fetchComments } = store.useStore()
+
+  const fetchNewComments = async (s?: Sort) => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      await fetchComments({ sort: s, skipOverride: 0 })
+    } catch (error: any) {
+      setError(error.toString())
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div>
+      <label htmlFor="sort-select" className="mr-2">
+        Sort:
+      </label>
+      <select
+        id="sort-select"
+        className="select select-sm rounded-md bg-neutral text-neutral-content"
+        onChange={(e) => fetchNewComments(e.target.value as Sort)}
+      >
+        <option value="newestFirst">Newest</option>
+        <option value="oldestFirst">Oldest</option>
+        <option value="highestScore">Highest rated</option>
+        <option value="lowestScore">Lowest rated</option>
+        <option value="mostReplies">Most replies</option>
+        <option value="leastReplies">Least replies</option>
+      </select>
+    </div>
   )
 }

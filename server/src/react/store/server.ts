@@ -17,6 +17,12 @@ export type ServerState = CoreState & {
   settingUpdated?: boolean
   clearSettingUpdatedFlag: () => void
 
+  selectedStatus: CommentStatus | undefined
+  setSelectedStatus: (status: CommentStatus | undefined) => void
+
+  search: string
+  setSearch: (search: string) => void
+
   updateCommentStatus: (
     commentId: number,
     status: CommentStatus,
@@ -31,6 +37,7 @@ export const createStore = (props: BaseStoreProps) => {
       ({
         settings: undefined,
         settingUpdated: false,
+        selectedStatus: undefined,
         clearSettingUpdatedFlag: () => {
           set(
             produce((state) => {
@@ -89,6 +96,20 @@ export const createStore = (props: BaseStoreProps) => {
             throw error
           }
         },
+        setSelectedStatus: (status) => {
+          set(
+            produce((state) => {
+              state.selectedStatus = status
+            }),
+          )
+        },
+        setSearch: (search) => {
+          set(
+            produce((state) => {
+              state.search = search
+            }),
+          )
+        },
         updateCommentStatus: async (commentId, status) => {
           await tryCatchApiCall<{ success: boolean }>(set, () =>
             app.api.comments.admin.comment_status.put({ commentId, status }),
@@ -101,13 +122,15 @@ export const createStore = (props: BaseStoreProps) => {
           return data
         },
       }) as Omit<ServerState, keyof CoreState>,
-    fetchCommentsImplementation: async ({ app, url, sort, skip }) => {
+    fetchCommentsImplementation: async ({ app, get, url, sort, skip }) => {
       return await app.api.comments.admin.comments.get({
         query: {
           url,
           depth: `0`,
           skip: `${skip}`,
           sort,
+          ...(get().selectedStatus ? { status: get().selectedStatus } : {}),
+          ...(get().search ? { search: get().search } : {}),
         },
       })
     },

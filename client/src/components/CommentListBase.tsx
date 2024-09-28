@@ -3,7 +3,7 @@ import { Comment } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useGlobalContext } from "../contexts/global"
-import { BaseStore } from "../exports"
+import { BaseStore, PropsWithClassname } from "../exports"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { CommentListItem } from "./CommentListItem"
@@ -12,26 +12,37 @@ import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
 import { NumberValue } from "./NumberValue"
 
-interface CommentListBaseProps {
+export interface CommentListBaseProps {
   url?: string
   showHeader?: boolean
-  headerContent?: React.ReactNode
-  preCommentContent?: React.ReactNode
+  renderHeaderContent?: ({
+    setIsLoading,
+    setError,
+  }: {
+    setIsLoading: (v: boolean) => void
+    setError: (v: string) => void
+  }) => React.ReactNode
+  renderPreCommentContent?: ({
+    isLoading,
+  }: { isLoading: boolean }) => React.ReactNode
   title?: string
   renderExtraControls?: (comment: Comment) => React.ReactNode
   disableItemActions?: boolean
-  disableAnimatedNumber?: boolean // New prop
+  disableAnimatedNumber?: boolean
+  headerClassName?: string
 }
 
-export const CommentListBase: FC<CommentListBaseProps> = ({
+export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   url,
+  className,
   showHeader,
-  headerContent,
-  preCommentContent,
+  renderHeaderContent,
+  renderPreCommentContent,
   title = "Comments",
   renderExtraControls,
   disableItemActions,
-  disableAnimatedNumber = false, // Default to false
+  disableAnimatedNumber = false,
+  headerClassName,
 }) => {
   const { store } = useGlobalContext<BaseStore>()
 
@@ -90,23 +101,28 @@ export const CommentListBase: FC<CommentListBaseProps> = ({
   }, [refetch])
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col", className)}>
       {showHeader && (
-        <div className="flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md">
+        <div
+          className={cn(
+            "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
+            headerClassName,
+          )}
+        >
           <div className="text-xl flex flex-row items-center">
             {title ? <span className="mr-4">{title}</span> : null}
             {isLoading ? <Loading className="w-8 h-8 mr-2" /> : null}
           </div>
           <div className="flex flex-row items-center justify-end">
-            {headerContent}
+            {renderHeaderContent?.({ setIsLoading, setError })}
           </div>
         </div>
       )}
       <div className="px-2">
         {error ? <ErrorBox>{error}</ErrorBox> : null}
-        {preCommentContent}
+        {renderPreCommentContent?.({ isLoading })}
         {!isLoading && !error && rootList.items.length === 0 ? (
-          <p className="italic">No comments yet!</p>
+          <p className="italic">No comments!</p>
         ) : null}
         {rootList.otherUserNewItems.length ? (
           <div className="text-sm bg-green-200 py-2 px-4 mb-6 rounded-md">

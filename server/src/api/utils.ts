@@ -2,6 +2,7 @@ import { and, asc, desc, eq, inArray, like, or, sql } from "drizzle-orm"
 import { t } from "elysia"
 import {
   type Comment,
+  UserStatus,
   commentRatings,
   comments,
   posts,
@@ -116,6 +117,7 @@ export const fetchComments = async (
       path: comments.path,
       status: comments.status,
       users_name: users.name,
+      users_status: users.status,
       userRatings_rating: commentRatings.rating,
       totalCount: sql<number>`count(*) over()`.as("total_count"),
     })
@@ -189,6 +191,7 @@ export const fetchComments = async (
       ret.users[c.userId!] = {
         id: c.userId!,
         name: c.users_name!,
+        status: c.users_status!,
       }
 
       if (c.userRatings_rating) {
@@ -208,6 +211,7 @@ export const CommentResponseSchema = t.Object({
     t.Object({
       id: t.Number(),
       name: t.String(),
+      status: t.Enum(UserStatus),
     }),
   ),
   comments: t.Array(

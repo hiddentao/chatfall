@@ -1,5 +1,6 @@
 import type { Cron } from "cron-async"
 import type { Database } from "./db"
+import type { UserStatus } from "./db/schema"
 import type { LogInterface } from "./lib/logger"
 import type { Mailer } from "./lib/mailer"
 import type { SettingsManager } from "./settings"
@@ -26,8 +27,12 @@ export enum Sort {
 export type CommentUser = {
   id: number
   name: string
+  status: UserStatus
 }
 
-export type LoggedInUser = CommentUser
+export type LoggedInUser = {
+  id: number
+  name: string
+}
 
 export type PostCommentResponse = { message: string; alert: boolean }
