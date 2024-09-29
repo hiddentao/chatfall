@@ -82,6 +82,7 @@ export class SettingsManager {
               ne(users.id, admin.id),
             ),
           )
+
         break
       }
       case Setting.BlacklistedDomains: {

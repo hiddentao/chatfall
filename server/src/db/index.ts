@@ -10,7 +10,7 @@ await client.connect()
 
 export const db = drizzle(client, {
   schema,
-  // logger: true,
+  logger: true,
 })
 
 export type Database = typeof db

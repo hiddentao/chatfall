@@ -3,7 +3,6 @@ import Elysia, { t } from "elysia"
 import {
   type Comment,
   CommentStatus,
-  UserStatus,
   commentRatings,
   comments,
   posts,
@@ -337,12 +336,6 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
           Object.entries(ret.users).forEach(([_, u]) => {
             delete u.email // don't return email to non-admin users
-
-            if (u.status === UserStatus.Blacklisted) {
-              u.name = "[banned]"
-            } else if (u.status === UserStatus.Deleted) {
-              u.name = "[deleted]"
-            }
           })
 
           return ret

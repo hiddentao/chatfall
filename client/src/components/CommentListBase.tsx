@@ -191,7 +191,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
           </Button>
         ) : null}
         {isLoading ? (
-          <CommentsBlockPlaceholder className="mt-6" numComments={4} />
+          <CommentsBlockPlaceholder className="mt-4" numComments={4} />
         ) : null}
       </div>
     </div>

@@ -37,7 +37,7 @@ const main = async () => {
   for (let i = 0; i < 20; i++) {
     userData.push({
       name: faker.internet.userName(),
-      email: faker.internet.email(),
+      email: faker.internet.email().toLowerCase(),
     })
   }
   await db.insert(users).values(userData)

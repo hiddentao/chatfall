@@ -1,4 +1,9 @@
-import { Comment, CommentUser, formatCommentTime } from "@chatfall/server"
+import {
+  Comment,
+  CommentUser,
+  UserStatus,
+  formatCommentTime,
+} from "@chatfall/server"
 import React, {
   FC,
   useCallback,
@@ -165,15 +170,42 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
     }
   }, [scrollToFirstReply])
 
+  const userIsBannedOrDeleted = useMemo(
+    () =>
+      user.status === UserStatus.Blacklisted ||
+      user.status === UserStatus.Deleted,
+    [user.status],
+  )
+
   return (
     <li className={cn("block", className)}>
       <div className="text-sm flex flex-row items-center mb-2">
-        <h3 className="font-bold">{user.name}</h3>
+        <h3 className="font-bold">
+          <span
+            className={cn("font-bold", {
+              "line-through text-gray-400": userIsBannedOrDeleted,
+            })}
+          >
+            {user.name}
+          </span>
+          {userIsBannedOrDeleted ? (
+            <span className="ml-1 text-red-500 italic">
+              {user.status === UserStatus.Blacklisted
+                ? "[banned]"
+                : "[deleted]"}
+            </span>
+          ) : null}
+        </h3>
         {user.email ? (
           <>
             <span className="mx-2 text-gray-400">/</span>
             <a href={`mailto:${user.email}`} title={user.email}>
-              <Button variant="link" className="text-xs">
+              <Button
+                variant="link"
+                className={cn("text-xs", {
+                  "line-through": userIsBannedOrDeleted,
+                })}
+              >
                 {user.email}
               </Button>
             </a>

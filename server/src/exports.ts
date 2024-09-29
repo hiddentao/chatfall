@@ -11,7 +11,7 @@ export type {
   CommentRating,
 } from "./db/schema"
 
-export { CommentStatus } from "./db/schema"
+export { CommentStatus, UserStatus } from "./db/schema"
 
 export * from "./utils/date"
 
