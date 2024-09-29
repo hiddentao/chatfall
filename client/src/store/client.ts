@@ -3,6 +3,7 @@ import {
   PostCommentResponse,
   SocketEvent,
   SocketEventTypeEnum,
+  SocketLikeCommentEvent,
   SocketNewCommentEvent,
   Sort,
 } from "@chatfall/server"
@@ -146,7 +147,9 @@ export const createStore = (props: BaseStoreProps) => {
               if (data.user.id === state.loggedInUser?.id) {
                 state.liked[data.data.id] = true
               }
-              state.comments[data.data.id].rating = data.data.rating
+              state.comments[data.data.id].rating = (
+                data.data as SocketLikeCommentEvent
+              ).rating
             }),
           )
           break
@@ -156,7 +159,9 @@ export const createStore = (props: BaseStoreProps) => {
               if (data.user.id === state.loggedInUser?.id) {
                 state.liked[data.data.id] = false
               }
-              state.comments[data.data.id].rating = data.data.rating
+              state.comments[data.data.id].rating = (
+                data.data as SocketLikeCommentEvent
+              ).rating
             }),
           )
           break

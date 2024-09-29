@@ -1,10 +1,12 @@
 import { type Static, t } from "elysia"
+import { CommentStatus } from "../db/schema"
 
 export enum SocketEventTypeEnum {
   NewComment = "NewComment",
   LikeComment = "LikeComment",
   UnlikeComment = "UnlikeComment",
   NewReply = "NewReply",
+  AdminUpdateCommentStatus = "AdminUpdateCommentStatus",
 }
 
 export const SocketCommentUser = t.Object({
@@ -34,10 +36,23 @@ export const SocketLikeCommentEvent = t.Object({
 
 export type SocketLikeCommentEvent = Static<typeof SocketLikeCommentEvent>
 
+export const SocketAdminUpdateCommentStatusEvent = t.Object({
+  id: t.Number(),
+  status: t.Enum(CommentStatus),
+})
+
+export type SocketAdminUpdateCommentStatusEvent = Static<
+  typeof SocketAdminUpdateCommentStatusEvent
+>
+
 export const SocketEvent = t.Object({
   type: t.Enum(SocketEventTypeEnum),
   user: SocketCommentUser,
-  data: t.Union([SocketNewCommentEvent, SocketLikeCommentEvent]),
+  data: t.Union([
+    SocketNewCommentEvent,
+    SocketLikeCommentEvent,
+    SocketAdminUpdateCommentStatusEvent,
+  ]),
 })
 
 export type SocketEvent = Static<typeof SocketEvent>

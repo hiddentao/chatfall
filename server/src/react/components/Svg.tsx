@@ -40,3 +40,9 @@ export const InfoSvg: FC<PropsWithClassname> = ({ className }) => (
     <Svg.InfoSvg className={className} />
   </SvgWrapper>
 )
+
+export const DeleteSvg: FC<PropsWithClassname> = ({ className }) => (
+  <SvgWrapper>
+    <Svg.DeleteSvg className={className} />
+  </SvgWrapper>
+)

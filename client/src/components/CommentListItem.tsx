@@ -21,22 +21,22 @@ import { ButtonWithLogin } from "./Login"
 import { NumberValue } from "./NumberValue"
 import { ChatSvg, LikeSvg, LikedSvg, ReplySvg } from "./Svg"
 
-export type CommentProps = PropsWithClassname & {
+export type CommentListItemProps = PropsWithClassname & {
   comment: Comment
   user: CommentUser
   liked: boolean
-  renderExtraControls?: (comment: Comment) => React.ReactNode
-  disableActions?: boolean
+  renderExtraControls?: (props: { comment: Comment }) => React.ReactNode
+  disableDefaultActions?: boolean
   disableAnimatedNumber?: boolean
 }
 
-const CommentListItemInner: FC<CommentProps> = ({
+const CommentListItemInner: FC<CommentListItemProps> = ({
   className,
   comment: c,
   user,
   liked,
   renderExtraControls,
-  disableActions,
+  disableDefaultActions,
   disableAnimatedNumber,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
@@ -183,10 +183,10 @@ const CommentListItemInner: FC<CommentProps> = ({
         <span
           title={`${c.createdAt}`}
           className="text-gray-400 text-xs"
-        >{`${formatCommentTime(c.createdAt)}`}</span>{" "}
+        >{`${formatCommentTime(c.createdAt)}`}</span>
       </div>
       <div className="mb-2">
-        <CommentBody body={c.body} />
+        <CommentBody comment={c} />
       </div>
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
@@ -199,7 +199,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             variant="iconMeta"
             title="Like/unlike"
             onClick={handleLike}
-            disabled={disableActions}
+            disabled={disableDefaultActions}
           >
             {updatingLike ? (
               <Loading className="w-4 h-4" />
@@ -210,7 +210,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             )}
           </ButtonWithLogin>
         </span>
-        {!disableActions && (
+        {!disableDefaultActions && (
           <Button
             variant="link"
             className="ml-4 inline-flex justify-start items-center"
@@ -240,7 +240,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             &nbsp;{formatPlural(c.replyCount, "reply", "replies")}
           </Button>
         ) : null}
-        {renderExtraControls && renderExtraControls(c)}
+        {renderExtraControls?.({ comment: c })}
       </div>
       {showingReplies ? (
         <div className="mt-3 p-4 flex flex-row">
@@ -256,7 +256,7 @@ const CommentListItemInner: FC<CommentProps> = ({
                       comment={s.comments[r]}
                       user={s.users[s.comments[r].userId]}
                       liked={s.liked[r]}
-                      disableActions={disableActions}
+                      disableDefaultActions={disableDefaultActions}
                       disableAnimatedNumber={disableAnimatedNumber}
                     />
                   ))}
@@ -277,7 +277,7 @@ const CommentListItemInner: FC<CommentProps> = ({
             {loadingReplies ? (
               <CommentsBlockPlaceholder className="mb-8" />
             ) : null}
-            {disableActions ? null : (
+            {disableDefaultActions ? null : (
               <CommentInputForm
                 ref={replyFormRef}
                 className={cn("p-4 w-full")}
@@ -298,13 +298,13 @@ const CommentListItemInner: FC<CommentProps> = ({
   )
 }
 
-export const CommentListItem: FC<CommentProps> = ({
+export const CommentListItem: FC<CommentListItemProps> = ({
   className,
   comment: c,
   user,
   liked,
   renderExtraControls,
-  disableActions,
+  disableDefaultActions: disableActions,
   disableAnimatedNumber,
 }) => {
   return (
@@ -314,7 +314,7 @@ export const CommentListItem: FC<CommentProps> = ({
       user={user}
       liked={liked}
       renderExtraControls={renderExtraControls}
-      disableActions={disableActions}
+      disableDefaultActions={disableActions}
       disableAnimatedNumber={disableAnimatedNumber}
     />
   )

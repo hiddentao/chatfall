@@ -5,7 +5,7 @@ import {
 } from "@chatfall/client"
 import { produce } from "immer"
 import type { CommentStatus } from "../../db/schema"
-import { type Settings, type SocketEvent, Sort } from "../../exports"
+import { type Settings, Sort } from "../../exports"
 import type { Setting, SettingValue } from "../../settings/types"
 
 export type ServerState = CoreState & {
@@ -114,6 +114,16 @@ export const createStore = (props: BaseStoreProps) => {
           await tryCatchApiCall<{ success: boolean }>(set, () =>
             app.api.comments.admin.comment_status.put({ commentId, status }),
           )
+
+          // update comment in store
+          set(
+            produce((state) => {
+              const comment = state.comments[commentId]
+              if (comment) {
+                comment.status = status
+              }
+            }),
+          )
         },
         getCanonicalUrls: async () => {
           const data = await tryCatchApiCall<string[]>(set, () =>
@@ -151,8 +161,8 @@ export const createStore = (props: BaseStoreProps) => {
         },
       })
     },
-    onSocketMessage: (useStore, data: SocketEvent) => {
-      console.log(useStore, data)
+    onSocketMessage: () => {
+      /* ignore */
     },
   })
 }

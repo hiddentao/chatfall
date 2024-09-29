@@ -1,4 +1,5 @@
 import {
+  Button,
   CommentListBase,
   type CommentListBaseProps,
   DefaultCommentFilters,
@@ -6,8 +7,9 @@ import {
 } from "@chatfall/client"
 import { type FC, useCallback, useEffect, useMemo, useState } from "react"
 import Select from "react-select"
-import { CommentStatus } from "../../db/schema"
+import { type Comment, CommentStatus } from "../../db/schema"
 import { PageWrapper } from "../components/PageWrapper"
+import { DeleteSvg } from "../components/Svg"
 import type { ServerStore } from "../store/server"
 
 const selectStyles = {
@@ -64,6 +66,20 @@ export const CommentsAdmin: FC = () => {
     return fn
   }, [selectedUrl])
 
+  const renderExtraControls = useMemo(() => {
+    const fn: CommentListBaseProps["renderExtraControls"] = ({ comment }) => {
+      return <CommentActions comment={comment} />
+    }
+    return fn
+  }, [])
+
+  const renderPreCommentContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
+      return <div className="h-4" />
+    }
+    return fn
+  }, [])
+
   return (
     <PageWrapper title="Comments Admin">
       {!urls ? (
@@ -76,7 +92,7 @@ export const CommentsAdmin: FC = () => {
             <p className="italic">No comments found!</p>
           ) : (
             <>
-              <div className="mb-4">
+              <div className="mb-4 w-full">
                 <Select
                   options={urlOptions}
                   value={urlOptions.find(
@@ -94,12 +110,14 @@ export const CommentsAdmin: FC = () => {
                   title=""
                   className="w-full"
                   url={selectedUrl}
-                  disableItemActions={true}
+                  disableDefaultItemActions={true}
                   disableAnimatedNumber={true}
                   showHeader={true}
                   renderHeaderContent={renderHeaderContent}
+                  renderPreCommentContent={renderPreCommentContent}
                   headerClassName="justify-center"
                   floatingHeader={true}
+                  renderExtraControls={renderExtraControls}
                 />
               ) : (
                 <p className="italic">Please select a URL</p>
@@ -212,5 +230,44 @@ const CommentFilters: FC<CommentFiltersProps> = ({
         />
       </div>
     </div>
+  )
+}
+
+interface CommentActionsProps {
+  comment: Comment
+}
+
+const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
+  const { store } = useGlobalContext<ServerStore>()
+  const { updateCommentStatus } = store.useStore()
+
+  const handleDeleteComment = async () => {
+    try {
+      if (
+        window.confirm(
+          "Are you sure you want to delete this comment? This CANNOT be undone!",
+        )
+      ) {
+        await updateCommentStatus(comment.id, CommentStatus.Deleted)
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error)
+    }
+  }
+
+  return (
+    <>
+      {comment.status !== CommentStatus.Deleted ? (
+        <Button
+          variant="link"
+          className="ml-4 inline-flex justify-start items-center"
+          title="Delete"
+          onClick={handleDeleteComment}
+        >
+          <DeleteSvg className="w-4 h-4 mr-1" />
+          Delete
+        </Button>
+      ) : null}
+    </>
   )
 }

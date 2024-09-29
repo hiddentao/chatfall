@@ -1,5 +1,4 @@
 import { Sort } from "@chatfall/server"
-import { Comment } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useInView } from "react-intersection-observer"
@@ -7,7 +6,7 @@ import { useGlobalContext } from "../contexts/global"
 import { BaseStore, PropsWithClassname } from "../exports"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
-import { CommentListItem } from "./CommentListItem"
+import { CommentListItem, CommentListItemProps } from "./CommentListItem"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { NumberValue } from "./NumberValue"
@@ -26,8 +25,8 @@ export interface CommentListBaseProps {
     isLoading,
   }: { isLoading: boolean }) => React.ReactNode
   title?: string
-  renderExtraControls?: (comment: Comment) => React.ReactNode
-  disableItemActions?: boolean
+  renderExtraControls?: CommentListItemProps["renderExtraControls"]
+  disableDefaultItemActions?: boolean
   disableAnimatedNumber?: boolean
   headerClassName?: string
   floatingHeader?: boolean
@@ -41,7 +40,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   renderPreCommentContent,
   title = "Comments",
   renderExtraControls,
-  disableItemActions,
+  disableDefaultItemActions,
   disableAnimatedNumber = false,
   headerClassName,
   floatingHeader,
@@ -117,7 +116,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
       {showHeader && (
         <>
           <div ref={headerRef} />
-          <div className="h-20">
+          <div className="h-16">
             <div
               className={cn(
                 "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
@@ -174,7 +173,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
                 user={users[comments[c].userId]}
                 liked={liked[c]}
                 renderExtraControls={renderExtraControls}
-                disableActions={disableItemActions}
+                disableDefaultActions={disableDefaultItemActions}
                 disableAnimatedNumber={disableAnimatedNumber}
               />
             ))}

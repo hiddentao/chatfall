@@ -45,6 +45,7 @@ export const CommentList: FC = () => {
       <CommentListBase
         title={title}
         showHeader={true}
+        className="px-2"
         renderHeaderContent={renderHeaderContent}
         renderPreCommentContent={renderPreCommentContent}
       />
