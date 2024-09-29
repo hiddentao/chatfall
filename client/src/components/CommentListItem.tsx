@@ -169,6 +169,16 @@ const CommentListItemInner: FC<CommentProps> = ({
     <li className={cn("block", className)}>
       <div className="text-sm flex flex-row items-center mb-2">
         <h3 className="font-bold">{user.name}</h3>
+        {user.email ? (
+          <>
+            <span className="mx-2 text-gray-400">/</span>
+            <a href={`mailto:${user.email}`} title={user.email}>
+              <Button variant="link" className="text-xs">
+                {user.email}
+              </Button>
+            </a>
+          </>
+        ) : null}
         <span className="mx-2">·</span>
         <span
           title={`${c.createdAt}`}

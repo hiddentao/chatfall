@@ -15,6 +15,7 @@ import { generateCanonicalUrl } from "../utils/string"
 import { SocketEventTypeEnum } from "../ws/types"
 import {
   AdminCommentQuerySchema,
+  AdminCommentResponseSchema,
   CommentQuerySchema,
   CommentResponseSchema,
   execHandler,
@@ -335,6 +336,8 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           })
 
           Object.entries(ret.users).forEach(([_, u]) => {
+            delete u.email // don't return email to non-admin users
+
             if (u.status === UserStatus.Blacklisted) {
               u.name = "[banned]"
             } else if (u.status === UserStatus.Deleted) {
@@ -401,7 +404,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
       },
       {
         query: AdminCommentQuerySchema,
-        response: CommentResponseSchema,
+        response: AdminCommentResponseSchema,
       },
     )
     .put(

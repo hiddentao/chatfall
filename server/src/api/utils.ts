@@ -118,6 +118,7 @@ export const fetchComments = async (
       status: comments.status,
       users_name: users.name,
       users_status: users.status,
+      users_email: users.email,
       userRatings_rating: commentRatings.rating,
       totalCount: sql<number>`count(*) over()`.as("total_count"),
     })
@@ -196,6 +197,7 @@ export const fetchComments = async (
         id: c.userId!,
         name: c.users_name!,
         status: c.users_status!,
+        email: c.users_email!,
       }
 
       if (c.userRatings_rating) {
@@ -207,33 +209,46 @@ export const fetchComments = async (
   return ret
 }
 
-export const CommentResponseSchema = t.Object({
+const BaseUserSchema = t.Object({
+  id: t.Number(),
+  name: t.String(),
+  status: t.Enum(UserStatus),
+})
+
+const AdminUserSchema = t.Object({
+  ...BaseUserSchema.properties,
+  email: t.String(),
+})
+
+const BaseCommentSchema = t.Object({
+  id: t.Number(),
+  userId: t.Number(),
+  postId: t.Number(),
+  body: t.String(),
+  status: t.Enum(CommentStatus),
+  depth: t.Number(),
+  rating: t.Number(),
+  replyCount: t.Number(),
+  path: t.String(),
+  createdAt: t.String(),
+  updatedAt: t.String(),
+})
+
+const BaseResponseSchema = {
   canonicalUrl: t.String(),
   totalComments: t.Number(),
-  users: t.Record(
-    t.Number(),
-    t.Object({
-      id: t.Number(),
-      name: t.String(),
-      status: t.Enum(UserStatus),
-    }),
-  ),
-  comments: t.Array(
-    t.Object({
-      id: t.Number(),
-      userId: t.Number(),
-      postId: t.Number(),
-      body: t.String(),
-      status: t.Enum(CommentStatus),
-      depth: t.Number(),
-      rating: t.Number(),
-      replyCount: t.Number(),
-      path: t.String(),
-      createdAt: t.String(),
-      updatedAt: t.String(),
-    }),
-  ),
+  comments: t.Array(BaseCommentSchema),
   liked: t.Record(t.Number(), t.Boolean()),
+}
+
+export const CommentResponseSchema = t.Object({
+  ...BaseResponseSchema,
+  users: t.Record(t.Number(), BaseUserSchema),
+})
+
+export const AdminCommentResponseSchema = t.Object({
+  ...BaseResponseSchema,
+  users: t.Record(t.Number(), AdminUserSchema),
 })
 
 export const CommentQuerySchema = t.Object({

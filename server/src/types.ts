@@ -28,6 +28,7 @@ export type CommentUser = {
   id: number
   name: string
   status: UserStatus
+  email?: string
 }
 
 export type LoggedInUser = {
