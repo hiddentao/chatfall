@@ -84,7 +84,7 @@ export const fetchComments = async (
     search,
   }: {
     canonicalUrl: string
-    depth?: number
+    depth?: string
     pathPrefix?: string
     skip: number
     sort: Sort
@@ -135,7 +135,7 @@ export const fetchComments = async (
     .where(
       and(
         canonicalUrl ? eq(posts.url, canonicalUrl) : undefined,
-        depth !== undefined ? eq(comments.depth, depth) : undefined,
+        depth ? eq(comments.depth, Number(depth)) : undefined,
         pathPrefix ? like(comments.path, `${pathPrefix}%`) : undefined,
         status && status.length ? inArray(comments.status, status) : undefined,
         search

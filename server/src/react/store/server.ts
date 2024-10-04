@@ -133,10 +133,11 @@ export const createStore = (props: BaseStoreProps) => {
         },
       }) as Omit<ServerState, keyof CoreState>,
     fetchCommentsImplementation: async ({ app, get, url, sort, skip }) => {
+      const hasFilter = get().selectedStatus || get().search
       return await app.api.comments.admin.comments.get({
         query: {
           url,
-          depth: `0`,
+          depth: hasFilter ? "" : `0`,
           skip: `${skip}`,
           sort,
           ...(get().selectedStatus ? { status: get().selectedStatus } : {}),

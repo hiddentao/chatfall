@@ -3,6 +3,7 @@ import {
   CommentListBase,
   type CommentListBaseProps,
   DefaultCommentFilters,
+  VerticalDivider,
   useGlobalContext,
 } from "@chatfall/client"
 import { type FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -21,7 +22,7 @@ const selectStyles = {
 
 export const CommentsAdmin: FC = () => {
   const { store } = useGlobalContext<ServerStore>()
-  const { getCanonicalUrls } = store.useStore()
+  const { getCanonicalUrls, comments } = store.useStore()
 
   const [selectedUrl, setSelectedUrl] = useState<string>("")
   const [urls, setUrls] = useState<string[] | undefined>()
@@ -74,8 +75,46 @@ export const CommentsAdmin: FC = () => {
   }, [])
 
   const renderPreCommentContent = useMemo(() => {
-    const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
-      return <div className="h-4" />
+    const fn: CommentListBaseProps["renderPreCommentContent"] = ({
+      allItems,
+    }) => {
+      const hasCommentsAtMultipleDepths = allItems.some(
+        (item) => comments[item].depth > 0,
+      )
+      return (
+        <>
+          <div className="h-2" />
+          {hasCommentsAtMultipleDepths && (
+            <div role="alert" className="mb-4 alert alert-warning italic">
+              <span>
+                Note: These filtered results include comments and replies at
+                multiple depths.
+              </span>
+            </div>
+          )}
+        </>
+      )
+    }
+    return fn
+  }, [comments])
+
+  const renderWrapper = useMemo(() => {
+    const fn: CommentListBaseProps["renderWrapper"] = ({
+      comment,
+      children,
+    }) => {
+      if (comment.depth > 0) {
+        // wrap the children in a div with flex-row and add as many vertical dividers as the depth
+        return (
+          <div className="flex flex-row">
+            {Array.from({ length: comment.depth }).map((_, index) => (
+              <VerticalDivider className="ml-4 mr-8" key={index} />
+            ))}
+            {children}
+          </div>
+        )
+      }
+      return children
     }
     return fn
   }, [])
@@ -117,6 +156,7 @@ export const CommentsAdmin: FC = () => {
                 headerClassName="justify-center"
                 floatingHeader={true}
                 renderExtraControls={renderExtraControls}
+                renderWrapper={renderWrapper}
               />
             </>
           )}
@@ -277,7 +317,7 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
         <Button
           variant="link"
           className="ml-8 inline-flex justify-start items-center"
-          title="Delete"
+          title="Delete this comment - it will remain in the database but will no longer be visible to the public"
           onClick={handleDeleteComment}
         >
           <DeleteSvg className="w-4 h-4 mr-1" />

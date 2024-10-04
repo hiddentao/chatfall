@@ -1,4 +1,4 @@
-import { Sort } from "@chatfall/server"
+import { Comment, Sort } from "@chatfall/server"
 import React, { FC, useEffect, useMemo, useState } from "react"
 import { useCallback } from "react"
 import { useInView } from "react-intersection-observer"
@@ -23,13 +23,18 @@ export interface CommentListBaseProps {
   }) => React.ReactNode
   renderPreCommentContent?: ({
     isLoading,
-  }: { isLoading: boolean }) => React.ReactNode
+    allItems,
+  }: { isLoading: boolean; allItems: number[] }) => React.ReactNode
   title?: string
   renderExtraControls?: CommentListItemProps["renderExtraControls"]
   disableDefaultItemActions?: boolean
   disableAnimatedNumber?: boolean
   headerClassName?: string
   floatingHeader?: boolean
+  renderWrapper?: (props: {
+    comment: Comment
+    children: React.ReactNode
+  }) => React.ReactNode
 }
 
 export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
@@ -44,6 +49,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   disableAnimatedNumber = false,
   headerClassName,
   floatingHeader,
+  renderWrapper,
 }) => {
   const { store } = useGlobalContext<BaseStore>()
   const { comments, rootList, users, liked, fetchComments } = store.useStore()
@@ -138,7 +144,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
       )}
       <div>
         {error ? <ErrorBox>{error}</ErrorBox> : null}
-        {renderPreCommentContent?.({ isLoading })}
+        {renderPreCommentContent?.({ isLoading, allItems })}
         {!isLoading && !error && rootList.items.length === 0 ? (
           <p className="italic">No comments!</p>
         ) : null}
@@ -165,18 +171,29 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
         ) : null}
         {!error && rootList.items.length ? (
           <ul className="flex flex-col" key={rootList.sort}>
-            {allItems.map((c) => (
-              <CommentListItem
-                key={c}
-                className="mb-9"
-                comment={comments[c]}
-                user={users[comments[c].userId]}
-                liked={liked[c]}
-                renderExtraControls={renderExtraControls}
-                disableDefaultActions={disableDefaultItemActions}
-                disableAnimatedNumber={disableAnimatedNumber}
-              />
-            ))}
+            {allItems.map((c) => {
+              const renderedComment = (
+                <CommentListItem
+                  comment={comments[c]}
+                  user={users[comments[c].userId]}
+                  liked={liked[c]}
+                  renderExtraControls={renderExtraControls}
+                  disableDefaultActions={disableDefaultItemActions}
+                  disableAnimatedNumber={disableAnimatedNumber}
+                />
+              )
+
+              return (
+                <li className="mb-9" key={c}>
+                  {renderWrapper
+                    ? renderWrapper({
+                        comment: comments[c],
+                        children: renderedComment,
+                      })
+                    : renderedComment}
+                </li>
+              )
+            })}
           </ul>
         ) : null}
         {canLoadMoreComments ? (

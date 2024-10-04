@@ -178,7 +178,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
   )
 
   return (
-    <li className={cn("block", className)}>
+    <div className={cn("block", className)}>
       <div className="text-sm flex flex-row items-center mb-2">
         <h3 className="font-bold">
           <span
@@ -276,22 +276,22 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
       </div>
       {showingReplies ? (
         <div className="mt-3 p-4 flex flex-row">
-          <div className="border-r border-r-gray-400 w-1"></div>
-          <div className="flex-1 ml-8">
+          <VerticalDivider className="mr-8" />
+          <div className="flex-1">
             {allItems.length ? (
               <>
                 <ul className="flex flex-col" ref={replyListRef}>
                   {allItems.map((r) => (
-                    <CommentListItem
-                      key={r}
-                      className="mb-8"
-                      comment={s.comments[r]}
-                      user={s.users[s.comments[r].userId]}
-                      liked={s.liked[r]}
-                      renderExtraControls={renderExtraControls}
-                      disableDefaultActions={disableDefaultActions}
-                      disableAnimatedNumber={disableAnimatedNumber}
-                    />
+                    <li className="mb-8" key={r}>
+                      <CommentListItem
+                        comment={s.comments[r]}
+                        user={s.users[s.comments[r].userId]}
+                        liked={s.liked[r]}
+                        renderExtraControls={renderExtraControls}
+                        disableDefaultActions={disableDefaultActions}
+                        disableAnimatedNumber={disableAnimatedNumber}
+                      />
+                    </li>
                   ))}
                 </ul>
                 {canLoadMoreReplies ? (
@@ -327,7 +327,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
           {error}
         </ErrorBox>
       )}
-    </li>
+    </div>
   )
 }
 
@@ -337,7 +337,7 @@ export const CommentListItem: FC<CommentListItemProps> = ({
   user,
   liked,
   renderExtraControls,
-  disableDefaultActions: disableActions,
+  disableDefaultActions,
   disableAnimatedNumber,
 }) => {
   return (
@@ -347,8 +347,12 @@ export const CommentListItem: FC<CommentListItemProps> = ({
       user={user}
       liked={liked}
       renderExtraControls={renderExtraControls}
-      disableDefaultActions={disableActions}
+      disableDefaultActions={disableDefaultActions}
       disableAnimatedNumber={disableAnimatedNumber}
     />
   )
+}
+
+export const VerticalDivider: FC<PropsWithClassname> = ({ className }) => {
+  return <div className={cn("border-r border-r-gray-400 w-1", className)} />
 }

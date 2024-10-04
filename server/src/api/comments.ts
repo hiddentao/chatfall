@@ -330,7 +330,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
           const ret = await fetchComments(db, {
             canonicalUrl,
-            depth: Number(depth),
+            depth,
             pathPrefix,
             skip: Number(skip),
             sort,
@@ -384,7 +384,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
 
           return fetchComments(db, {
             canonicalUrl,
-            depth: Number(depth),
+            depth,
             pathPrefix,
             skip: Number(skip),
             sort,
