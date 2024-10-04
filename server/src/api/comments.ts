@@ -377,17 +377,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         return await execHandler(async () => {
           await getLoggedInUserAndAssertAdmin(ctx, props)
 
-          const {
-            url: _url,
-            skip,
-            sort,
-            depth,
-            pathPrefix,
-            status,
-            search,
-          } = query
+          const { url, skip, sort, depth, pathPrefix, status, search } = query
 
-          const canonicalUrl = generateCanonicalUrl(_url)
+          const canonicalUrl = url ? generateCanonicalUrl(url) : ""
           const limit = ctx.settings.getSetting(Setting.CommentsPerPage)
 
           return fetchComments(db, {

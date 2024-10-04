@@ -54,6 +54,7 @@ export const CommentList: FC = () => {
 }
 
 interface CommentFiltersProps {
+  url?: string
   setIsLoading: (isLoading: boolean) => void
   setError: (error: string) => void
 }
@@ -61,6 +62,7 @@ interface CommentFiltersProps {
 export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
   setIsLoading,
   setError,
+  url,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
   const { fetchComments, rootList } = store.useStore()
@@ -70,7 +72,7 @@ export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
     setError("")
 
     try {
-      await fetchComments({ sort: s, skipOverride: 0 })
+      await fetchComments({ sort: s, skipOverride: 0, url })
     } catch (error: any) {
       setError(error.toString())
     } finally {

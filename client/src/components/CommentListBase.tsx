@@ -102,7 +102,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   }, [rootList.items, rootList.myNewItems])
 
   useEffect(() => {
-    refetch()
+    refetch(undefined, 0)
   }, [refetch])
 
   useEffect(() => {

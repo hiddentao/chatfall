@@ -83,7 +83,7 @@ export const fetchComments = async (
     status,
     search,
   }: {
-    canonicalUrl?: string
+    canonicalUrl: string
     depth?: number
     pathPrefix?: string
     skip: number
@@ -103,7 +103,7 @@ export const fetchComments = async (
     [Sort.leastReplies]: asc(comments.replyCount),
   }[sort]
 
-  let query = db
+  const query = db
     .select({
       id: comments.id,
       userId: comments.userId,
@@ -132,37 +132,21 @@ export const fetchComments = async (
         eq(commentRatings.userId, userId || 0),
       ),
     )
-
-  if (canonicalUrl) {
-    // @ts-ignore
-    query = query.where(eq(posts.url, canonicalUrl))
-  }
-
-  if (depth !== undefined) {
-    // @ts-ignore
-    query = query.where(eq(comments.depth, depth))
-  }
-
-  if (pathPrefix) {
-    // @ts-ignore
-    query = query.where(like(comments.path, `${pathPrefix}%`))
-  }
-
-  if (status && status.length) {
-    // @ts-ignore
-    query = query.where(inArray(comments.status, status))
-  }
-
-  if (search) {
-    // @ts-ignore
-    query = query.where(
-      or(
-        ilike(users.name, `%${search}%`),
-        ilike(users.email, `%${search}%`),
-        ilike(comments.body, `%${search}%`),
+    .where(
+      and(
+        canonicalUrl ? eq(posts.url, canonicalUrl) : undefined,
+        depth !== undefined ? eq(comments.depth, depth) : undefined,
+        pathPrefix ? like(comments.path, `${pathPrefix}%`) : undefined,
+        status && status.length ? inArray(comments.status, status) : undefined,
+        search
+          ? or(
+              ilike(users.name, `%${search}%`),
+              ilike(users.email, `%${search}%`),
+              ilike(comments.body, `%${search}%`),
+            )
+          : undefined,
       ),
     )
-  }
 
   const result = await query.orderBy(order_by).limit(limit).offset(skip)
 

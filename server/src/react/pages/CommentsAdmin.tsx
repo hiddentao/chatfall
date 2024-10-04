@@ -44,7 +44,9 @@ export const CommentsAdmin: FC = () => {
   }, [])
 
   const urlOptions = useMemo(() => {
-    return urls ? urls.map((url) => ({ value: url, label: url })) : []
+    const ret = urls ? urls.map((url) => ({ value: url, label: url })) : []
+    ret.unshift({ value: "", label: "All URLs" })
+    return ret
   }, [urls])
 
   const renderHeaderContent = useMemo(() => {
@@ -52,8 +54,6 @@ export const CommentsAdmin: FC = () => {
       setIsLoading,
       setError,
     }) => {
-      if (!selectedUrl) return null
-
       return (
         <CommentFilters
           setIsLoading={setIsLoading}
@@ -105,23 +105,19 @@ export const CommentsAdmin: FC = () => {
                   styles={selectStyles}
                 />
               </div>
-              {selectedUrl ? (
-                <CommentListBase
-                  title=""
-                  className="w-full"
-                  url={selectedUrl}
-                  disableDefaultItemActions={true}
-                  disableAnimatedNumber={true}
-                  showHeader={true}
-                  renderHeaderContent={renderHeaderContent}
-                  renderPreCommentContent={renderPreCommentContent}
-                  headerClassName="justify-center"
-                  floatingHeader={true}
-                  renderExtraControls={renderExtraControls}
-                />
-              ) : (
-                <p className="italic">Please select a URL</p>
-              )}
+              <CommentListBase
+                title=""
+                className="w-full"
+                url={selectedUrl}
+                disableDefaultItemActions={true}
+                disableAnimatedNumber={true}
+                showHeader={true}
+                renderHeaderContent={renderHeaderContent}
+                renderPreCommentContent={renderPreCommentContent}
+                headerClassName="justify-center"
+                floatingHeader={true}
+                renderExtraControls={renderExtraControls}
+              />
             </>
           )}
         </>
@@ -200,6 +196,7 @@ const CommentFilters: FC<CommentFiltersProps> = ({
     <div className="flex flex-row text-sm">
       <div>
         <DefaultCommentFilters
+          url={selectedUrl}
           setIsLoading={setIsLoading}
           setError={setError}
         />
@@ -268,7 +265,7 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
       {comment.status === CommentStatus.Moderation && (
         <Button
           variant="link"
-          className="ml-4 inline-flex justify-start items-center"
+          className="ml-8 inline-flex justify-start items-center"
           title="Approve this comment and make it visible to the public"
           onClick={handleMarkVisible}
         >
@@ -279,7 +276,7 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
       {comment.status !== CommentStatus.Deleted && (
         <Button
           variant="link"
-          className="ml-4 inline-flex justify-start items-center"
+          className="ml-8 inline-flex justify-start items-center"
           title="Delete"
           onClick={handleDeleteComment}
         >
