@@ -46,3 +46,9 @@ export const DeleteSvg: FC<PropsWithClassname> = ({ className }) => (
     <Svg.DeleteSvg className={className} />
   </SvgWrapper>
 )
+
+export const TickSvg: FC<PropsWithClassname> = ({ className }) => (
+  <SvgWrapper>
+    <Svg.TickSvg className={className} />
+  </SvgWrapper>
+)

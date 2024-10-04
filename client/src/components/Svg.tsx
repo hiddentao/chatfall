@@ -12,6 +12,7 @@ import LogoutSvg from "../images/logout.svg?react"
 import RefreshSvg from "../images/refresh.svg?react"
 import ReplySvg from "../images/reply.svg?react"
 import RightSvg from "../images/right.svg?react"
+import TickSvg from "../images/tick.svg?react"
 import WarningSvg from "../images/warning.svg?react"
 import WaterfallSvg from "../images/waterfall-svgrepo-com.svg?react"
 
@@ -32,4 +33,5 @@ export {
   LogoutSvg,
   InfoSvg,
   DeleteSvg,
+  TickSvg,
 }

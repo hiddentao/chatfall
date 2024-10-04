@@ -266,6 +266,9 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 path,
                 createdAt,
                 updatedAt: dateNow(),
+                status: ctx.settings.getSetting(Setting.ModerateAllComments)
+                  ? CommentStatus.Moderation
+                  : CommentStatus.Visible,
               })
               .returning()
 
@@ -279,16 +282,26 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               name: user.name,
             },
             data: {
-              ...inserted,
+              ...sanitizeCommentBody(inserted),
             },
           })
 
+          let msg: string
+
+          if (inserted.status === CommentStatus.Moderation) {
+            msg = `Your ${
+              parentCommentId ? "reply" : "comment"
+            } will be visible once the moderator has approved it.`
+          } else {
+            msg = `Your ${
+              parentCommentId ? "reply" : "comment"
+            } was successfully added!`
+          }
+
           return {
             id: inserted.id,
-            message: parentCommentId
-              ? "Your reply was successfully added!"
-              : "Your comment was successfully added!",
-            alert: false,
+            message: msg,
+            alert: true,
           }
         })
       },
@@ -326,13 +339,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             status: [CommentStatus.Visible, CommentStatus.Moderation],
           })
 
-          ret.comments.forEach((c) => {
-            if (c.status === CommentStatus.Moderation) {
-              c.body = "[awaiting moderation]"
-            } else if (c.status === CommentStatus.Deleted) {
-              c.body = "[deleted]"
-            }
-          })
+          ret.comments = ret.comments.map(sanitizeCommentBody)
 
           Object.entries(ret.users).forEach(([_, u]) => {
             delete u.email // don't return email to non-admin users
@@ -422,4 +429,14 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
         }),
       },
     )
+}
+
+const sanitizeCommentBody = (comment: Comment): Comment => {
+  if (comment.status === CommentStatus.Moderation) {
+    comment.body = "[awaiting moderation]"
+  } else if (comment.status === CommentStatus.Deleted) {
+    comment.body = "[deleted]"
+  }
+
+  return comment
 }

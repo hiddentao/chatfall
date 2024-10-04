@@ -9,7 +9,7 @@ import { type FC, useCallback, useEffect, useMemo, useState } from "react"
 import Select from "react-select"
 import { type Comment, CommentStatus } from "../../db/schema"
 import { PageWrapper } from "../components/PageWrapper"
-import { DeleteSvg } from "../components/Svg"
+import { DeleteSvg, TickSvg } from "../components/Svg"
 import type { ServerStore } from "../store/server"
 
 const selectStyles = {
@@ -241,6 +241,14 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
   const { store } = useGlobalContext<ServerStore>()
   const { updateCommentStatus } = store.useStore()
 
+  const handleMarkVisible = async () => {
+    try {
+      await updateCommentStatus(comment.id, CommentStatus.Visible)
+    } catch (error) {
+      console.error("Error marking comment as visible:", error)
+    }
+  }
+
   const handleDeleteComment = async () => {
     try {
       if (
@@ -257,7 +265,18 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
 
   return (
     <>
-      {comment.status !== CommentStatus.Deleted ? (
+      {comment.status === CommentStatus.Moderation && (
+        <Button
+          variant="link"
+          className="ml-4 inline-flex justify-start items-center"
+          title="Approve this comment and make it visible to the public"
+          onClick={handleMarkVisible}
+        >
+          <TickSvg className="w-4 h-4 mr-1" />
+          Approve
+        </Button>
+      )}
+      {comment.status !== CommentStatus.Deleted && (
         <Button
           variant="link"
           className="ml-4 inline-flex justify-start items-center"
@@ -267,7 +286,7 @@ const CommentActions: FC<CommentActionsProps> = ({ comment }) => {
           <DeleteSvg className="w-4 h-4 mr-1" />
           Delete
         </Button>
-      ) : null}
+      )}
     </>
   )
 }

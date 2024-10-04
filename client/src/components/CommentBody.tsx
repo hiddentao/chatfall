@@ -7,6 +7,10 @@ export const CommentBody: FC<{ comment: Comment }> = ({ comment }) => {
       return <p className="italic text-gray-500">[deleted]</p>
     }
 
+    if (comment.status === CommentStatus.Moderation) {
+      return <p className="italic text-gray-500">[awaiting moderation]</p>
+    }
+
     return comment.body.split("\n").map((line, i) => (
       <p key={i} className="mb-1">
         {line || <br />}
