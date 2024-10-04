@@ -301,7 +301,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           return {
             id: inserted.id,
             message: msg,
-            alert: true,
+            alert: inserted.status === CommentStatus.Moderation,
           }
         })
       },
