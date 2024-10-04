@@ -288,6 +288,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
                       comment={s.comments[r]}
                       user={s.users[s.comments[r].userId]}
                       liked={s.liked[r]}
+                      renderExtraControls={renderExtraControls}
                       disableDefaultActions={disableDefaultActions}
                       disableAnimatedNumber={disableAnimatedNumber}
                     />
