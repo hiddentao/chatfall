@@ -30,6 +30,7 @@ export interface CommentListBaseProps {
   disableDefaultItemActions?: boolean
   disableAnimatedNumber?: boolean
   headerClassName?: string
+  bodyClassName?: string
   floatingHeader?: boolean
   renderWrapper?: (props: {
     comment: Comment
@@ -48,6 +49,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   disableDefaultItemActions,
   disableAnimatedNumber = false,
   headerClassName,
+  bodyClassName,
   floatingHeader,
   renderWrapper,
 }) => {
@@ -142,7 +144,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
           </div>
         </>
       )}
-      <div>
+      <div className={bodyClassName}>
         {error ? <ErrorBox>{error}</ErrorBox> : null}
         {renderPreCommentContent?.({ isLoading, allItems })}
         {!isLoading && !error && rootList.items.length === 0 ? (

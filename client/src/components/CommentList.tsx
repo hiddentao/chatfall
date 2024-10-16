@@ -45,7 +45,7 @@ export const CommentList: FC = () => {
       <CommentListBase
         title={title}
         showHeader={true}
-        className="px-2"
+        bodyClassName="px-2"
         renderHeaderContent={renderHeaderContent}
         renderPreCommentContent={renderPreCommentContent}
       />
@@ -82,7 +82,7 @@ export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
 
   return (
     <div>
-      <label htmlFor="sort-select" className="mr-2">
+      <label htmlFor="sort-select" className="mr-2 hidden md:inline-block">
         Sort:
       </label>
       <select
