@@ -261,7 +261,7 @@ const CommentFilters: FC<CommentFiltersProps> = ({
         <input
           type="text"
           placeholder="Comments/users"
-          className="input input-sm input-bordered text-base-content md:w-72 w-40"
+          className="input input-sm input-bordered text-base-content sm:w-72 w-40"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />

@@ -32,7 +32,7 @@ export const CommentList: FC = () => {
     const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
       return canonicalUrl ? (
         <>
-          <CommentInputForm className="mt-4 mb-8 mx-6" />
+          <CommentInputForm className="mt-4 mb-8 mx-2 sm:mx-6" />
         </>
       ) : null
     }
@@ -82,7 +82,7 @@ export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
 
   return (
     <div>
-      <label htmlFor="sort-select" className="mr-2 hidden md:inline-block">
+      <label htmlFor="sort-select" className="mr-2 hidden sm:inline-block">
         Sort:
       </label>
       <select

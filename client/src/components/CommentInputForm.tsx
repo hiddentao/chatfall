@@ -189,13 +189,13 @@ export const CommentInputForm = forwardRef<
               disabled={!!isPosting}
             />
             {loggedInUser && focused ? (
-              <div className="text-xs italic flex flex-col items-start md:flex-row">
+              <div className="text-xs italic flex flex-col items-start sm:flex-row">
                 <p>
                   Logged in as: <strong>{loggedInUser.name}</strong>
                 </p>
                 <Button
                   variant="link"
-                  className="md:ml-2 italic"
+                  className="sm:ml-2 italic"
                   title="Logout"
                   onClick={onClickLogout}
                 >

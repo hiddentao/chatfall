@@ -56,7 +56,7 @@ export const BanEditor: FC<BanEditorProps> = ({
 
   return (
     <PageWrapper title={title}>
-      <div className="card card-compact bg-base-300 w-full md:max-w-[600px] shadow-xl mb-8">
+      <div className="card card-compact bg-base-300 w-full sm:max-w-[600px] shadow-xl mb-8">
         <div className="card-body p-4">{children}</div>
       </div>
       <TextAreaInput
@@ -64,7 +64,7 @@ export const BanEditor: FC<BanEditorProps> = ({
         label={title}
         placeholder={placeholder}
         rows={10}
-        className="w-full md:max-w-[500px] mb-4"
+        className="w-full sm:max-w-[500px] mb-4"
         inputClassname="p-2 border rounded-md w-full"
         hideValidationIndicator={true}
       />
