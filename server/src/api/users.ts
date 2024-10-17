@@ -1,6 +1,7 @@
 import { and, asc, countDistinct, eq } from "drizzle-orm"
 
 import Elysia, { t } from "elysia"
+import _ from "lodash"
 import { UserStatus, users } from "../db/schema"
 import {
   generateVerificationCodeAndBlob,
@@ -146,10 +147,7 @@ export const createUserRoutes = (ctx: GlobalContext) => {
 
           return {
             user,
-            jwt: await signJwt({
-              id: user.id,
-              name,
-            }),
+            jwt: await signJwt(_.pick(user, "id", "name")),
           }
         })
       },
