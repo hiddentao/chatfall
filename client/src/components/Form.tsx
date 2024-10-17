@@ -189,12 +189,13 @@ export const TextInput = (
   )
 }
 
-export const TextAreaInput = (
-  props: TextFieldProps & {
+export const TextAreaInput = forwardRef<
+  HTMLTextAreaElement,
+  TextFieldProps & {
     onFocus?: () => void
     rows?: number
-  },
-) => {
+  }
+>((props, ref) => {
   const {
     field,
     className,
@@ -220,6 +221,7 @@ export const TextAreaInput = (
       <TextFieldLabel {...props} />
       <div className="flex flex-row justify-start items-center">
         <TextareaAutoresize
+          ref={ref}
           tabIndex={tabIndex}
           minRows={rows}
           placeholder={placeholder}
@@ -237,4 +239,4 @@ export const TextAreaInput = (
       {hideError ? null : <FieldError {...field} />}
     </div>
   )
-}
+})

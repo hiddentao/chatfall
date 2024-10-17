@@ -13,12 +13,13 @@ import React, {
   useState,
 } from "react"
 import { useGlobalContext } from "../contexts/global"
+import { useScrollIntoViewIfNeeded } from "../hooks/scroll"
 import { ClientStore } from "../store/client"
 import { PropsWithClassname } from "../types"
 import { cn, formatPlural } from "../utils/ui"
 import { Button } from "./Button"
 import { CommentBody } from "./CommentBody"
-import { CommentInputForm, CommentInputFormHandle } from "./CommentInputForm"
+import { CommentInputModal, CommentInputModalRef } from "./CommentInputModal"
 import { CommentsBlockPlaceholder } from "./CommentPlaceholder"
 import { ErrorBox } from "./ErrorBox"
 import { Loading } from "./Loading"
@@ -49,12 +50,14 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
   const [showingReplies, setShowingReplies] = useState<boolean>(false)
   const [updatingLike, setUpdatingLike] = useState<boolean>(false)
   const [loadingReplies, setLoadingReplies] = useState<boolean>(false)
-  const [scrollToReplyForm, setScrollToReplyForm] = useState<boolean>(false)
-  const [scrollToFirstReply, setScrollToFirstReply] = useState<boolean>(false)
+  const [scrollToReplyList, setScrollToReplyList] = useState<boolean>(false)
+  const [showReplyForm, setShowReplyForm] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
-  const replyListRef = useRef<HTMLUListElement>(null)
-  const replyFormRef = useRef<CommentInputFormHandle>(null)
-
+  const { ref: replyListRef, scrollIntoView: scrollReplyListIntoView } =
+    useScrollIntoViewIfNeeded<HTMLUListElement>()
+  const { ref: lastReplyRef, scrollIntoView: scrollLastReplyIntoView } =
+    useScrollIntoViewIfNeeded<HTMLLIElement>()
+  const replyFormModal = useRef<CommentInputModalRef>(null)
   const myReplies = useMemo(() => s.replies[c.id] || null, [s.replies, c.id])
 
   const handleLike = useCallback(
@@ -94,7 +97,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
 
       if (!onceLoaded) {
         onceLoaded = () => {
-          setScrollToFirstReply(true)
+          setScrollToReplyList(true)
         }
       }
 
@@ -114,15 +117,15 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
     [c.id, fetchMoreReplies, showingReplies, s.replies],
   )
 
-  const showReplyForm = useCallback(
+  const onClickReply = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       if (!showingReplies) {
         handleToggleReplies(undefined, () => {
-          setScrollToReplyForm(true)
+          setShowReplyForm(true)
         })
       } else {
-        setScrollToReplyForm(true)
+        setShowReplyForm(true)
       }
     },
     [handleToggleReplies, showingReplies],
@@ -153,22 +156,23 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
     return items
   }, [myReplies?.items, myReplies?.myNewItems])
 
-  useEffect(() => {
-    if (scrollToReplyForm && replyFormRef.current) {
-      setScrollToReplyForm(false)
-      replyFormRef.current.scrollIntoViewAndFocus()
-    }
-  }, [scrollToReplyForm])
+  const onReplyPosted = useCallback(() => {
+    scrollLastReplyIntoView()
+  }, [scrollLastReplyIntoView])
 
   useEffect(() => {
-    if (scrollToFirstReply && replyListRef.current) {
-      setScrollToFirstReply(false)
-      replyListRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      })
+    if (showReplyForm && replyFormModal.current) {
+      setShowReplyForm(false)
+      replyFormModal.current.open()
     }
-  }, [scrollToFirstReply])
+  }, [showReplyForm])
+
+  useEffect(() => {
+    if (scrollToReplyList) {
+      setScrollToReplyList(false)
+      scrollReplyListIntoView()
+    }
+  }, [scrollToReplyList, scrollReplyListIntoView])
 
   const userIsBannedOrDeleted = useMemo(
     () =>
@@ -245,9 +249,9 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
         {!disableDefaultActions && (
           <Button
             variant="link"
-            className="ml-4 inline-flex justify-start items-center"
             title="Reply"
-            onClick={showReplyForm}
+            onClick={onClickReply}
+            className="ml-4 inline-flex justify-start items-center"
           >
             <div className="svg-container w-4 h-4 mx-1">
               <ReplySvg />
@@ -281,8 +285,14 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
             {allItems.length ? (
               <>
                 <ul className="flex flex-col" ref={replyListRef}>
-                  {allItems.map((r) => (
-                    <li className="mb-8" key={r}>
+                  {allItems.map((r, index) => (
+                    <li
+                      className="mb-8"
+                      key={r}
+                      ref={
+                        index === allItems.length - 1 ? lastReplyRef : undefined
+                      }
+                    >
                       <CommentListItem
                         comment={s.comments[r]}
                         user={s.users[s.comments[r].userId]}
@@ -310,13 +320,12 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
             {loadingReplies ? (
               <CommentsBlockPlaceholder className="mb-8" />
             ) : null}
-            {disableDefaultActions ? null : (
-              <CommentInputForm
-                ref={replyFormRef}
-                className={cn("p-4 w-full")}
+            {!disableDefaultActions && (
+              <CommentInputModal
                 parentCommentId={c.id}
                 commentFieldPlaceholder="Add reply..."
-                initiallyFocused={true}
+                onCommentPosted={onReplyPosted}
+                ref={replyFormModal}
               />
             )}
           </div>
@@ -331,26 +340,8 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
   )
 }
 
-export const CommentListItem: FC<CommentListItemProps> = ({
-  className,
-  comment: c,
-  user,
-  liked,
-  renderExtraControls,
-  disableDefaultActions,
-  disableAnimatedNumber,
-}) => {
-  return (
-    <CommentListItemInner
-      className={className}
-      comment={c}
-      user={user}
-      liked={liked}
-      renderExtraControls={renderExtraControls}
-      disableDefaultActions={disableDefaultActions}
-      disableAnimatedNumber={disableAnimatedNumber}
-    />
-  )
+export const CommentListItem: FC<CommentListItemProps> = (props) => {
+  return <CommentListItemInner {...props} />
 }
 
 export const VerticalDivider: FC<PropsWithClassname> = ({ className }) => {

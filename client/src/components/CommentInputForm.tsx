@@ -1,15 +1,14 @@
 import { PostCommentResponse } from "@chatfall/server"
 import React, {
-  forwardRef,
   useCallback,
+  useState,
+  forwardRef,
   useImperativeHandle,
   useRef,
-  useState,
 } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { useField, useForm } from "../hooks/form"
 import { type ClientStore } from "../store/client"
-import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button } from "./Button"
 import { ErrorBox } from "./ErrorBox"
@@ -17,12 +16,17 @@ import { FormDiv, TextAreaInput, standardInputStyle } from "./Form"
 import { ButtonWithLogin } from "./Login"
 import { WarningSvg } from "./Svg"
 
-export type CommentInputFormProps = PropsWithClassname & {
+export type CommentInputFormProps = {
+  className?: string
+  showMinified?: boolean
   parentCommentId?: number
   commentFieldPlaceholder?: string
   commentFieldTitle?: string
-  initiallyFocused?: boolean
   onCommentPosted?: () => void
+}
+
+export type CommentInputFormRef = {
+  setFocused: () => void
 }
 
 const validateCommentText = (value: string) => {
@@ -31,51 +35,34 @@ const validateCommentText = (value: string) => {
   }
 }
 
-// Define the type for the imperative handle
-export type CommentInputFormHandle = {
-  scrollIntoViewAndFocus: () => void
-}
-
 export const CommentInputForm = forwardRef<
-  CommentInputFormHandle,
+  CommentInputFormRef,
   CommentInputFormProps
 >(
   (
     {
-      className,
+      showMinified,
       parentCommentId,
+      className,
       commentFieldPlaceholder,
-      initiallyFocused,
       onCommentPosted,
     },
     ref,
   ) => {
     const { store } = useGlobalContext<ClientStore>()
     const { loggedInUser, addComment, logout } = store.useStore()
-    const [focused, setFocused] = useState<boolean>(!!initiallyFocused)
     const [error, setError] = useState<string>("")
     const [isPosting, setIsPosting] = useState<boolean>(false)
     const [responseAfterPosting, setResponseAfterPosting] =
       useState<PostCommentResponse>()
-    const divRef = useRef<HTMLDivElement>(null)
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          scrollIntoViewAndFocus() {
-            if (divRef.current) {
-              divRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              })
-              divRef.current.querySelector("textarea")?.focus()
-            }
-          },
-        }
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+    useImperativeHandle(ref, () => ({
+      setFocused: () => {
+        textareaRef.current?.focus()
       },
-      [],
-    )
+    }))
 
     const [commentText] = [
       useField({
@@ -109,12 +96,6 @@ export const CommentInputForm = forwardRef<
       [addComment, parentCommentId],
     )
 
-    const onClickContinue = useCallback(() => {
-      reset()
-      setResponseAfterPosting(undefined)
-      onCommentPosted?.()
-    }, [reset, onCommentPosted])
-
     const handleSubmit = useCallback(
       async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
@@ -132,6 +113,12 @@ export const CommentInputForm = forwardRef<
       [commentText.value, postComment, reset],
     )
 
+    const handleContinue = useCallback(() => {
+      reset()
+      setResponseAfterPosting(undefined)
+      onCommentPosted?.()
+    }, [onCommentPosted, reset])
+
     const onClickLogout = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
@@ -140,24 +127,15 @@ export const CommentInputForm = forwardRef<
       [logout],
     )
 
-    const onFocusForm = useCallback(() => {
-      setFocused(true)
-    }, [])
-
     const onHideError = useCallback(() => {
       setError("")
     }, [])
 
     return (
       <FormDiv
-        ref={divRef}
-        className={cn(
-          "max-h-14 p-4",
-          {
-            "max-h-full": focused,
-          },
-          className,
-        )}
+        className={cn("max-h-full p-4", className, {
+          "max-h-14": showMinified,
+        })}
       >
         {responseAfterPosting ? (
           <div>
@@ -167,7 +145,7 @@ export const CommentInputForm = forwardRef<
               ) : null}
               {responseAfterPosting.message}
             </p>
-            <Button className="mt-4" onClick={onClickContinue}>
+            <Button className="mt-4" onClick={handleContinue}>
               Continue
             </Button>
           </div>
@@ -178,18 +156,19 @@ export const CommentInputForm = forwardRef<
               field={commentText}
               hideError={true}
               required={true}
-              rows={focused ? 4 : 1}
+              rows={showMinified ? 1 : 8}
               placeholder={commentFieldPlaceholder || "Add comment..."}
               hideValidationIndicator={true}
               inputClassname={cn("self-stretch w-full", {
-                "bg-transparent border-0 italic p-0 min-h-1": !focused,
-                [standardInputStyle]: focused,
+                "bg-transparent border-0 italic p-0 min-h-1 pointer-events-none":
+                  showMinified,
+                [standardInputStyle]: !showMinified,
               })}
-              onFocus={onFocusForm}
               disabled={!!isPosting}
+              ref={textareaRef}
             />
-            {loggedInUser && focused ? (
-              <div className="text-xs italic flex flex-col items-start sm:flex-row">
+            {loggedInUser && !showMinified ? (
+              <div className="text-xs italic flex flex-col items-center sm:flex-row mt-2">
                 <p>
                   Logged in as: <strong>{loggedInUser.name}</strong>
                 </p>
@@ -203,7 +182,7 @@ export const CommentInputForm = forwardRef<
                 </Button>
               </div>
             ) : null}
-            {focused ? (
+            {!showMinified ? (
               <div>
                 <ButtonWithLogin
                   tabIndex={2}
@@ -228,3 +207,5 @@ export const CommentInputForm = forwardRef<
     )
   },
 )
+
+CommentInputForm.displayName = "CommentInputForm"

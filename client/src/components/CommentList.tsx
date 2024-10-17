@@ -2,7 +2,7 @@ import { Sort } from "@chatfall/server"
 import { FC, useMemo } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { type ClientStore } from "../store/client"
-import { CommentInputForm } from "./CommentInputForm"
+import { CommentInputModal } from "./CommentInputModal"
 import { CommentListBase, CommentListBaseProps } from "./CommentListBase"
 
 export const CommentList: FC = () => {
@@ -31,9 +31,7 @@ export const CommentList: FC = () => {
   const renderPreCommentContent = useMemo(() => {
     const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
       return canonicalUrl ? (
-        <>
-          <CommentInputForm className="mt-4 mb-8 mx-2 sm:mx-6" />
-        </>
+        <CommentInputModal className="mt-4 mb-8 mx-2 sm:mx-6" />
       ) : null
     }
 
@@ -41,15 +39,13 @@ export const CommentList: FC = () => {
   }, [canonicalUrl])
 
   return (
-    <>
-      <CommentListBase
-        title={title}
-        showHeader={true}
-        bodyClassName="px-2"
-        renderHeaderContent={renderHeaderContent}
-        renderPreCommentContent={renderPreCommentContent}
-      />
-    </>
+    <CommentListBase
+      title={title}
+      showHeader={true}
+      bodyClassName="px-2"
+      renderHeaderContent={renderHeaderContent}
+      renderPreCommentContent={renderPreCommentContent}
+    />
   )
 }
 

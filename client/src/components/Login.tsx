@@ -6,9 +6,9 @@ import { useField, useForm } from "../hooks/form"
 import { PropsWithClassname } from "../types"
 import { cn } from "../utils/ui"
 import { Button, ButtonProps } from "./Button"
+import { CloseButton } from "./CloseButton"
 import { ErrorBox } from "./ErrorBox"
 import { FormDiv, TextInput, standardInputStyle } from "./Form"
-import { CrossSvg } from "./Svg"
 
 export const validateEmail = (value: string) => {
   if (!isEmail(value)) {
@@ -300,7 +300,7 @@ export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
 
   return (
     <div
-      className={cn("dropdown", {
+      className={cn("dropdown dropdown-top", {
         "dropdown-open": showLoginForm,
       })}
     >
@@ -312,13 +312,7 @@ export const ButtonWithLogin: FC<ButtonProps> = ({ className, ...props }) => {
           onLoginComplete={onLoginComplete}
           className="relative"
         >
-          <Button
-            variant="iconMeta"
-            className="w-4 h-4 p-1 absolute top-1 right-1"
-            onClick={closeLoginForm}
-          >
-            <CrossSvg />
-          </Button>
+          <CloseButton onClick={closeLoginForm} />
         </LoginForm>
       </div>
     </div>
