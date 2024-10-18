@@ -27,8 +27,7 @@ export interface CommentListBaseProps {
   }: { isLoading: boolean; allItems: number[] }) => React.ReactNode
   title?: string
   renderExtraControls?: CommentListItemProps["renderExtraControls"]
-  disableDefaultItemActions?: boolean
-  disableAnimatedNumber?: boolean
+  isAdminView?: boolean
   headerClassName?: string
   bodyClassName?: string
   floatingHeader?: boolean
@@ -46,12 +45,11 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
   renderPreCommentContent,
   title = "Comments",
   renderExtraControls,
-  disableDefaultItemActions,
-  disableAnimatedNumber = false,
   headerClassName,
   bodyClassName,
   floatingHeader,
   renderWrapper,
+  isAdminView,
 }) => {
   const { store } = useGlobalContext<BaseStore>()
   const { comments, rootList, users, liked, fetchComments } = store.useStore()
@@ -124,22 +122,20 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
       {showHeader && (
         <>
           <div ref={headerRef} />
-          <div className="h-16">
-            <div
-              className={cn(
-                "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
-                headerClassName,
-                {
-                  "fixed top-0 left-0 right-0 z-10 rounded-none": isHeaderFixed,
-                },
-              )}
-            >
-              <div className="text-xl flex flex-row items-center">
-                {title ? <span className="mr-4">{title}</span> : null}
-              </div>
-              <div className="flex flex-row items-center justify-end">
-                {renderHeaderContent?.({ setIsLoading, setError })}
-              </div>
+          <div
+            className={cn(
+              "flex flex-row justify-between font-heading bg-info text-info-content px-4 py-3 rounded-md",
+              headerClassName,
+              {
+                "fixed top-0 left-0 right-0 z-10 rounded-none": isHeaderFixed,
+              },
+            )}
+          >
+            <div className="text-xl flex flex-row items-center">
+              {title ? <span className="mr-4">{title}</span> : null}
+            </div>
+            <div className="flex flex-row items-center justify-end">
+              {renderHeaderContent?.({ setIsLoading, setError })}
             </div>
           </div>
         </>
@@ -155,7 +151,7 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
             <div className="inline-block mr-2">
               <strong>
                 <NumberValue
-                  disableAnimatedNumber={disableAnimatedNumber}
+                  disableAnimatedNumber={isAdminView}
                   value={rootList.otherUserNewItems.length}
                 />{" "}
                 new comment
@@ -180,11 +176,9 @@ export const CommentListBase: FC<CommentListBaseProps & PropsWithClassname> = ({
                   user={users[comments[c].userId]}
                   liked={liked[c]}
                   renderExtraControls={renderExtraControls}
-                  disableDefaultActions={disableDefaultItemActions}
-                  disableAnimatedNumber={disableAnimatedNumber}
+                  isAdminView={isAdminView}
                 />
               )
-
               return (
                 <li className="mb-9" key={c}>
                   {renderWrapper

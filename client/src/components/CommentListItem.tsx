@@ -32,8 +32,7 @@ export type CommentListItemProps = PropsWithClassname & {
   user: CommentUser
   liked: boolean
   renderExtraControls?: (props: { comment: Comment }) => React.ReactNode
-  disableDefaultActions?: boolean
-  disableAnimatedNumber?: boolean
+  isAdminView?: boolean
 }
 
 const CommentListItemInner: FC<CommentListItemProps> = ({
@@ -42,8 +41,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
   user,
   liked,
   renderExtraControls,
-  disableDefaultActions,
-  disableAnimatedNumber,
+  isAdminView,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
   const { loggedInUser, likeComment, fetchReplies, ...s } = store.useStore()
@@ -222,20 +220,17 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
         >{`${formatCommentTime(c.createdAt)}`}</span>
       </div>
       <div className="mb-2">
-        <CommentBody comment={c} />
+        <CommentBody comment={c} isAdminView={isAdminView} />
       </div>
       <div className="mt-2 flex flex-row items-center text-xs">
         <span className="inline-flex flex-row items-center text-gray-500 mr-2">
-          <NumberValue
-            disableAnimatedNumber={disableAnimatedNumber}
-            value={c.rating}
-          />
+          <NumberValue disableAnimatedNumber={isAdminView} value={c.rating} />
           <ButtonWithLogin
             className="w-6 h-6 ml-1 p-[0.3em]"
             variant="iconMeta"
             title="Like/unlike"
             onClick={handleLike}
-            disabled={disableDefaultActions}
+            disabled={isAdminView}
           >
             {updatingLike ? (
               <Loading className="w-4 h-4" />
@@ -246,7 +241,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
             )}
           </ButtonWithLogin>
         </span>
-        {!disableDefaultActions && (
+        {!isAdminView && (
           <Button
             variant="link"
             title="Reply"
@@ -270,7 +265,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
               <ChatSvg />
             </div>
             <NumberValue
-              disableAnimatedNumber={disableAnimatedNumber}
+              disableAnimatedNumber={isAdminView}
               value={c.replyCount}
             />
             &nbsp;{formatPlural(c.replyCount, "reply", "replies")}
@@ -298,8 +293,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
                         user={s.users[s.comments[r].userId]}
                         liked={s.liked[r]}
                         renderExtraControls={renderExtraControls}
-                        disableDefaultActions={disableDefaultActions}
-                        disableAnimatedNumber={disableAnimatedNumber}
+                        isAdminView={isAdminView}
                       />
                     </li>
                   ))}
@@ -320,7 +314,7 @@ const CommentListItemInner: FC<CommentListItemProps> = ({
             {loadingReplies ? (
               <CommentsBlockPlaceholder className="mb-8" />
             ) : null}
-            {!disableDefaultActions && (
+            {!isAdminView && (
               <CommentInputModal
                 parentCommentId={c.id}
                 commentFieldPlaceholder="Add reply..."

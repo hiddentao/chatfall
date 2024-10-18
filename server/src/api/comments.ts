@@ -8,7 +8,7 @@ import {
   posts,
 } from "../db/schema"
 import { Setting } from "../settings/types"
-import { type GlobalContext } from "../types"
+import { type CommentUser, type GlobalContext } from "../types"
 import { dateDiff, dateFormatDiff, dateNow } from "../utils/date"
 import { generateCanonicalUrl } from "../utils/string"
 import { SocketEventTypeEnum } from "../ws/types"
@@ -282,7 +282,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
               name: user.name,
             },
             data: {
-              ...sanitizeCommentBody(inserted),
+              ...sanitizeCommentDataForNonAdminUsers(inserted),
             },
           })
 
@@ -339,11 +339,15 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             status: [CommentStatus.Visible, CommentStatus.Moderation],
           })
 
-          ret.comments = ret.comments.map(sanitizeCommentBody)
-
-          Object.entries(ret.users).forEach(([_, u]) => {
-            delete u.email // don't return email to non-admin users
-          })
+          // sanitize data for non-admin users
+          for (let k in ret.comments) {
+            ret.comments[k] = sanitizeCommentDataForNonAdminUsers(
+              ret.comments[k],
+            )
+          }
+          for (let k in ret.users) {
+            ret.users[k] = sanitizeUserDataForNonAdminUsers(ret.users[k])
+          }
 
           return ret
         })
@@ -423,7 +427,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
     )
 }
 
-const sanitizeCommentBody = (comment: Comment): Comment => {
+const sanitizeCommentDataForNonAdminUsers = (comment: Comment): Comment => {
   if (comment.status === CommentStatus.Moderation) {
     comment.body = "[awaiting moderation]"
   } else if (comment.status === CommentStatus.Deleted) {
@@ -431,4 +435,9 @@ const sanitizeCommentBody = (comment: Comment): Comment => {
   }
 
   return comment
+}
+
+const sanitizeUserDataForNonAdminUsers = (user: CommentUser): CommentUser => {
+  delete user.email // don't return email to non-admin users
+  return user
 }

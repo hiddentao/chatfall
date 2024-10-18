@@ -2,6 +2,7 @@ import { Sort } from "@chatfall/server"
 import { FC, useMemo } from "react"
 import { useGlobalContext } from "../contexts/global"
 import { type ClientStore } from "../store/client"
+import { cn } from "../utils/ui"
 import { CommentInputModal } from "./CommentInputModal"
 import { CommentListBase, CommentListBaseProps } from "./CommentListBase"
 
@@ -21,6 +22,7 @@ export const CommentList: FC = () => {
         <DefaultCommentFilters
           setIsLoading={setIsLoading}
           setError={setError}
+          hideLabelOnSmallScreens={true}
         />
       )
     }
@@ -43,22 +45,25 @@ export const CommentList: FC = () => {
       title={title}
       showHeader={true}
       bodyClassName="px-2"
+      headerClassName="h-16"
       renderHeaderContent={renderHeaderContent}
       renderPreCommentContent={renderPreCommentContent}
     />
   )
 }
 
-interface CommentFiltersProps {
+interface DefaultCommentFiltersProps {
   url?: string
   setIsLoading: (isLoading: boolean) => void
   setError: (error: string) => void
+  hideLabelOnSmallScreens?: boolean
 }
 
-export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
+export const DefaultCommentFilters: FC<DefaultCommentFiltersProps> = ({
   setIsLoading,
   setError,
   url,
+  hideLabelOnSmallScreens = false,
 }) => {
   const { store } = useGlobalContext<ClientStore>()
   const { fetchComments, rootList } = store.useStore()
@@ -77,8 +82,13 @@ export const DefaultCommentFilters: FC<CommentFiltersProps> = ({
   }
 
   return (
-    <div>
-      <label htmlFor="sort-select" className="mr-2 hidden sm:inline-block">
+    <div className="flex flex-row items-center">
+      <label
+        htmlFor="sort-select"
+        className={cn("mr-2 inline-block", {
+          "hidden sm:inline-block": hideLabelOnSmallScreens,
+        })}
+      >
         Sort:
       </label>
       <select

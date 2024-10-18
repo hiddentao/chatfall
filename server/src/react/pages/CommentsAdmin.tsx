@@ -16,7 +16,8 @@ import type { ServerStore } from "../store/server"
 const selectStyles = {
   container: (provided: any) => ({
     ...provided,
-    minWidth: "400px",
+    minWidth: "300px",
+    color: "black",
   }),
 }
 
@@ -83,10 +84,9 @@ export const CommentsAdmin: FC = () => {
       )
       return (
         <>
-          <div className="h-2" />
           {hasCommentsAtMultipleDepths && (
-            <div role="alert" className="mb-4 alert alert-warning italic">
-              <span>
+            <div role="alert" className="mb-8 alert alert-warning italic">
+              <span className="text-left">
                 Note: These filtered results include comments and replies at
                 multiple depths.
               </span>
@@ -148,12 +148,11 @@ export const CommentsAdmin: FC = () => {
                 title=""
                 className="w-full"
                 url={selectedUrl}
-                disableDefaultItemActions={true}
-                disableAnimatedNumber={true}
+                isAdminView={true}
                 showHeader={true}
                 renderHeaderContent={renderHeaderContent}
                 renderPreCommentContent={renderPreCommentContent}
-                headerClassName="justify-center"
+                headerClassName="justify-start md:justify-center mb-4"
                 floatingHeader={true}
                 renderExtraControls={renderExtraControls}
                 renderWrapper={renderWrapper}
@@ -233,7 +232,7 @@ const CommentFilters: FC<CommentFiltersProps> = ({
   }, [searchInput, search, filterBySearch])
 
   return (
-    <div className="flex flex-row text-sm">
+    <div className="flex flex-col md:flex-row text-sm">
       <div>
         <DefaultCommentFilters
           url={selectedUrl}
@@ -241,8 +240,8 @@ const CommentFilters: FC<CommentFiltersProps> = ({
           setError={setError}
         />
       </div>
-      <div className="ml-8">
-        <span className="mr-2">Status:</span>
+      <div className="flex flex-row items-center mt-2 md:mt-0 md:ml-8">
+        <span className="mr-2 inline-block">Status:</span>
         <select
           className="select select-sm rounded-md text-base-content"
           value={selectedStatus}
@@ -256,12 +255,12 @@ const CommentFilters: FC<CommentFiltersProps> = ({
           ))}
         </select>
       </div>
-      <div className="ml-8">
-        <span className="mr-2">Search:</span>
+      <div className="flex flex-row items-center mt-2 md:mt-0 md:ml-8">
+        <span className="mr-2 inline-block">Search:</span>
         <input
           type="text"
           placeholder="Comments/users"
-          className="input input-sm input-bordered text-base-content sm:w-72 w-40"
+          className="input input-sm input-bordered text-base-content w-64"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />

@@ -88,11 +88,11 @@ const AppRoutes = () => {
         <div className="dropdown dropdown-bottom sm:hidden">
           <label tabIndex={0} className="btn m-1">
             {menuText}
-            <DropdownArrowSvg />
+            <DropdownArrowSvg className="w-4 h-4" />
           </label>
           <ul
             tabIndex={0}
-            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
           >
             {navLinks.map((link, index) => (
               <li key={index}>

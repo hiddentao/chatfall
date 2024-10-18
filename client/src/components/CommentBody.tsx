@@ -1,22 +1,35 @@
 import { Comment, CommentStatus } from "@chatfall/server"
-import { FC, useMemo } from "react"
+import { FC, ReactNode, useMemo } from "react"
 
-export const CommentBody: FC<{ comment: Comment }> = ({ comment }) => {
+export const CommentBody: FC<{ comment: Comment; isAdminView?: boolean }> = ({
+  comment,
+  isAdminView,
+}) => {
   const formattedBody = useMemo(() => {
+    let lines: ReactNode[] = []
+
+    const isVisible = comment.status === CommentStatus.Visible
+
+    if (isAdminView || isVisible) {
+      lines = comment.body.split("\n").map((line, i) => (
+        <p key={i} className="mb-1">
+          {line || <br />}
+        </p>
+      ))
+    }
+
     if (comment.status === CommentStatus.Deleted) {
-      return <p className="italic text-gray-500">[deleted]</p>
+      lines.unshift(<p className="italic text-gray-500">[deleted]</p>)
     }
 
     if (comment.status === CommentStatus.Moderation) {
-      return <p className="italic text-gray-500">[awaiting moderation]</p>
+      lines.unshift(
+        <p className="italic text-gray-500">[awaiting moderation]</p>,
+      )
     }
 
-    return comment.body.split("\n").map((line, i) => (
-      <p key={i} className="mb-1">
-        {line || <br />}
-      </p>
-    ))
-  }, [comment.body, comment.status])
+    return lines
+  }, [comment.body, isAdminView, comment.status])
 
   return <div>{formattedBody}</div>
 }
