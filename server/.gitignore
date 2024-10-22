@@ -12,3 +12,6 @@ drizzle
 # local db file
 local.db
 *.local.db
+
+# build
+dist
