@@ -251,7 +251,7 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
                 {creatingAdmin ? (
                   <p className="border-gray-500 border rounded-md p-4 text-lg mb-4">
                     Since you are the first user to sign up, you will become the
-                    administrator of this Chatfall instance!
+                    administrator of this Chatfall server!
                   </p>
                 ) : null}
                 <LoginEmailForm

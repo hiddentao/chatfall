@@ -1,5 +1,6 @@
 {
   "name": "@chatfall/chatfall",
+  "version": "0.0.1",
   "workspaces": ["client", "server"],
   "scripts": {
     "dev": "turbo run dev",

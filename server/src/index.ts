@@ -35,7 +35,7 @@ const program = new Command()
 
 program
   .name("chatfall")
-  .description("Chatfall commenting system")
+  .description("Chatfall commenting server")
   .version(CHATFALL_VERSION)
 
 program
@@ -50,12 +50,12 @@ program
   .description("Setup and/or upgrade your database to the latest table schema")
   .action(async () => {
     await migrateDb()
+    process.exit(0)
   })
 
 // entry point
 ;(async function main() {
   await program.parseAsync(process.argv)
-  process.exit(0)
 })().catch((error) => {
   console.error("Error:", error)
   process.exit(1)

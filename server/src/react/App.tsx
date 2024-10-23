@@ -25,7 +25,7 @@ export const App = ({ path }: { path: string }) => {
                   name="viewport"
                   content="width=device-width, initial-scale=1"
                 />
-                <link rel="stylesheet" href="/public/client.css" />
+                <link rel="stylesheet" href="/public/frontend.css" />
                 <script
                   type="text/javascript"
                   dangerouslySetInnerHTML={{

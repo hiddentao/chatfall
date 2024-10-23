@@ -1,11 +1,12 @@
 {
   "name": "@chatfall/server",
+  "version": "0.0.1",
   "private": true,
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development node scripts/build-client-dev.js & bun --hot --watch src/index.ts server",
-    "build": "NODE_ENV=production bun scripts/build-server-prod.ts",
+    "dev": "bun run scripts/dev.ts",
+    "build": "bun run scripts/build.ts",
     "start": "bun run dist/index.js",
     "db:migrate": "bun drizzle-kit generate --config ./src/db/drizzle.config.ts && bun drizzle-kit migrate --config ./src/db/drizzle.config.ts && bun run scripts/generate-migration-data.ts",
     "db:seed": "bun src/db/seed.ts",
@@ -36,7 +37,8 @@
     "esbuild-plugin-tailwindcss": "^1.2.1",
     "execa": "^9.4.1",
     "postcss-import": "^16.1.0",
-    "tailwindcss": "^3.4.10"
+    "tailwindcss": "^3.4.10",
+    "yargs": "^17.7.2"
   },
   "peerDependencies": {
     "typescript": "^5.5.3"

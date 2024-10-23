@@ -73,7 +73,7 @@ export const app = new Elysia({
     const app = createElement(App, { path: params["*"] })
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
-      bootstrapModules: ["/public/client.js"],
+      bootstrapModules: ["/public/frontend.js"],
     })
     // output the stream as the response
     return new Response(stream, {
