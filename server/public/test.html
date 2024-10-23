@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatfall server test</title>
-    <link rel="stylesheet" href="./lib/chatfall.css" />
+    <link rel="stylesheet" href="/chatfall.css" />
   </head>
   <body>
     <div id="root" />
     <script type="module">
-      import { Chatfall } from './lib/chatfall.es.js';
+      import { Chatfall } from '/chatfall.es.js';
       Chatfall.init({
         rootElement: document.getElementById('root'),
         server: location.origin,
@@ -17,4 +17,3 @@
     </script>
   </body>
 </html>
-

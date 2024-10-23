@@ -5,7 +5,7 @@ import { app } from "./app"
 import { migrate as migrateDb } from "./db/migrate"
 import { env } from "./env"
 
-const CHATFALL_VERSION = import.meta.require("../../package.json").version
+import { version as CHATFALL_VERSION } from "../../package.json"
 
 async function startServer() {
   const startTime = performance.now()

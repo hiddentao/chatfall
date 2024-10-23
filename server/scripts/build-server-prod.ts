@@ -1,9 +1,14 @@
+import fs from "fs"
 import path from "path"
 import { transform } from "@svgr/core"
 import Bun, { type BunPlugin } from "bun"
 import { execa } from "execa"
 
-// shift the migration information into code
+// clean old files
+const distBinDir = path.resolve(__dirname, "../dist-bin")
+fs.readdirSync(distBinDir).forEach((file) => {
+  fs.unlinkSync(path.join(distBinDir, file))
+})
 
 const svg: BunPlugin = {
   name: "SVG React Loader",
@@ -63,7 +68,7 @@ for (const platform of platforms) {
       path.resolve(__dirname, "../dist/index.js"),
       "--compile",
       "--outfile",
-      path.resolve(__dirname, `../dist/chatfall-${platform.name}`),
+      path.resolve(__dirname, `../dist-bin/chatfall-${platform.name}`),
       "--target",
       platform.target,
     ])

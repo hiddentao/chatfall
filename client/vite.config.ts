@@ -26,7 +26,7 @@ export default defineConfig(({ command }) => {
         build: {
           cssMinify: true,
           minify: "esbuild",
-          outDir: "./dist/lib",
+          outDir: "./dist",
           lib: {
             entry: "src/scaffold/index.tsx",
             formats: ["es"],

@@ -19,7 +19,8 @@ async function runDevCommand() {
     },
   )
 
-  await Promise.all([serverFrontendBuildProcess, serverProcess])
+  await serverFrontendBuildProcess
+  await serverProcess
 }
 
 runDevCommand().catch(console.error)

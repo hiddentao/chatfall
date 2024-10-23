@@ -15,7 +15,8 @@ async function runBuildCommand() {
     stdio: "inherit",
   })
 
-  await Promise.all([serverFrontendBuildProcess, serverBuildProcess])
+  await serverFrontendBuildProcess
+  await serverBuildProcess
 }
 
 runBuildCommand().catch(console.error)
