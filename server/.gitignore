@@ -18,4 +18,4 @@ dist
 dist-bin
 
 # Add this line to the existing .gitignore file
-src/db/migration-data.ts
+*.generated.ts

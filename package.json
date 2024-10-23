@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "workspaces": ["client", "server"],
   "scripts": {
-    "dev": "turbo run dev",
-    "check": "turbo run check",
+    "check": "bun run scripts/check.ts",
     "prepare": "husky",
     "create-release": "bun run scripts/create-release-pr.ts"
   },

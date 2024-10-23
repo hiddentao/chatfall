@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
   "files": {
-    "ignore": ["node_modules", "**/node_modules", "**/dist", "**/public"]
+    "ignore": [
+      "node_modules",
+      "**/node_modules",
+      "**/dist",
+      "**/dist-bin",
+      "**/public",
+      "**/*.generated.ts"
+    ]
   },
   "formatter": {
     "indentStyle": "space",
@@ -68,7 +75,7 @@
         "noDuplicateObjectKeys": "error",
         "noDuplicateParameters": "error",
         "noEmptyBlockStatements": "error",
-        "noExplicitAny": "warn",
+        "noExplicitAny": "off",
         "noExtraNonNullAssertion": "error",
         "noFallthroughSwitchClause": "error",
         "noFunctionAssign": "error",

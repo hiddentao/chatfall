@@ -203,6 +203,7 @@ export const useForm = (options: FormOptions): FormApi => {
     [debouncedValidateAsync, options],
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We use version as a more reliable trigger for validation
   useEffect(() => {
     validate(fields)
   }, [

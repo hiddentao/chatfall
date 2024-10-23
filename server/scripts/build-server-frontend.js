@@ -87,7 +87,7 @@ build().catch((err) => {
 
 const writePublicFilesToCode = () => {
   const publicDir = path.resolve(__dirname, "../public")
-  const outputFile = path.resolve(__dirname, "../src/public.ts")
+  const outputFile = path.resolve(__dirname, "../src/public.generated.ts")
   const paths = {}
 
   const getMimeType = (ext) => {

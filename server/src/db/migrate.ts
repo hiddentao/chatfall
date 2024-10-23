@@ -4,7 +4,7 @@ import { migrate as drizzleMigrate } from "drizzle-orm/node-postgres/migrator"
 import pc from "picocolors"
 import tempDir from "temp-dir"
 import { db } from "./index"
-import { migrationData } from "./migration-data"
+import { migrationData } from "./migration-data.generated"
 
 export const migrate = async () => {
   const migrationsFolder = path.join(

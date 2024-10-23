@@ -69,12 +69,8 @@
           "name": "comment_ratings_user_id_users_id_fk",
           "tableFrom": "comment_ratings",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -82,12 +78,8 @@
           "name": "comment_ratings_comment_id_comments_id_fk",
           "tableFrom": "comment_ratings",
           "tableTo": "comments",
-          "columnsFrom": [
-            "comment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["comment_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -240,12 +232,8 @@
           "name": "comments_user_id_users_id_fk",
           "tableFrom": "comments",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -253,12 +241,8 @@
           "name": "comments_post_id_posts_id_fk",
           "tableFrom": "comments",
           "tableTo": "posts",
-          "columnsFrom": [
-            "post_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["post_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -320,9 +304,7 @@
         "posts_url_unique": {
           "name": "posts_url_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "url"
-          ]
+          "columns": ["url"]
         }
       }
     },
@@ -386,9 +368,7 @@
         "settings_key_unique": {
           "name": "settings_key_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "key"
-          ]
+          "columns": ["key"]
         }
       }
     },
@@ -466,9 +446,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       }
     }
@@ -477,20 +455,12 @@
     "public.commentStatus": {
       "name": "commentStatus",
       "schema": "public",
-      "values": [
-        "Visible",
-        "Moderation",
-        "Deleted"
-      ]
+      "values": ["Visible", "Moderation", "Deleted"]
     },
     "public.userStatus": {
       "name": "userStatus",
       "schema": "public",
-      "values": [
-        "Active",
-        "Blacklisted",
-        "Deleted"
-      ]
+      "values": ["Active", "Blacklisted", "Deleted"]
     }
   },
   "schemas": {},

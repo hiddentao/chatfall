@@ -3,7 +3,7 @@ import path from "path"
 
 const drizzleDir = path.resolve(__dirname, "../src/db/migrations")
 const dbDir = path.resolve(__dirname, "../src/db")
-const outputFile = path.resolve(dbDir, "migration-data.ts")
+const outputFile = path.resolve(dbDir, "migration-data.generated.ts")
 
 function readDrizzleFiles(): { [key: string]: string } {
   const files: { [key: string]: string } = {}
