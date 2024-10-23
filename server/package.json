@@ -4,10 +4,8 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development node scripts/build-client.js & bun --hot --watch src/index.ts",
-    "build:client": "NODE_ENV=production bun scripts/build-client.js",
-    "build:server": "NODE_ENV=production bun scripts/build-server.ts",
-    "build:all": "bun build:client && bun build:server",
+    "dev": "NODE_ENV=development node scripts/build-client-dev.js & bun --hot --watch src/index.ts",
+    "build": "NODE_ENV=production bun scripts/build-server-prod.ts",
     "start": "bun run dist/index.js",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
@@ -41,6 +39,7 @@
     "esbuild-plugin-svgr": "^2.1.0",
     "esbuild-plugin-tailwind": "^0.1.0",
     "esbuild-plugin-tailwindcss": "^1.2.1",
+    "execa": "^9.4.1",
     "postcss-import": "^16.1.0",
     "tailwindcss": "^3.4.10"
   },

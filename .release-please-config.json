@@ -1,0 +1,33 @@
+{
+  "packages": {
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "node",
+      "package-name": "chatfall",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "include-component-in-tag": true
+    },
+    "client": {
+      "release-type": "node",
+      "package-name": "@chatfall/client"
+    },
+    "server": {
+      "release-type": "node",
+      "package-name": "@chatfall/server"
+    }
+  },
+  "changelog-sections": [
+    {"type": "feat", "section": "Features", "hidden": false},
+    {"type": "fix", "section": "Bug Fixes", "hidden": false},
+    {"type": "chore", "section": "Miscellaneous", "hidden": false},
+    {"type": "docs", "section": "Miscellaneous", "hidden": false},
+    {"type": "perf", "section": "Miscellaneous", "hidden": false},
+    {"type": "style", "section": "Miscellaneous", "hidden": false},
+    {"type": "refactor", "section": "Miscellaneous", "hidden": false},
+    {"type": "build", "section": "Miscellaneous", "hidden": false}
+  ],
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
