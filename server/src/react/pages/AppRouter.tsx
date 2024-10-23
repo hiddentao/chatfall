@@ -108,10 +108,18 @@ const AppRoutes = () => {
         {navLinks.map((link) => (
           <Route key={link.to} path={link.to} element={link.element} />
         ))}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )
 }
+
+const NotFound = () => (
+  <div className="text-center mt-8">
+    <h2 className="text-2xl font-bold mb-4">404 - Page Not Found</h2>
+    <p>The page you're looking for doesn't exist.</p>
+  </div>
+)
 
 export const AppRouter: FC<{ path: string; config: Config }> = ({
   path,
