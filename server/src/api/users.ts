@@ -86,8 +86,8 @@ export const createUserRoutes = (ctx: GlobalContext) => {
 
           await ctx.mailer.send({
             to: email,
-            subject: "Verify your email",
-            text: `Your verification code is: ${data.code}`,
+            subject: "Chatfall: verify your email",
+            text: `Your Chatfall verification code is: ${data.code}`,
           })
 
           return {

@@ -10,8 +10,8 @@ async function runBuild(directory: string) {
 
 async function createReleasePR() {
   try {
-    await runBuild("server")
     await runBuild("client")
+    await runBuild("server")
 
     console.log("Creating release PR...")
     const { stdout } = await execa("bunx", [
@@ -22,9 +22,8 @@ async function createReleasePR() {
       "--manifest-file",
       ".release-please-manifest.json",
       "--repo-url",
-      "github.com/hiddentao/chatfall",
+      "git@github.com:hiddentao/chatfall.git",
       "--monorepo-tags",
-      "--include-component-in-tag",
     ])
 
     console.log(stdout)
