@@ -3,6 +3,8 @@ import { transform } from "@svgr/core"
 import Bun, { type BunPlugin } from "bun"
 import { execa } from "execa"
 
+// shift the migration information into code
+
 const svg: BunPlugin = {
   name: "SVG React Loader",
   setup(build) {
@@ -33,7 +35,7 @@ const result = await Bun.build({
   entrypoints: [path.resolve(__dirname, "../src/index.ts")],
   outdir: path.resolve(__dirname, "../dist"),
   target: "bun",
-  sourcemap: "external",
+  sourcemap: "inline",
   minify: true,
   plugins: [svg],
 })
@@ -58,10 +60,10 @@ for (const platform of platforms) {
   try {
     await execa("bun", [
       "build",
-      "./dist/index.js",
+      path.resolve(__dirname, "../dist/index.js"),
       "--compile",
       "--outfile",
-      `dist/chatfall-${platform.name}`,
+      path.resolve(__dirname, `../dist/chatfall-${platform.name}`),
       "--target",
       platform.target,
     ])

@@ -14,6 +14,7 @@ import {
 } from "./types"
 
 export class SettingsManager {
+  private loaded: boolean = false
   private log: LogInterface
   private db: Database
   private settings: Record<string, SettingValueRaw> = {
@@ -28,10 +29,13 @@ export class SettingsManager {
   constructor(cfg: { db: Database; log: LogInterface; cron: Cron }) {
     this.log = cfg.log
     this.db = cfg.db
-    this._reload()
   }
 
   private async _reload() {
+    if (this.loaded) {
+      return
+    }
+
     this.log.debug(`Loading settings`)
 
     const rows = await this.db.select().from(settings)
@@ -42,17 +46,23 @@ export class SettingsManager {
         return acc
       }, this.settings)
     }
+
+    this.loaded = true
   }
 
   public getSetting<K extends Setting>(key: K): SettingValue<K> {
+    this._reload()
     return this.settings[key] as SettingValue<K>
   }
 
   public getSettings(): Settings {
+    this._reload()
     return { ...this.settings } as Settings
   }
 
   public async setSetting<K extends Setting>(key: K, value: SettingValue<K>) {
+    this._reload()
+
     const now = dateNow()
 
     const admin = await getAdminUser(this.db)

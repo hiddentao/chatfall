@@ -13,7 +13,7 @@ client.connect().catch((err) => {
 
 export const db = drizzle(client, {
   schema,
-  logger: true,
+  logger: process.env.NODE_ENV === "development",
 })
 
 export type Database = typeof db

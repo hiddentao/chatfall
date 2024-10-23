@@ -3,7 +3,7 @@ import { execa } from "execa"
 
 async function runBuild(directory: string) {
   console.log(`Running build in ${directory}...`)
-  await execa("bun", ["build"], {
+  await execa("bun", ["run", "build"], {
     cwd: path.join(process.cwd(), directory),
   })
 }
