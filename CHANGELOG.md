@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.3...chatfall-v0.4.4) (2024-10-24)
+
+
+### Miscellaneous
+
+* publish the release when a new release tag gets added ([8408814](https://github.com/hiddentao/chatfall/commit/8408814a4345f0f54d838b01d642a56d964ed939))
+
 ## [0.4.3](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.2...chatfall-v0.4.3) (2024-10-24)
 
 
