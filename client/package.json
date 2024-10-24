@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "bunx --bun vite",
-    "build": "tsc -b && vite build && cp -rf ./dist/* ../server/public/",
+    "build": "bun run scripts/build.ts",
     "bundle:analyze": "bunx vite-bundle-visualizer",
     "format": "biome format",
     "format:write": "biome format --write",
