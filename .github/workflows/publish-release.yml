@@ -1,13 +1,16 @@
-name: Create release
+name: Publish Release
 
-on: [workflow_dispatch]
+on:
+  pull_request:
+    types:
+      - closed
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
-  create-release:
+  publish-release:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,15 +23,13 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
-
       - name: Build
         run: bun run build
 
-      - uses: googleapis/release-please-action@v4
+      - name: Create GitHub Release
+        uses: googleapis/release-please-action@v4
         with:
+          skip-github-pull-request: true
           config-file: release-please-config.json
           manifest-file: release-please-manifest.json
           repo-url: hiddentao/chatfall
-          skip-github-release: true
