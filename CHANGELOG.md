@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/hiddentao/chatfall/compare/chatfall-v0.2.0...chatfall-v0.2.1) (2024-10-24)
+
+
+### Miscellaneous
+
+* refactor the release script ([262662c](https://github.com/hiddentao/chatfall/commit/262662cc9f9f4cb4566bd8d1f0f398b9c27d50d1))
+
 ## [0.2.0](https://github.com/hiddentao/chatfall/compare/chatfall-v0.1.0...chatfall-v0.2.0) (2024-10-24)
 
 
