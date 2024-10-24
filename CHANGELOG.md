@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.0...chatfall-v0.4.1) (2024-10-24)
+
+
+### Bug Fixes
+
+* enable release-please to write to the PR ([47eb4b9](https://github.com/hiddentao/chatfall/commit/47eb4b9a5a59d2b62b89f83c43d040fc0d1ee229))
+
 ## [0.4.0](https://github.com/hiddentao/chatfall/compare/chatfall-v0.3.0...chatfall-v0.4.0) (2024-10-24)
 
 
