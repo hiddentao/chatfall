@@ -1,15 +1,16 @@
 import { execa } from "execa"
 
-async function runBuildCommand() {
-  await execa("bun", ["scripts/build-server-frontend.js"], {
-    env: { NODE_ENV: "production" },
-    stdio: "inherit",
-  })
+const commonOptions = {
+  env: { NODE_ENV: "production" },
+  stdio: "inherit",
+} as any
 
-  await execa("bun", ["scripts/build-server-prod.ts"], {
-    env: { NODE_ENV: "production" },
-    stdio: "inherit",
-  })
+async function runBuildCommand() {
+  await execa("bun", ["scripts/generate-migration-data.ts"], commonOptions)
+
+  await execa("bun", ["scripts/build-server-frontend.js"], commonOptions)
+
+  await execa("bun", ["scripts/build-server-prod.ts"], commonOptions)
 }
 
 runBuildCommand()
