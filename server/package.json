@@ -5,6 +5,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "prepare": "bun run scripts/prepare.ts",
     "dev": "bun run scripts/dev.ts",
     "build": "bun run scripts/build.ts",
     "start": "bun run dist/index.js",
