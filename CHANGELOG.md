@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.2](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.1...chatfall-v0.4.2) (2024-10-24)
+
+
+### Bug Fixes
+
+* build failing because migration data script not yet generated ([93efa3f](https://github.com/hiddentao/chatfall/commit/93efa3f46a1592abbcd612d977d1ba536a252ce7))
+
+
+### Miscellaneous
+
+* upload release artifacts to release tag ([0f67d1a](https://github.com/hiddentao/chatfall/commit/0f67d1afc6096fbe267228167e1c99cf4497c406))
+
 ## [0.4.1](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.0...chatfall-v0.4.1) (2024-10-24)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@chatfall/chatfall",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "workspaces": [
     "client",
     "server"
