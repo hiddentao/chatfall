@@ -6,9 +6,9 @@
     "server"
   ],
   "scripts": {
-    "check": "bun run scripts/check.ts",
     "prepare": "husky",
-    "create-release": "bun run scripts/create-release.ts",
+    "check": "bun run scripts/check.ts",
+    "build": "bun run scripts/build.ts",
     "finalize-release": "bun run scripts/finalize-release.ts"
   },
   "devDependencies": {

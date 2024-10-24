@@ -10,29 +10,10 @@ async function runBuild(directory: string) {
   console.log(pc.green(`Build completed in ${directory}`))
 }
 
-async function createRelease() {
+async function buildAll() {
   try {
     await runBuild("client")
     await runBuild("server")
-
-    console.log(pc.blue("Creating release PR..."))
-    const { stdout } = await execa("bunx", [
-      "release-please",
-      "release-pr",
-      "--token",
-      `${process.env.GITHUB_TOKEN}`,
-      "--config-file",
-      "release-please-config.json",
-      "--manifest-file",
-      "release-please-manifest.json",
-      "--repo-url",
-      "hiddentao/chatfall",
-      "--monorepo-tags",
-    ])
-
-    console.log(stdout)
-
-    console.log(pc.magenta("Release PR process completed."))
   } catch (error) {
     console.error(pc.red("Error creating release PR:"), error)
     if (error instanceof Error) {
@@ -42,4 +23,4 @@ async function createRelease() {
   }
 }
 
-createRelease()
+buildAll()

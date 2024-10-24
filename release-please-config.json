@@ -1,14 +1,14 @@
 {
+  "release-type": "node",
+  "bump-minor-pre-major": false,
+  "bump-patch-for-minor-pre-major": false,
+  "draft": false,
+  "prerelease": false,
+  "include-component-in-tag": true,
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
-      "release-type": "node",
       "package-name": "chatfall",
-      "bump-minor-pre-major": false,
-      "bump-patch-for-minor-pre-major": false,
-      "draft": false,
-      "prerelease": false,
-      "include-component-in-tag": true,
       "extra-files": [
         "client/dist/*",
         "server/dist-bin/*",
