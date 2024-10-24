@@ -17,6 +17,8 @@ async function createReleasePR() {
     const { stdout } = await execa("bunx", [
       "release-please",
       "release-pr",
+      "--token",
+      `${process.env.GITHUB_TOKEN}`,
       "--config-file",
       "release-please-config.json",
       "--manifest-file",
