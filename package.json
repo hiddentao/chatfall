@@ -1,7 +1,10 @@
 {
   "name": "@chatfall/chatfall",
-  "version": "0.0.1",
-  "workspaces": ["client", "server"],
+  "version": "0.2.0",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "check": "bun run scripts/check.ts",
     "prepare": "husky",
