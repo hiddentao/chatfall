@@ -8,15 +8,12 @@
       "bump-patch-for-minor-pre-major": false,
       "draft": false,
       "prerelease": false,
-      "include-component-in-tag": true
-    },
-    "client": {
-      "release-type": "node",
-      "package-name": "@chatfall/client"
-    },
-    "server": {
-      "release-type": "node",
-      "package-name": "@chatfall/server"
+      "include-component-in-tag": true,
+      "extra-files": [
+        "client/dist/*",
+        "server/dist-bin/*",
+        "server/dist/index.js"
+      ]
     }
   },
   "changelog-sections": [

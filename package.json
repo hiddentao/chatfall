@@ -5,7 +5,8 @@
   "scripts": {
     "check": "bun run scripts/check.ts",
     "prepare": "husky",
-    "create-release": "bun run scripts/create-release-pr.ts"
+    "create-release": "bun run scripts/create-release.ts",
+    "finalize-release": "bun run scripts/finalize-release.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
