@@ -23,6 +23,9 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
       - name: Build
         run: bun run build
 
