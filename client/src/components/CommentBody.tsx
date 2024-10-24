@@ -1,5 +1,6 @@
 import { Comment, CommentStatus } from "@chatfall/server"
 import { FC, ReactNode, useMemo } from "react"
+import { cn } from "../utils/ui"
 
 export const CommentBody: FC<{ comment: Comment; isAdminView?: boolean }> = ({
   comment,
@@ -12,19 +13,30 @@ export const CommentBody: FC<{ comment: Comment; isAdminView?: boolean }> = ({
 
     if (isAdminView || isVisible) {
       lines = comment.body.split("\n").map((line, i) => (
-        <p key={i} className="mb-1">
+        <p
+          key={i}
+          className={cn("mb-1", {
+            "line-through": comment.status === CommentStatus.Deleted,
+          })}
+        >
           {line || <br />}
         </p>
       ))
     }
 
     if (comment.status === CommentStatus.Deleted) {
-      lines.unshift(<p className="italic text-gray-500">[deleted]</p>)
+      lines.unshift(
+        <p key="deleted" className="italic text-gray-500">
+          [deleted]
+        </p>,
+      )
     }
 
     if (comment.status === CommentStatus.Moderation) {
       lines.unshift(
-        <p className="italic text-gray-500">[awaiting moderation]</p>,
+        <p key="moderation" className="italic text-gray-500">
+          [awaiting moderation]
+        </p>,
       )
     }
 

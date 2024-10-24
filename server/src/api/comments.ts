@@ -336,7 +336,6 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
             sort,
             limit,
             userId: user?.id,
-            status: [CommentStatus.Visible, CommentStatus.Moderation],
           })
 
           // sanitize data for non-admin users
