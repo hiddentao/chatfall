@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/hiddentao/chatfall/compare/chatfall-v0.2.1...chatfall-v0.2.2) (2024-10-24)
+
+
+### Bug Fixes
+
+* build client files first to avoid race conditions in further build ([e625dfb](https://github.com/hiddentao/chatfall/commit/e625dfbc4151c4ef385f15d0cab58a6d8ecbef27))
+
+
+### Miscellaneous
+
+* create github workflow to create a release ([f401cda](https://github.com/hiddentao/chatfall/commit/f401cdaac5444c0b1b25fa8deea87a18390e66ea))
+
 ## [0.2.1](https://github.com/hiddentao/chatfall/compare/chatfall-v0.2.0...chatfall-v0.2.1) (2024-10-24)
 
 
