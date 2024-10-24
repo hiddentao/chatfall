@@ -74,15 +74,21 @@ const build = async () => {
 
   for (const platform of platforms) {
     try {
+      const outfile = path.resolve(
+        __dirname,
+        `../dist-bin/chatfall-${platform.name}`,
+      )
+
       await execa("bun", [
         "build",
         path.resolve(__dirname, "../dist/chatfall-server.js"),
         "--compile",
         "--outfile",
-        path.resolve(__dirname, `../dist-bin/chatfall-${platform.name}`),
+        outfile,
         "--target",
         platform.target,
       ])
+
       console.log(`Built executable for ${platform.name}`)
     } catch (error) {
       console.error(`Failed to build for ${platform.name}:`, error)
