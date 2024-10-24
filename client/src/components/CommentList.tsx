@@ -1,55 +1,109 @@
 import { Sort } from "@chatfall/server"
-import React from "react"
-import { useCallback } from "react"
-import { useCommentsStore } from "../shared/comments.store"
+import { FC, useMemo } from "react"
+import { useGlobalContext } from "../contexts/global"
+import { type ClientStore } from "../store/client"
+import { cn } from "../utils/ui"
+import { CommentInputModal } from "./CommentInputModal"
+import { CommentListBase, CommentListBaseProps } from "./CommentListBase"
 
-export default function CommentList() {
-  const { comments, users, fetchComments, sort } = useCommentsStore()
+export const CommentList: FC = () => {
+  const {
+    store,
+    config: { title = "Comments" },
+  } = useGlobalContext<ClientStore>()
+  const { canonicalUrl } = store.useStore()
 
-  const handleSortChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      fetchComments(event.target.value as Sort)
-    },
-    [fetchComments],
-  )
+  const renderHeaderContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderHeaderContent"] = ({
+      setIsLoading,
+      setError,
+    }) => {
+      return (
+        <DefaultCommentFilters
+          setIsLoading={setIsLoading}
+          setError={setError}
+          hideLabelOnSmallScreens={true}
+        />
+      )
+    }
+
+    return fn
+  }, [])
+
+  const renderPreCommentContent = useMemo(() => {
+    const fn: CommentListBaseProps["renderPreCommentContent"] = () => {
+      return canonicalUrl ? (
+        <CommentInputModal className="mt-4 mb-8 mx-2 sm:mx-6" />
+      ) : null
+    }
+
+    return fn
+  }, [canonicalUrl])
 
   return (
-    <section className="flex flex-col gap-2">
-      <div className="flex justify-end">
-        <label htmlFor="sort-select" className="mr-2">
-          Sort By:
-        </label>
-        <select id="sort-select" value={sort} onChange={handleSortChange}>
-          <option value={Sort.newest_first}>Newest first</option>
-          <option value={Sort.oldest_first}>Oldest first</option>
-          <option value={Sort.highest_score}>Highest rated</option>
-          <option value={Sort.lowest_score}>Lowest rated</option>
-          <option value={Sort.most_replies}>Most replies</option>
-          <option value={Sort.least_replies}>Least replies</option>
-        </select>
-      </div>
-      {comments.length > 0 ? (
-        <ul className="flex flex-col gap-2">
-          {comments.map((c) => (
-            <li key={c.id} className="block">
-              <div className="flex flex-row">
-                <h3 className="font-bold">{users[c.userId].username}</h3>
-                <span className="text-gray-400 ml-2">{`${c.createdAt}`}</span>{" "}
-                {/* Display the selected sorting parameter */}
-                <span className="text-gray-800 ml-2">{`Rating: ${c.rating}`}</span>
-              </div>
-              <div>{c.body}</div>
-              {c.reply_count > 0 && (
-                <div className="mt-4">{`Replies: ${c.reply_count}`}</div>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-slate-500 text-center rounded-xl border-slate-400/40 border-2 p-3">
-          No comments
-        </p>
-      )}
-    </section>
+    <CommentListBase
+      title={title}
+      showHeader={true}
+      bodyClassName="px-2"
+      headerClassName="h-16"
+      renderHeaderContent={renderHeaderContent}
+      renderPreCommentContent={renderPreCommentContent}
+    />
+  )
+}
+
+interface DefaultCommentFiltersProps {
+  url?: string
+  setIsLoading: (isLoading: boolean) => void
+  setError: (error: string) => void
+  hideLabelOnSmallScreens?: boolean
+}
+
+export const DefaultCommentFilters: FC<DefaultCommentFiltersProps> = ({
+  setIsLoading,
+  setError,
+  url,
+  hideLabelOnSmallScreens = false,
+}) => {
+  const { store } = useGlobalContext<ClientStore>()
+  const { fetchComments, rootList } = store.useStore()
+
+  const fetchNewComments = async (s?: Sort) => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      await fetchComments({ sort: s, skipOverride: 0, url })
+    } catch (error: any) {
+      setError(error.toString())
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-row items-center">
+      <label
+        htmlFor="sort-select"
+        className={cn("mr-2 inline-block", {
+          "hidden sm:inline-block": hideLabelOnSmallScreens,
+        })}
+      >
+        Sort:
+      </label>
+      <select
+        id="sort-select"
+        value={rootList.sort}
+        className="select select-sm rounded-md text-base-content"
+        onChange={(e) => fetchNewComments(e.target.value as Sort)}
+      >
+        <option value={Sort.newestFirst}>Newest</option>
+        <option value={Sort.oldestFirst}>Oldest</option>
+        <option value={Sort.highestScore}>Highest rated</option>
+        <option value={Sort.lowestScore}>Lowest rated</option>
+        <option value={Sort.mostReplies}>Most replies</option>
+        <option value={Sort.leastReplies}>Least replies</option>
+      </select>
+    </div>
   )
 }

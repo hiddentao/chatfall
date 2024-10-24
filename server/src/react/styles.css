@@ -1,0 +1,17 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+    html {
+      @apply bg-base-100 text-base-content;
+    }
+  }
+  
+  @layer utilities {
+    .svg-container {
+      svg {
+        @apply fill-current w-full h-full m-auto;
+      }    
+    }
+}

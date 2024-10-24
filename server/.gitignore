@@ -12,3 +12,10 @@ drizzle
 # local db file
 local.db
 *.local.db
+
+# build
+dist
+dist-bin
+
+# Add this line to the existing .gitignore file
+*.generated.ts

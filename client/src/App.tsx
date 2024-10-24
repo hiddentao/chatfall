@@ -1,66 +1,44 @@
-import { Skull } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Toaster, toast } from "sonner"
-import CommentList from "./components/CommentList"
-import { useCommentsStore } from "./shared/comments.store"
+import { FC } from "react"
+import { CommentList } from "./components/CommentList"
+import "./global.css"
+import { GlobalProvider } from "./contexts/global"
+import { createStore } from "./store/client"
+import { Config, ThemeMode, ThemeNames } from "./types"
+import { updateCSSVariables } from "./utils/ui"
 
-function App() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
+export const createApp = (config: Config) => {
+  const store = createStore(config)
 
-  const { fetchComments } = useCommentsStore()
+  // override theme variables
+  if (config.darkThemeOverride?.colors) {
+    updateCSSVariables(
+      ThemeNames[ThemeMode.Dark],
+      config.darkThemeOverride.colors,
+    )
+  }
+  if (config.lightThemeOverride?.colors) {
+    updateCSSVariables(
+      ThemeNames[ThemeMode.Light],
+      config.lightThemeOverride.colors,
+    )
+  }
 
-  useEffect(() => {
-    fetchComments()
-      .then(() => {
-        setIsLoading(false)
-      })
-      .catch(() => {
-        setIsError(true)
-        setIsLoading(false)
+  // set light/dark mode theme
+  const useDarkMode =
+    config.mode === ThemeMode.Dark ||
+    (config.mode === undefined &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  document.documentElement.dataset.theme = useDarkMode
+    ? ThemeNames[ThemeMode.Dark]
+    : ThemeNames[ThemeMode.Light]
 
-        toast.error("Could not fetch comments", {
-          id: "unable-to-fetch-comments",
-        })
-      })
-  }, [fetchComments])
+  const App: FC = () => {
+    return (
+      <GlobalProvider store={store} config={config}>
+        <CommentList />
+      </GlobalProvider>
+    )
+  }
 
-  return (
-    <>
-      <header className="px-3 sm:px-4 py-4 mx-auto max-w-3xl">
-        <h1 className="text-2xl sm:text-3xl text-center underline underline-offset-8 decoration-wavy pb-4">
-          Comments
-        </h1>
-      </header>
-
-      {
-        /* Main */
-        !isLoading && !isError && (
-          <main className="flex flex-col gap-3 mx-auto max-w-3xl px-3 sm:px-4">
-            <h2 className="text-xl">Comment list</h2>
-            <CommentList />
-          </main>
-        )
-      }
-
-      {
-        /* Error */
-        !isLoading && isError && (
-          <main className="flex flex-col mx-auto max-w-3xl px-3 sm:px-4 mt-3">
-            <div className="flex flex-col items-center gap-2 text-center bg-slate-300 rounded-xl px-6 py-16">
-              <Skull size={60} />
-              <h2 className="text-2xl sm:text-4xl h-[3-vh] ">
-                Unable to fetch comments
-              </h2>
-              <p>Make sure server is up and running !</p>
-            </div>
-          </main>
-        )
-      }
-
-      <Toaster />
-    </>
-  )
+  return App
 }
-
-export default App

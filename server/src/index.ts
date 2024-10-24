@@ -1,32 +1,62 @@
+import { Command } from "commander"
 import pc from "picocolors"
 
 import { app } from "./app"
+import { migrate as migrateDb } from "./db/migrate"
 import { env } from "./env"
 
-const ELYSIA_VERSION = import.meta.require("elysia/package.json").version
+import { version as CHATFALL_VERSION } from "../../package.json"
 
-const startTime = performance.now()
+async function startServer() {
+  const startTime = performance.now()
 
-// clear screen
-process.stdout.write("\x1Bc\n")
+  // clear screen
+  process.stdout.write("\x1Bc\n")
 
-app.listen(
-  {
-    port: env.PORT,
-    hostname: env.HOSTNAME,
-  },
-  (server) => {
-    const duration = performance.now() - startTime
+  app.listen(
+    {
+      port: env.PORT,
+      hostname: env.HOSTNAME,
+    },
+    (server) => {
+      const duration = performance.now() - startTime
 
-    console.log(
-      `🦊 ${pc.green(`${pc.bold("Elysia")} v${ELYSIA_VERSION}`)} ${pc.gray("started in")} ${pc.bold(duration.toFixed(2))} ms\n`,
-    )
-    console.log(
-      `${pc.green(" ➜ ")} ${pc.bold("Server")}:   ${pc.cyan(String(server.url))}`,
-    )
-    console.log(
-      `${pc.green(" ➜ ")} ${pc.bold("Database")}: ${pc.cyan(env.DATABASE_URL)}`,
-      "\n",
-    )
-  },
-)
+      console.log(
+        `🦊 ${pc.green(`${pc.bold("Chatfall server")} v${CHATFALL_VERSION}`)} ${pc.gray("started in")} ${pc.bold(duration.toFixed(2))} ms\n`,
+      )
+      console.log(
+        `${pc.green(" ➜ ")} ${pc.bold("Running at")}:   ${pc.cyan(String(server.url))}`,
+      )
+    },
+  )
+}
+
+const program = new Command()
+
+program
+  .name("chatfall")
+  .description("Chatfall commenting server")
+  .version(CHATFALL_VERSION)
+
+program
+  .command("server")
+  .description("Start the Chatfall server")
+  .action(async () => {
+    await startServer()
+  })
+
+program
+  .command("migrate-db")
+  .description("Setup and/or upgrade your database to the latest table schema")
+  .action(async () => {
+    await migrateDb()
+    process.exit(0)
+  })
+
+// entry point
+;(async function main() {
+  await program.parseAsync(process.argv)
+})().catch((error) => {
+  console.error("Error:", error)
+  process.exit(1)
+})

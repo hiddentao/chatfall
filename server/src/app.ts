@@ -2,13 +2,92 @@ import cors from "@elysiajs/cors"
 import swagger from "@elysiajs/swagger"
 import { Elysia } from "elysia"
 
-import { api } from "./api"
-import { isProd } from "./env"
-import { logger } from "./lib/logger"
-import { pluginConditionally } from "./utils/elysia"
+// @ts-ignore
+import { renderToReadableStream } from "react-dom/server.browser"
 
-export const app = new Elysia()
-  .use(cors())
+import { Cron } from "cron-async"
+import { createElement } from "react"
+import { createApi } from "./api"
+import { db } from "./db"
+import { env, isProd } from "./env"
+import { verifyJwt } from "./lib/jwt"
+import { createLog, createRequestLogger } from "./lib/logger"
+import { Mailer } from "./lib/mailer"
+import { paths as publicPaths } from "./public.generated"
+import { App } from "./react/App"
+import { SettingsManager } from "./settings"
+import { pluginConditionally } from "./utils/elysia"
+import { SocketManager, createSocket } from "./ws"
+
+const log = createLog({
+  name: "@",
+  minlogLevel: env.LOG_LEVEL,
+})
+
+const mailer = new Mailer({
+  log: log.create("mailer"),
+  apiKey: env.MAILGUN_API_KEY,
+  fromAddress: env.MAILGUN_SENDER,
+})
+
+const cron = new Cron()
+
+const settings = new SettingsManager({ db, log, cron })
+
+const sockets = new SocketManager(log.create("sockets"))
+
+const ctx = { mailer, log, db, sockets, cron, settings }
+
+export const app = new Elysia({
+  websocket: {
+    idleTimeout: 120,
+    perMessageDeflate: true,
+  },
+})
+  .use(pluginConditionally(!isProd, createRequestLogger(log)))
+  .use(
+    cors({
+      origin: "*",
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  )
   .use(swagger())
-  .use(pluginConditionally(!isProd, logger))
-  .use(api)
+  .derive(async ({ headers }) => {
+    const auth = headers["authorization"]
+
+    const jwtToken = auth?.startsWith("Bearer ") ? auth.slice(7) : null
+    if (jwtToken) {
+      try {
+        const user = await verifyJwt(jwtToken)
+        return { user }
+      } catch (err) {
+        ctx.log.error(`Error verifying JWT token`, err)
+      }
+    }
+  })
+  .use(createApi(ctx))
+  .use(createSocket(ctx))
+  .get("/*", async ({ params, request }) => {
+    const p = params["*"]
+    if (`/${p}` in publicPaths) {
+      return new Response(publicPaths[`/${p}`].data, {
+        headers: { "Content-Type": publicPaths[`/${p}`].mimeType },
+      })
+    }
+
+    // create our react App component
+    const url = new URL(request.url)
+    const app = createElement(App, { path: params["*"], server: url.origin })
+
+    // render the app component to a readable stream
+    const stream = await renderToReadableStream(app, {
+      bootstrapModules: ["/frontend.js"],
+    })
+
+    // output the stream as the response
+    return new Response(stream, {
+      headers: { "Content-Type": "text/html" },
+    })
+  })
+
+export type ServerApp = typeof app

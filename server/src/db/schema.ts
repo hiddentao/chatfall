@@ -1,8 +1,8 @@
-import { Omit, type TObject } from "@sinclair/typebox"
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm"
 import {
   index,
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
@@ -10,14 +10,55 @@ import {
 } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-typebox"
 
+const enumToPgEnum = <T extends Record<string, any>>(
+  myEnum: T,
+): [T[keyof T], ...T[keyof T][]] => {
+  return Object.values(myEnum).map((value: any) => `${value}`) as any
+}
+
+export const settings = pgTable(
+  "settings",
+  {
+    id: serial("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    value: text("value").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => {
+    return {
+      settings_createdAt_index: index("settings_createdAt_index").on(
+        table.createdAt,
+      ),
+    }
+  },
+)
+
+export enum UserStatus {
+  Active = "Active",
+  Blacklisted = "Blacklisted",
+  Deleted = "Deleted",
+}
+export const userStatus = pgEnum("userStatus", enumToPgEnum(UserStatus))
+
 export const users = pgTable(
   "users",
   {
     id: serial("id").primaryKey(),
-    name: text("name").notNull().unique(),
+    name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    status: userStatus("status").notNull().default(UserStatus.Active),
+    lastLoggedIn: timestamp("last_logged_in", { mode: "string" }),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -38,9 +79,12 @@ export const posts = pgTable(
   {
     id: serial("id").primaryKey(),
     url: text("url").notNull().unique(),
-    title: text("title").notNull(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -52,6 +96,16 @@ export const posts = pgTable(
 export type Post = InferSelectModel<typeof posts>
 export type PostToInsert = InferInsertModel<typeof posts>
 
+export enum CommentStatus {
+  Visible = "Visible",
+  Moderation = "Moderation",
+  Deleted = "Deleted",
+}
+export const commentStatus = pgEnum(
+  "commentStatus",
+  enumToPgEnum(CommentStatus),
+)
+
 export const comments = pgTable(
   "comments",
   {
@@ -62,13 +116,18 @@ export const comments = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id),
+    status: commentStatus("status").notNull().default(CommentStatus.Visible),
     body: text("body").notNull(),
     depth: integer("depth").notNull().default(0),
     path: text("path").notNull(),
     rating: integer("rating").notNull().default(0),
-    reply_count: integer("reply_count").notNull().default(0),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    replyCount: integer("reply_count").notNull().default(0),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {
@@ -96,8 +155,12 @@ export const commentRatings = pgTable(
       .notNull()
       .references(() => comments.id),
     rating: integer("rating").notNull(),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => {
     return {

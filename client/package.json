@@ -1,10 +1,15 @@
 {
   "name": "@chatfall/client",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/exports.ts"
+  },
   "scripts": {
     "dev": "bunx --bun vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && cp -rf ./dist/* ../server/public/",
+    "bundle:analyze": "bunx vite-bundle-visualizer",
     "format": "biome format",
     "format:write": "biome format --write",
     "lint": "biome lint",
@@ -13,23 +18,40 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@elysiajs/eden": "^1.0.14",
-    "@tailwindcss/vite": "^4.0.0-alpha.17",
     "@chatfall/server": "workspace:*",
-    "lucide-react": "^0.407.0",
+    "@elysiajs/eden": "^1.0.14",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "p-debounce": "^4.0.0",
     "react": "^18.3.1",
+    "react-animated-numbers": "^0.18.0",
     "react-dom": "^18.3.1",
-    "sonner": "^1.5.0",
-    "tailwindcss": "^4.0.0-alpha.17",
+    "react-intersection-observer": "^9.13.1",
+    "react-responsive": "^10.0.0",
+    "react-textarea-autosize": "^8.5.3",
+    "theme-change": "^2.5.0",
+    "validator": "^13.12.0",
+    "winston": "^3.14.2",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@tailwindcss/vite": "^0.0.0-development.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/validator": "^13.12.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "ajv": "^8.17.1",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.10",
+    "postcss": "^8.4.41",
+    "postcss-import": "^16.1.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss": "^3.4.10",
     "typescript": "^5.5.3",
-    "vite": "^5.3.3"
+    "vite": "^5.3.3",
+    "vite-plugin-dts": "^4.0.1",
+    "vite-plugin-svgr": "^4.2.0"
   },
   "trustedDependencies": ["@biomejs/biome"]
 }

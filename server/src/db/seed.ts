@@ -3,14 +3,15 @@ import { faker } from "@faker-js/faker"
 import { drizzle } from "drizzle-orm/node-postgres"
 import { Pool } from "pg"
 import { env } from "../env"
+import { generateCanonicalUrl } from "../utils/string.ts"
 import {
+  CommentStatus,
   type CommentToInsert,
-  type Post,
-  type PostToInsert,
   type UserToInsert,
   commentRatings,
   comments,
   posts,
+  settings,
   users,
 } from "./schema.ts"
 
@@ -28,6 +29,7 @@ const main = async () => {
   await db.delete(comments)
   await db.delete(posts)
   await db.delete(users)
+  await db.delete(settings)
 
   console.log("--> Insert users")
 
@@ -35,7 +37,7 @@ const main = async () => {
   for (let i = 0; i < 20; i++) {
     userData.push({
       name: faker.internet.userName(),
-      email: faker.internet.email(),
+      email: faker.internet.email().toLowerCase(),
     })
   }
   await db.insert(users).values(userData)
@@ -52,8 +54,7 @@ const main = async () => {
 
   await db.insert(posts).values([
     {
-      title: "test",
-      url: "test",
+      url: generateCanonicalUrl("http://localhost:5173/"),
     },
   ])
   const p = (await db.select().from(posts).limit(1))[0]
@@ -68,29 +69,39 @@ const main = async () => {
       body: faker.lorem.paragraph(),
       path: `${i}`,
       rating: faker.number.int({ min: 0, max: 100 }),
-      reply_count: i === 1 ? 20 : 0,
-      createdAt: faker.date.between({
-        from: "2023-01-01T00:00:00.000Z",
-        to: "2023-02-01T00:00:00.000Z",
-      }),
+      replyCount: i === 1 ? 20 : 0,
+      status:
+        Math.random() > 0.9 ? CommentStatus.Moderation : CommentStatus.Visible,
+      createdAt: faker.date
+        .between({
+          from: "2023-01-01T00:00:00.000Z",
+          to: "2023-02-01T00:00:00.000Z",
+        })
+        .toUTCString(),
     })
   }
 
-  for (let depth = 1; depth <= 5; depth++) {
+  const maxDepth = 2
+
+  for (let depth = 1; depth <= maxDepth; depth++) {
     const pathPrefixStr = Array.from({ length: depth }, (_) => "1").join(".")
     for (let j = 1; j <= 20; j++) {
+      const d = new Date(2023, depth + 1, j).toUTCString()
+
       commentData.push({
         userId: uList[faker.number.int({ min: 0, max: uList.length - 1 })],
         postId: p.id,
         body: faker.lorem.paragraph(),
         depth: depth,
         path: `${pathPrefixStr}.${j}`,
-        reply_count: j === 1 && depth < 5 ? 20 : 0,
+        replyCount: j === 1 && depth < maxDepth ? 20 : 0,
         rating: faker.number.int({ min: 0, max: 100 }),
-        createdAt: faker.date.between({
-          from: new Date(2023, depth + 1, 1),
-          to: new Date(2023, depth + 2, 1),
-        }),
+        status:
+          Math.random() > 0.9
+            ? CommentStatus.Moderation
+            : CommentStatus.Visible,
+        createdAt: d,
+        updatedAt: d,
       })
     }
   }
