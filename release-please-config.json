@@ -4,7 +4,7 @@
   "bump-patch-for-minor-pre-major": false,
   "draft": false,
   "prerelease": false,
-  "include-component-in-tag": true,
+  "include-component-in-tag": false,
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
