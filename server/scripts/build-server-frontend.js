@@ -80,11 +80,6 @@ async function build() {
   }
 }
 
-build().catch((err) => {
-  console.error("Error:", err)
-  process.exit(1)
-})
-
 const writePublicFilesToCode = () => {
   const publicDir = path.resolve(__dirname, "../public")
   const outputFile = path.resolve(__dirname, "../src/public.generated.ts")
@@ -124,3 +119,5 @@ export interface PathData {
 export const paths: Record<string, PathData> = ${JSON.stringify(paths, null, 2)};`
   fs.writeFileSync(outputFile, content)
 }
+
+build()

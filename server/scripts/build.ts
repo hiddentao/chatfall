@@ -12,4 +12,4 @@ async function runBuildCommand() {
   })
 }
 
-runBuildCommand().catch(console.error)
+runBuildCommand()

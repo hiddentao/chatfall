@@ -12,4 +12,4 @@ async function runDevCommand() {
   })
 }
 
-runDevCommand().catch(console.error)
+runDevCommand()

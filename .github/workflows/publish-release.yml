@@ -37,3 +37,9 @@ jobs:
           config-file: release-please-config.json
           manifest-file: release-please-manifest.json
           repo-url: hiddentao/chatfall
+
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.js          

@@ -71,10 +71,7 @@
     "react-select": "^5.8.1",
     "tmp": "^0.2.3"
   },
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "pg"
-  ],
+  "trustedDependencies": ["@biomejs/biome", "pg"],
   "exports": {
     ".": "./src/exports.ts"
   }

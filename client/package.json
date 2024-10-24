@@ -53,7 +53,5 @@
     "vite-plugin-dts": "^4.0.1",
     "vite-plugin-svgr": "^4.2.0"
   },
-  "trustedDependencies": [
-    "@biomejs/biome"
-  ]
+  "trustedDependencies": ["@biomejs/biome"]
 }
