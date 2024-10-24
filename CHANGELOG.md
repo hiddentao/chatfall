@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.2...chatfall-v0.4.3) (2024-10-24)
+
+
+### Bug Fixes
+
+* artifacts upload step wasn't running ([2817d97](https://github.com/hiddentao/chatfall/commit/2817d97f8a35decb9aa3e8074ef8014532a5c011))
+
 ## [0.4.2](https://github.com/hiddentao/chatfall/compare/chatfall-v0.4.1...chatfall-v0.4.2) (2024-10-24)
 
 
