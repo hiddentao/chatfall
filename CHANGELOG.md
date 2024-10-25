@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/hiddentao/chatfall/compare/v0.16.0...v0.16.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* npm publishing now a separate job ([6019760](https://github.com/hiddentao/chatfall/commit/6019760e4d50cc7b6b007ae4d224ef0596d7c541))
+
 ## [0.16.0](https://github.com/hiddentao/chatfall/compare/v0.15.0...v0.16.0) (2024-10-25)
 
 
