@@ -15,7 +15,7 @@ async function publishNpm() {
     console.log(pc.green("NPM package published successfully"))
   } catch (error) {
     console.error(pc.red("Failed to publish NPM package:"), error)
-    process.exit(1)
+    process.exit(-1)
   }
 }
 
