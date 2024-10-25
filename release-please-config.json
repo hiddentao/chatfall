@@ -9,7 +9,7 @@
     ".": {
       "changelog-path": "CHANGELOG.md",
       "package-name": "chatfall",
-      "component": "root"
+      "component": "."
     },
     "client": {
       "package-name": "@chatfall/client",
@@ -25,7 +25,7 @@
       "type": "linked-versions",
       "groupName": "chatfall",
       "components": [
-        "root", "client", "server"
+        ".", "client", "server"
       ]
     }    
   ],

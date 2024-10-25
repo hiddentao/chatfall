@@ -1,5 +1,5 @@
 {
-  "name": "@chatfall/chatfall",
+  "name": "chatfall",
   "version": "0.8.0",
   "workspaces": [
     "client",
