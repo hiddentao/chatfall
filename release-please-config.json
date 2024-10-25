@@ -8,12 +8,13 @@
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
-      "package-name": "chatfall",
-      "extra-files": [
-        "client/dist/*",
-        "server/dist-bin/*",
-        "server/dist/index.js"
-      ]
+      "package-name": "chatfall"
+    },
+    "client": {
+      "package-name": "@chatfall/client"
+    },
+    "server": {
+      "package-name": "@chatfall/server"
     }
   },
   "changelog-sections": [

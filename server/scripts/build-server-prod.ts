@@ -45,7 +45,7 @@ const build = async () => {
     entrypoints: [path.resolve(__dirname, "../src/index.ts")],
     outdir: path.resolve(__dirname, "../dist"),
     target: "bun",
-    sourcemap: "inline",
+    sourcemap: "linked",
     minify: true,
     plugins: [svg],
   })
@@ -58,10 +58,14 @@ const build = async () => {
     process.exit(-1)
   }
 
-  // rename output file to chatfall-server.js
+  // rename index.* to chatfall-server.*
   fs.renameSync(
     path.resolve(__dirname, "../dist/index.js"),
     path.resolve(__dirname, "../dist/chatfall-server.js"),
+  )
+  fs.renameSync(
+    path.resolve(__dirname, "../dist/index.js.map"),
+    path.resolve(__dirname, "../dist/chatfall-server.d.ts"),
   )
 
   const platforms = [
