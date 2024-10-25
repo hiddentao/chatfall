@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/hiddentao/chatfall/compare/v0.7.0...v0.7.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* set NPM registry token before publishing ([d34e901](https://github.com/hiddentao/chatfall/commit/d34e90142bfce8011ba2d7cffbb9ea77e5759b2d))
+
 ## [0.7.0](https://github.com/hiddentao/chatfall/compare/v0.6.1...v0.7.0) (2024-10-25)
 
 
