@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/hiddentao/chatfall/compare/0.9.0...v0.9.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* keep the v in the version tags ([a6e60b7](https://github.com/hiddentao/chatfall/commit/a6e60b770a370143fcd3e0080678cf9b1f167ee6))
+
 ## [0.9.0](https://github.com/hiddentao/chatfall/compare/v0.8.0...0.9.0) (2024-10-25)
 
 
