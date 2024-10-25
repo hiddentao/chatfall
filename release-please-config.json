@@ -5,6 +5,15 @@
   "draft": false,
   "prerelease": false,
   "include-component-in-tag": false,
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "groupName": "chatfall",
+      "components": [
+        ".", "client", "server"
+      ]
+    }    
+  ],
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
