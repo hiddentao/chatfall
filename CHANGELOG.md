@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.7.1](https://github.com/hiddentao/chatfall/compare/v0.7.0...v0.7.1) (2024-10-25)
+
+
+### Bug Fixes
+
+* reset package version ([93ce603](https://github.com/hiddentao/chatfall/commit/93ce60388233deea2f00166826a83ce1ab939111))
+
+
+### Miscellaneous
+
+* don't create a release on a merge commit ([8b8ee26](https://github.com/hiddentao/chatfall/commit/8b8ee26cfeebe0dcb5482c29cf2ae7ef93f04402))
+* release main ([#18](https://github.com/hiddentao/chatfall/issues/18)) ([5181af9](https://github.com/hiddentao/chatfall/commit/5181af9dbef403e5556420ff51425038d7626fab))
+* release main ([#19](https://github.com/hiddentao/chatfall/issues/19)) ([3abcb98](https://github.com/hiddentao/chatfall/commit/3abcb980d1f93f78c811c7a0dae91cf2ee46795f))
+* set NPM registry token before publishing ([d34e901](https://github.com/hiddentao/chatfall/commit/d34e90142bfce8011ba2d7cffbb9ea77e5759b2d))
+* trigger rebuild ([1848508](https://github.com/hiddentao/chatfall/commit/18485080d84105fda26f754c04d697350270152b))
+* try and undo previous changes to get publish release working again ([a8e5698](https://github.com/hiddentao/chatfall/commit/a8e56989522893fe181bd69fcac91db1125e7bf5))
+
 ## [0.8.0](https://github.com/hiddentao/chatfall/compare/v0.7.1...v0.8.0) (2024-10-25)
 
 

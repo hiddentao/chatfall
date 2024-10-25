@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/hiddentao/chatfall/compare/v0.7.0...v0.7.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* try and undo previous changes to get publish release working again ([a8e5698](https://github.com/hiddentao/chatfall/commit/a8e56989522893fe181bd69fcac91db1125e7bf5))
+
 ## [0.7.0](https://github.com/hiddentao/chatfall/compare/v0.6.1...v0.7.0) (2024-10-25)
 
 
