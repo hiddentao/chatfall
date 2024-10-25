@@ -48,6 +48,6 @@ jobs:
 
       - name: Publish Client NPM package
         if: ${{ steps.release.outputs.release_created }}
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: bun run publish-npm
+        run: |
+          npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+          bun run publish-npm
