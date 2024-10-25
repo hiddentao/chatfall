@@ -1,6 +1,5 @@
 {
   "name": "@chatfall/chatfall",
-  "private": true,
   "version": "0.7.0",
   "workspaces": [
     "client",
