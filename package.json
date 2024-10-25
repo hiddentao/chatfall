@@ -34,6 +34,6 @@
   "packageManager": "bun@1.1.18",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chatfall/chatfall.git"
+    "url": "https://github.com/hiddentao/chatfall.git"
   }
 }
