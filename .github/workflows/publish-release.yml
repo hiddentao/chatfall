@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  publish-release:
+  create-github-release:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release')
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +46,31 @@ jobs:
       - name: Upload Release Artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.*          
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.*
+
+  publish-npm:
+    needs: create-github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Syncing package.json versions
+        run: bun run update-versions
+
+      - name: Build
+        run: bun run build
 
       - name: Publish Client NPM package
         run: |
