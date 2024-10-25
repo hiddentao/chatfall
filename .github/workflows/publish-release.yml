@@ -28,11 +28,11 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build
-        run: bun run build
-
       - name: Syncing package versions
         run: bun run update-versions
+
+      - name: Build
+        run: bun run build
 
       - name: Create GitHub Release
         uses: googleapis/release-please-action@v4
