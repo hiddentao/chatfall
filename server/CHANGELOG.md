@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/hiddentao/chatfall/compare/v0.6.0...v0.6.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* work towards publishing client NPM package ([eee8858](https://github.com/hiddentao/chatfall/commit/eee8858cf3818b608b80746c001d471be2d9607d))
+
 ## [0.2.0](https://github.com/hiddentao/chatfall/compare/server-v0.1.0...server-v0.2.0) (2024-10-24)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@chatfall/server",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "private": true,
   "module": "src/index.ts",
   "type": "module",
@@ -71,7 +71,10 @@
     "react-select": "^5.8.1",
     "tmp": "^0.2.3"
   },
-  "trustedDependencies": ["@biomejs/biome", "pg"],
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "pg"
+  ],
   "exports": {
     ".": "./src/exports.ts"
   }

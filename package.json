@@ -1,7 +1,7 @@
 {
   "name": "@chatfall/chatfall",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.6.1",
   "workspaces": [
     "client",
     "server"
@@ -11,7 +11,7 @@
     "check": "bun run scripts/check.ts",
     "build": "bun run scripts/build.ts",
     "publish-npm": "bun run scripts/publish-npm.ts"
-  },  
+  },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@commitlint/cli": "^19.4.0",
