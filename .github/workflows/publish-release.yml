@@ -28,7 +28,7 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Syncing package versions
+      - name: Syncing package.json versions
         run: bun run update-versions
 
       - name: Build
