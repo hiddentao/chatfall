@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Update package.json versions
+      - name: Syncing package versions
         run: bun run update-versions
 
       - name: Create GitHub Release
