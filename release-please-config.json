@@ -8,7 +8,6 @@
   "pull-request-title-pattern": "chore(release): release ${version}",
   "group-pull-request-title-pattern": "chore(release): release ${version}",
   "changelog-path": "CHANGELOG.md",
-  "separate-pull-requests": false,
   "packages": {
     "client": {
       "package-name": "@chatfall/client",
