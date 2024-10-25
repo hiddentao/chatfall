@@ -19,8 +19,8 @@
       "component": "server"
     },
     ".": {
-      "package-name": "chatfall",
-      "component": "chatfall"
+      "package-name": ".",
+      "component": "."
     }
   },
   "plugins": [
@@ -28,7 +28,7 @@
       "type": "linked-versions",
       "groupName": "chatfall",
       "components": [
-        "client", "server", "chatfall"
+        "client", "server", "."
       ]
     }    
   ],
