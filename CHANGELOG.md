@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/hiddentao/chatfall/compare/v0.8.0...v0.8.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* add linked-versions plugin to release-please to ensure version parity ([a6f0771](https://github.com/hiddentao/chatfall/commit/a6f07719232bdc8c344161bb59dd6eb226baa094))
+* minor upate to enable a new build to take place ([3ec8b26](https://github.com/hiddentao/chatfall/commit/3ec8b26aba3b2f729cf716104dd94c21595e8850))
+
 ## [0.8.0](https://github.com/hiddentao/chatfall/compare/v0.7.0...v0.8.0) (2024-10-25)
 
 
