@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/hiddentao/chatfall/compare/v0.8.0...v0.8.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* minor upate to enable a new build to take place ([3ec8b26](https://github.com/hiddentao/chatfall/commit/3ec8b26aba3b2f729cf716104dd94c21595e8850))
+
 ## [0.8.0](https://github.com/hiddentao/chatfall/compare/v0.7.0...v0.8.0) (2024-10-25)
 
 
