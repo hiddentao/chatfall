@@ -3,7 +3,7 @@ import { execa } from "execa"
 import pc from "picocolors"
 
 async function publishNpm() {
-  const clientDir = path.join(__dirname, "..")
+  const clientDir = path.join(__dirname, "..", "client")
 
   console.log(pc.blue("Publishing NPM package from client/ folder..."))
 
