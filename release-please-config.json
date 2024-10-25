@@ -5,27 +5,30 @@
   "draft": false,
   "prerelease": false,
   "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "changelog-path": "CHANGELOG.md",
+      "package-name": "chatfall",
+      "component": "root"
+    },
+    "client": {
+      "package-name": "@chatfall/client",
+      "component": "client"
+    },
+    "server": {
+      "package-name": "@chatfall/server",
+      "component": "server"
+    }
+  },
   "plugins": [
     {
       "type": "linked-versions",
       "groupName": "chatfall",
       "components": [
-        ".", "client", "server"
+        "root", "client", "server"
       ]
     }    
   ],
-  "packages": {
-    ".": {
-      "changelog-path": "CHANGELOG.md",
-      "package-name": "chatfall"
-    },
-    "client": {
-      "package-name": "@chatfall/client"
-    },
-    "server": {
-      "package-name": "@chatfall/server"
-    }
-  },
   "changelog-sections": [
     {"type": "feat", "section": "Features", "hidden": false},
     {"type": "fix", "section": "Bug Fixes", "hidden": false},
