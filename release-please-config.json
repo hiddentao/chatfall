@@ -9,7 +9,8 @@
     ".": {
       "changelog-path": "CHANGELOG.md",
       "package-name": "chatfall",
-      "component": "."
+      "component": ".",
+      "pull-request-title": "chore(release): v${version}"
     },
     "client": {
       "package-name": "@chatfall/client",
