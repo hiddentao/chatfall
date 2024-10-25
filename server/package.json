@@ -1,6 +1,6 @@
 {
   "name": "@chatfall/server",
-  "version": "0.13.1",
+  "version": "0.0.0",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {

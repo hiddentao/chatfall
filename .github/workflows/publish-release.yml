@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Update package.json versions
+        run: bun run update-versions
+
       - name: Create GitHub Release
         uses: googleapis/release-please-action@v4
         id: release
@@ -45,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.*          
 
-      # - name: Publish Client NPM package
-      #   run: |
-      #     npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-      #     bun run publish-npm
+      - name: Publish Client NPM package
+        run: |
+          npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+          bun run publish-npm

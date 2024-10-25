@@ -9,6 +9,7 @@
     "prepare": "husky",
     "check": "bun run scripts/check.ts",
     "build": "bun run scripts/build.ts",
+    "update-versions": "bun run scripts/update-versions.ts",
     "publish-npm": "bun run scripts/publish-npm.ts"
   },
   "devDependencies": {
