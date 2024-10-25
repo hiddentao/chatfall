@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.1](https://github.com/hiddentao/chatfall/compare/v0.12.0...v0.12.1) (2024-10-25)
+
+
+### Miscellaneous
+
+* try without separate PRs ([a74ce06](https://github.com/hiddentao/chatfall/commit/a74ce06f5480a925c214d04a062f4b3b26911368))
+
 ## [0.12.0](https://github.com/hiddentao/chatfall/compare/v0.11.0...v0.12.0) (2024-10-25)
 
 
