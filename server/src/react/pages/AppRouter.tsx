@@ -7,6 +7,7 @@ import {
 import { Button } from "@chatfall/client"
 import {
   type FC,
+  type PropsWithChildren,
   type ReactNode,
   useCallback,
   useEffect,
@@ -21,6 +22,7 @@ import {
   useLocation,
 } from "react-router-dom"
 import { StaticRouter } from "react-router-dom/server"
+import ClientOnly from "../components/ClientOnly"
 import {
   DarkSvg,
   DropdownArrowSvg,
@@ -59,7 +61,7 @@ const navLinks = [
   },
 ]
 
-const AppRoutes = () => {
+const Nav: FC = () => {
   const location = useLocation()
 
   const handleDropdownClick = useCallback(() => {
@@ -72,58 +74,43 @@ const AppRoutes = () => {
   }, [location.pathname])
 
   return (
-    <>
-      <nav className="flex flex-col sm:flex-row">
-        <div className="tabs tabs-boxed hidden sm:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`tab ${location.pathname === link.to ? "tab-active" : ""} min-h-[3rem] h-auto py-2`}
-            >
-              {link.text}
-            </Link>
-          ))}
-        </div>
-        <div className="dropdown dropdown-bottom sm:hidden">
-          <label tabIndex={0} className="btn m-1">
-            {menuText}
-            <DropdownArrowSvg className="w-4 h-4" />
-          </label>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
-          >
-            {navLinks.map((link, index) => (
-              <li key={index}>
-                <Link to={link.to} onClick={handleDropdownClick}>
-                  {link.text}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-      <Routes>
+    <nav className="flex flex-col sm:flex-row">
+      <div className="tabs tabs-boxed hidden sm:flex">
         {navLinks.map((link) => (
-          <Route key={link.to} path={link.to} element={link.element} />
+          <Link
+            key={link.to}
+            to={link.to}
+            className={`tab ${location.pathname === link.to ? "tab-active" : ""} min-h-[3rem] h-auto py-2`}
+          >
+            {link.text}
+          </Link>
         ))}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+      </div>
+      <div className="dropdown dropdown-bottom sm:hidden">
+        <label tabIndex={0} className="btn m-1">
+          {menuText}
+          <DropdownArrowSvg className="w-4 h-4" />
+        </label>
+        <ul
+          tabIndex={0}
+          className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
+        >
+          {navLinks.map((link, index) => (
+            <li key={index}>
+              <Link to={link.to} onClick={handleDropdownClick}>
+                {link.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
   )
 }
 
-const NotFound = () => (
-  <div className="text-center mt-8">
-    <h2 className="text-2xl font-bold mb-4">404 - Page Not Found</h2>
-    <p>The page you're looking for doesn't exist.</p>
-  </div>
-)
-
-export const AppRouter: FC<{ path: string; config: Config }> = ({
-  path,
+const Layout: FC<PropsWithChildren<{ config: Config }>> = ({
   config,
+  children,
 }) => {
   const { store } = useGlobalContext<ServerStore>()
   const { themeMode, toggleTheme } = useThemeContext()
@@ -186,11 +173,6 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     })()
   }, [hasAdmin])
 
-  const Router = useMemo(
-    () => (typeof window !== "undefined" ? BrowserRouter : StaticRouter),
-    [],
-  )
-
   useEffect(() => {
     setModeSwitcherBtn(
       <Button
@@ -245,9 +227,10 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
             {loggedInUser ? (
               <>
                 {settings ? (
-                  <Router location={path}>
-                    <AppRoutes />
-                  </Router>
+                  <>
+                    <Nav />
+                    {children}
+                  </>
                 ) : (
                   <div className="flex flex-row justify-center items-center w-full">
                     <div className="skeleton h-32 w-5/6" />
@@ -294,3 +277,39 @@ export const AppRouter: FC<{ path: string; config: Config }> = ({
     </div>
   )
 }
+
+export const AppRouter: FC<{ path: string; config: Config }> = ({
+  path,
+  config,
+}) => {
+  const Router = useMemo(
+    () => (typeof window !== "undefined" ? BrowserRouter : StaticRouter),
+    [],
+  )
+
+  return (
+    <Router location={path}>
+      <Routes>
+        {navLinks.map((link) => (
+          <Route
+            key={link.to}
+            path={link.to}
+            element={
+              <ClientOnly>
+                <Layout config={config}>{link.element}</Layout>
+              </ClientOnly>
+            }
+          />
+        ))}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
+  )
+}
+
+const NotFound = () => (
+  <div className="text-center mt-8">
+    <h2 className="text-2xl font-bold mb-4">404 - Page Not Found</h2>
+    <p>The page you're looking for doesn't exist.</p>
+  </div>
+)
