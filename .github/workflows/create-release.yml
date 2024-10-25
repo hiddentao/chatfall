@@ -15,6 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if latest commit is a merge commit
+        id: check_merge
+        run: |
+          LATEST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          if [[ $LATEST_COMMIT_MESSAGE == Merge* ]]; then
+            echo "Error: Latest commit is a merge commit. Release creation is not allowed."
+            exit 1
+          fi
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
