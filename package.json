@@ -31,5 +31,9 @@
   "dependencies": {
     "turbo": "^2.0.6"
   },
-  "packageManager": "bun@1.1.18"
+  "packageManager": "bun@1.1.18",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chatfall/chatfall.git"
+  }
 }
