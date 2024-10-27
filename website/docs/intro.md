@@ -2,46 +2,36 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 
-## Getting Started
+It is built using [ElysiaJS](https://elysiajs.com/), [React](https://react.dev/) and [PostgreSQL](https://www.postgresql.org/) and has a whole host of features, including:
 
-Get started by **creating a new site**.
+* Easily embeddable into any webpage.
+* Fully customizable styling, including dark theme support.
+* Threaded comment view with unlimited depth.
+* Mobile-friendly responsive interface.
+* Easy deployment - server-side backend executable is a single binary with no dependencies.
+* Quick and simple registration by email.
+* Reply to and like any comment at any depth.
+* Sort comments by: newest/oldest, most/least replied-to, most/least liked.
+* Real-time in-page notifications of new comments (uses [Websockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)).
+* Comprehensive administration features:
+  * Set the minimum amount of time a user must wait before posting again.
+  * Ban by email and/or email domain.
+  * Delete unwanted comments.
+  * Mark all comments as requiring moderation.
+  * Approve/deny comments marked as requiring moderation.
+  * Set banned words - users will not be able to create comments containing these words.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+Chatfall comes a full-stack solution, with both a server-side and client-side component:
 
-### What you'll need
+* Server-side: 
+    * Responsible for reading/writing comments from/to your database, authenticating users, sending emails, etc.
+    * Distributed as single binary exectuable on the [Github releases page](https://github.com/hiddentao/chatfall/releases). 
+* Client-side:
+    * To be embedded into webpages where comments are needed. Designed to load and render quickly.
+    * Distributed as a JS and companion CSS file available on the Github releases page but also via the [@chatfall/client NPM package](https://www.npmjs.com/package/@chatfall/client).
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+The best way to discover what Chatfall has to offer is to follow the instructions in the [Tutorial](./tutorial/setup-the-server.mdx) to get it up and running locally.

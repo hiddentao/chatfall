@@ -27,7 +27,7 @@ const EnvDTO = Type.Object({
   ),
   PORT: Type.Number({ default: 3000 }),
   HOSTNAME: Type.String({ default: "localhost" }),
-  DATABASE_URL: Type.String({ default: "file:./local.db" }),
+  DATABASE_URL: Type.String(),
   MAILGUN_API_KEY: Type.Optional(Type.String({ default: "" })),
   MAILGUN_SENDER: Type.Optional(Type.String({ default: "" })),
   LOG_LEVEL: Type.Enum(LogLevel, { default: "info" }),
