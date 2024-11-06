@@ -5,7 +5,7 @@ sidebar_position: 1
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Setup the server
+# Setup the environment
 
 For the purposes of this tutorial you will be running Chatfall on your local development machine. Let's get started by first setting up a development database to hold all the user and comments data needed by Chatfall.
 
@@ -123,53 +123,5 @@ bun chatfall-server.js migrate-db
 
 
 You can and should run this command whenever you download a new version of the Chatfall server binary. This will ensure that your database schema is always up-to-date.
-
-
-## Run the server
-
-Now we're ready to run the server:
-
-<Tabs>
-<TabItem value="binary" label="Binary">
-
-```bash
-./chatfall server
-```
-
-</TabItem>
-<TabItem value="bun" label="Bun">
-
-```bash
-bun chatfall-server.js server
-```
-
-</TabItem>
-</Tabs>
-
-You should see a log message that looks like the following:
-
-```
-🦊 Chatfall server v0.17.0 started in 0.25 ms
-
- ➜  Running at:   http://localhost:3000/
-```
-
-Visit http://localhost:3000 in your browser and you should see the admin interface login page:
-
-![Admin login](./assets/admin-login.png)
-
-:::info
-The first user to login will automatically be made an admin!
-:::
-
-At this point you can create your first user account by using it to login to the admin interface. 
-
-You will need to enter your email address and then you will receive a verification code by email. Enter the code to verify your email address 
-and login.
-
-_NOTE: Because we earlier set the `LOG_LEVEL` environment variable to `debug` you should see the email verification code in the shell/terminal 
-in which you are running the server._
-
-
 
 
