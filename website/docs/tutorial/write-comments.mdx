@@ -1,10 +1,71 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Write comments
 
-Now that the server is up and running you can test out the comment system by visiting http://localhost:3000/test.html in your browser.
+Now that the server is up and running you can test out the commenting system by visiting http://localhost:3000/test.html 
+in your browser. 
+
+This is a test page that is always available for testing any Chatfall server. It is also a live example of how to embed 
+the commenting system in your own web page.
+
+## Adding Comments
+
+The comment system provides a responsive input form that works seamlessly on both desktop and mobile devices.
+
+Click the comment input area to open the comment form popup.
+
+![Anonymous comment form](./assets/anon-comment-form.png)
+
+When you click the "Login and Submit" button you will be prompted to enter your email address. 
+
+![Enter email](./assets/enter-email.png)
+
+Once submitted you'll receive a verification code by email. Enter the code to verify your email:
+
+![Verify email](./assets/verify-email.png)
+
+Once verified your comment will be submitted. At this point you will be logged in and 
+can submit additional comments in future without re-verifying your email.
+
+![Logged in comment form](./assets/logged-in-comment-form.png)
+
+## Replying to Comments
+
+To reply to an existing comment click the **Reply** button below any comment. The reply form will appear as a popup:
+
+![Add Reply](./assets/add-reply.png)
+
+Once submitted your reply will appear nested under the parent comment:
+
+![View Reply](./assets/view-reply.png)
+
+## Liking/unliking comments
+
+You can like/unlike comments by clicking the thumbs up icon:
+
+![Like comment](./assets/like-comment.png)
+
+## Sorting & Navigation
+
+By default comments are sorted by newest first. You can change the sort mode using the dropdown in the top right:
+
+![Sort options](./assets/sort-modes.png)
+
+## Loading more
+
+The system loads 10 comments at a time. Click **Load more comments** at the bottom to load additional comments according to 
+the current sort mode:
+
+![Load more](./assets/load-more.png)
+
+The same mechanism also applies when viewing replies.
+
+## Next steps
+
+The rest of the documentation deep dives into the various aspects of using Chatfall, as well as customization, admin settings, moderation and 
+how to deploy it.
 
 
 

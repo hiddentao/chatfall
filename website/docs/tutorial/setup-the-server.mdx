@@ -31,8 +31,7 @@ _Note that you can also choose to download `chatfall-server.js` and run it on an
 
 Once you've downloaded your binary of choice you can see the available commands by running it with the `--help` option:
 
-```bash
-./chatfall
+```bas./chatfall --help
 
 Usage: chatfall [options] [command]
 
@@ -61,11 +60,11 @@ But before we can run the server we need to setup the database and configure the
 
 When users wish to comment they first have to authenticate themselves to Chatfall using their email address. The server returns a [JWT](https://jwt.io/) token which then gets stored client-side so that the user doesn't need to login again the next time they visit the page. 
 
-This token gets encrypted server-side to prevent spoofing and tampering. The encryption key used for this must also be set as an environment variable and must be unique to your Chatfall instance. We recommend using a 512-character hexadecimal string. You can obtain one using https://www.browserling.com/tools/random-hex. Once you have it set the following:
+This token gets encrypted server-side to prevent spoofing and tampering. The encryption key used for this encryption must be set as an environment variable and must be unique to your Chatfall instance. We recommend using a 512-character hexadecimal string. You can obtain one using https://www.browserling.com/tools/random-hex. Once you have it set the following:
 
 
 ```bash
-export ENC_KEY="<your 512-character hex string here>"
+export ENC_KEY="your 512-character hex string here"
 ```
 
 ## Dummy emails 
@@ -74,7 +73,7 @@ Chatfall relies on [Mailgun](https://mailgun.com) for sending out its login veri
 
 However, if the mailer environment variables are not set then emails will simply be logged out to the shell. For the purposes of this tutorial we will do just that.
 
-To see email contents in the shell we need to enable `debug` level logging:
+To see email contents in the shell/terminal we need to set the logging level to `debug`:
 
 ```bash
 export LOG_LEVEL=debug
@@ -97,7 +96,7 @@ Once you've setup your database you should have obtained a connection string URL
 postgresql://username:password@hostname:port/chatfall?sslmode=require
 ```
 
-Let's set this as an environment variable in the bash:
+Let's set this as an environment variable:
 
 ```bash
 export DATABASE_URL="postgresql://username:password@hostname:port/chatfall?sslmode=require"
@@ -105,16 +104,28 @@ export DATABASE_URL="postgresql://username:password@hostname:port/chatfall?sslmo
 
 At this point we can setup the database tables using the `migrate-db` CLI command:
 
+<Tabs>
+<TabItem value="binary" label="Binary">
+
 ```bash
 ./chatfall migrate-db
 ```
 
-You can and should run this command whenever you download a new version of the server binary. This will ensure that your database schema is always up-to-date.
+</TabItem>
+<TabItem value="bun" label="Bun">
+
+```bash
+bun chatfall-server.js migrate-db
+```
+
+</TabItem>
+</Tabs>
+
+
+You can and should run this command whenever you download a new version of the Chatfall server binary. This will ensure that your database schema is always up-to-date.
 
 
 ## Run the server
-
-Before we can actually run the server we need to make sure that the database 
 
 Now we're ready to run the server:
 
@@ -143,5 +154,22 @@ You should see a log message that looks like the following:
  ➜  Running at:   http://localhost:3000/
 ```
 
-Visit http://localhost:3000 in your browser and you should see the admin interface login page.
+Visit http://localhost:3000 in your browser and you should see the admin interface login page:
+
+![Admin login](./assets/admin-login.png)
+
+:::info
+The first user to login will automatically be made an admin!
+:::
+
+At this point you can create your first user account by using it to login to the admin interface. 
+
+You will need to enter your email address and then you will receive a verification code by email. Enter the code to verify your email address 
+and login.
+
+_NOTE: Because we earlier set the `LOG_LEVEL` environment variable to `debug` you should see the email verification code in the shell/terminal 
+in which you are running the server._
+
+
+
 
