@@ -21,7 +21,7 @@ export class SettingsManager {
     [Setting.ModerateAllComments]: false,
     [Setting.CommentsPerPage]: 10,
     [Setting.UserNextCommentDelaySeconds]: 60,
-    [Setting.BlacklistedWords]: [],
+    [Setting.SpamPhrases]: [],
     [Setting.BlacklistedEmails]: [],
     [Setting.BlacklistedDomains]: [],
   }

@@ -14,7 +14,7 @@ import { PageWrapper } from "./PageWrapper"
 interface BanEditorProps {
   title: string
   settingKey: Setting
-  validateItems: (value: string) => string | undefined
+  validateItems?: (value: string) => string | undefined
   placeholder: string
   children: ReactNode
 }

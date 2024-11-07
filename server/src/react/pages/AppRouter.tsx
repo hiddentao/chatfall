@@ -33,9 +33,9 @@ import { useThemeContext } from "../contexts/theme"
 import { type ServerStore } from "../store/server"
 import { BannedDomains } from "./BannedDomains"
 import { BannedEmails } from "./BannedEmails"
-import { BannedWords } from "./BannedWords"
 import { CommentsAdmin } from "./CommentsAdmin"
 import { GeneralSettings } from "./GeneralSettings"
+import { SpamPhrases } from "./SpamPhrases"
 
 const navLinks = [
   { to: "/", text: "General settings", element: <GeneralSettings /> },
@@ -50,9 +50,9 @@ const navLinks = [
     element: <BannedDomains />,
   },
   {
-    to: "/blacklisted-words",
-    text: "Banned Words",
-    element: <BannedWords />,
+    to: "/spam-phrases",
+    text: "Spam Phrases",
+    element: <SpamPhrases />,
   },
   {
     to: "/comments",
