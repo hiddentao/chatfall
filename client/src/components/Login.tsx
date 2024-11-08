@@ -80,7 +80,7 @@ export const VerifyEmailForm: FC<VerifyEmailFormProps> = ({
       <TextInput
         label="Verification code"
         field={code}
-        inputClassname={cn(standardInputStyle, "max-w-full")}
+        inputClassName={cn(standardInputStyle, "max-w-full")}
         hideTooltip={true}
         hideError={true}
         maxChars={10}
@@ -135,7 +135,7 @@ export const EmailTextInput: FC<
       }}
       onEnterPress={onEnterPress}
       className={className}
-      inputClassname={cn(standardInputStyle, "max-w-full")}
+      inputClassName={cn(standardInputStyle, "max-w-full")}
       hideTooltip={true}
       hideError={true}
       maxChars={64}

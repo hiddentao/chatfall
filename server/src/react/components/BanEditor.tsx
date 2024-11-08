@@ -65,7 +65,7 @@ export const BanEditor: FC<BanEditorProps> = ({
         placeholder={placeholder}
         rows={10}
         className="w-full sm:max-w-[500px] mb-4"
-        inputClassname="p-2 border rounded-md w-full"
+        inputClassName="p-2 border rounded-md w-full"
         hideValidationIndicator={true}
       />
       <FieldError error={form.formError} />

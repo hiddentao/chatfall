@@ -52,3 +52,9 @@ export const TickSvg: FC<PropsWithClassname> = ({ className }) => (
     <Svg.TickSvg className={className} />
   </SvgWrapper>
 )
+
+export const CrossSvg: FC<PropsWithClassname> = ({ className }) => (
+  <SvgWrapper>
+    <Svg.CrossSvg className={className} />
+  </SvgWrapper>
+)

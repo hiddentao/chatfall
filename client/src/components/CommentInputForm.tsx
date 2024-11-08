@@ -159,7 +159,7 @@ export const CommentInputForm = forwardRef<
               rows={showMinified ? 1 : 8}
               placeholder={commentFieldPlaceholder || "Add comment..."}
               hideValidationIndicator={true}
-              inputClassname={cn("self-stretch w-full", {
+              inputClassName={cn("self-stretch w-full", {
                 "bg-transparent border-0 italic p-0 min-h-1 pointer-events-none":
                   showMinified,
                 [standardInputStyle]: !showMinified,

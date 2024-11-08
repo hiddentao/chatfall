@@ -7,19 +7,11 @@ import {
   useGlobalContext,
 } from "@chatfall/client"
 import { type FC, useCallback, useEffect, useMemo, useState } from "react"
-import Select from "react-select"
 import { type Comment, CommentStatus } from "../../db/schema"
 import { PageWrapper } from "../components/PageWrapper"
+import { type Option, SearchableSelect } from "../components/SearchableSelect"
 import { DeleteSvg, TickSvg } from "../components/Svg"
 import type { ServerStore } from "../store/server"
-
-const selectStyles = {
-  container: (provided: any) => ({
-    ...provided,
-    minWidth: "300px",
-    color: "black",
-  }),
-}
 
 export const CommentsAdmin: FC = () => {
   const { store } = useGlobalContext<ServerStore>()
@@ -46,8 +38,10 @@ export const CommentsAdmin: FC = () => {
   }, [])
 
   const urlOptions = useMemo(() => {
-    const ret = urls ? urls.map((url) => ({ value: url, label: url })) : []
-    ret.unshift({ value: "", label: "All URLs" })
+    const ret = urls
+      ? urls.map((url) => ({ value: url, label: url }))
+      : ([] as Option[])
+    ret.unshift({ value: "", label: "(All URLs)" })
     return ret
   }, [urls])
 
@@ -132,16 +126,13 @@ export const CommentsAdmin: FC = () => {
           ) : (
             <>
               <div className="mb-4 w-full">
-                <Select
+                <SearchableSelect
                   options={urlOptions}
-                  value={urlOptions.find(
+                  selectedOption={urlOptions.find(
                     (option) => option.value === selectedUrl,
                   )}
                   onChange={handleUrlChange}
                   placeholder="Select URL"
-                  isClearable
-                  isSearchable
-                  styles={selectStyles}
                 />
               </div>
               <CommentListBase

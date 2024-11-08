@@ -79,6 +79,14 @@ To see email contents in the shell/terminal we need to set the logging level to 
 export LOG_LEVEL=debug
 ```
 
+## Production mode
+
+The `NODE_ENV` environment variable should be set to `production`:
+  
+```bash
+export NODE_ENV=production
+```
+
 ## PostgreSQL database
 
 Chatfall requires a PostgreSQL database to store all of its data. The easiest way to get one setup is to use one of the existing cloud hosted providers such as:

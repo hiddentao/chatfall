@@ -86,7 +86,7 @@ export const FieldLabel = ({
 
 export interface FieldProps extends FieldLabelProps {
   className?: string
-  inputClassname?: string
+  inputClassName?: string
   field: FieldApi<any>
   hideTooltip?: boolean
   hideError?: boolean
@@ -135,7 +135,7 @@ export const TextInput = (
   const {
     field,
     className,
-    inputClassname,
+    inputClassName,
     maxChars,
     hideError,
     placeholder,
@@ -169,7 +169,7 @@ export const TextInput = (
       <div className="flex flex-row justify-start items-center">
         <input
           tabIndex={tabIndex}
-          className={cn("input input-bordered", inputClassname)}
+          className={cn("input input-bordered", inputClassName)}
           maxLength={maxChars}
           name={field.name}
           value={field.value}
@@ -199,7 +199,7 @@ export const TextAreaInput = forwardRef<
   const {
     field,
     className,
-    inputClassname,
+    inputClassName,
     hideError,
     placeholder,
     onFocus,
@@ -225,7 +225,7 @@ export const TextAreaInput = forwardRef<
           tabIndex={tabIndex}
           minRows={rows}
           placeholder={placeholder}
-          className={cn("textarea textarea-bordered", inputClassname)}
+          className={cn("textarea textarea-bordered", inputClassName)}
           onChange={onInputChange}
           value={field.value}
           onFocus={onFocus}
