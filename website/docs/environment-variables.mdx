@@ -1,11 +1,10 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 ---
 
-# Server-side environment
+# Environment variables
 
-Server-side configuration is done entirely through environment variables. You can see the list of variables and their options in 
-[env.ts](https://github.com/hiddentao/chatfall/blob/main/server/src/env.ts). The following variables can be set:
+Server-side configuration is done partially through environment variables. These variables must be set _before_ running the server. 
 
 * `DATABASE_URL` - **REQUIRED**. The PostgreSQL database connection URL.
 * `ENC_KEY` - **REQUIRED**. The encryption key for authentication tokens. Must be a hex string of atleast length `48`.
@@ -18,6 +17,10 @@ Server-side configuration is done entirely through environment variables. You ca
 
 When running the server in production you will should set `NODE_ENV` to `production` and also set the `MAILGUN_API_KEY` and `MAILGUN_SENDER` variables, otherwise 
 users will not be able to sign up or login.
+
+:::info
+You can see the full list of variables and their various options in [env.ts](https://github.com/hiddentao/chatfall/blob/main/server/src/env.ts).
+:::
 
 ## Setting environment variables
 
