@@ -198,7 +198,7 @@ const Layout: FC<PropsWithChildren<{ config: Config }>> = ({
           <h1 className="text-2xl font-heading">
             Chatfall Admin
             <strong className="block text-xs text-info-content/50">
-              {config.server}
+              {config.serverUrl}
             </strong>
           </h1>
           {modeSwitcherBtn}

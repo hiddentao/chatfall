@@ -38,7 +38,11 @@ export type ThemeConfig = {
  */
 export type Config = {
   // URL of the comments server
-  server: string
+  serverUrl: string
+  // URL of the page, default is the current URL
+  pageUrl?: string
+  // Root element to append comments to, default is document.body
+  rootElement?: HTMLElement
   // Title of the comments section, default is "Comments"
   title?: string
   // Fix the theme mode (i.e. disable auto light/dark mode detection based on the user's system preferences)

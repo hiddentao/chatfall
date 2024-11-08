@@ -9,15 +9,16 @@ export type ChatfallProps = Config & {
 
 export const Chatfall = {
   init: (props: ChatfallProps) => {
-    ;["rootElement", "server"].forEach((key) => {
-      if (!(props as any)[key]) {
-        throw new Error(`Config '${key}' is required`)
-      }
+    if (!props.serverUrl) {
+      throw new Error("serverUrl is required")
+    }
+
+    const App = createApp({
+      ...props,
+      pageUrl: props.pageUrl || window.location.href,
     })
 
-    const App = createApp(props)
-
-    ReactDOM.createRoot(props.rootElement).render(
+    ReactDOM.createRoot(props.rootElement || document.body).render(
       <React.StrictMode>
         <App />
       </React.StrictMode>,

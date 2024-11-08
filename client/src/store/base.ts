@@ -13,7 +13,8 @@ import { jwt } from "../lib/jwt"
 
 export type BaseStoreProps = {
   initialSort?: Sort
-  server: string
+  pageUrl: string
+  serverUrl: string
 }
 
 const createApp = (server: string): ReturnType<typeof treaty<ServerApp>> => {
@@ -110,10 +111,6 @@ export type CoreState = {
   }) => Promise<void>
 }
 
-const getPageUrl = () => {
-  return window.location.href
-}
-
 type StoreSetMethod = (fn: (state: any) => any | Partial<any>) => void
 
 const tryCatchApiCall = async <T = any>(
@@ -183,7 +180,7 @@ export const createBaseStore = <State extends CoreState>({
     data: SocketEvent,
   ) => void
 }) => {
-  const app = createApp(props.server)
+  const app = createApp(props.serverUrl)
 
   const ws = new Socket(app)
 
@@ -197,7 +194,7 @@ export const createBaseStore = <State extends CoreState>({
         state.loggedInUser = loggedInUser
         ws.onceReady((ws) => {
           const token = jwt.getToken()?.token
-          ws.send({ type: "register", url: getPageUrl(), jwtToken: token })
+          ws.send({ type: "register", url: props.pageUrl, jwtToken: token })
         })
       }),
     )
@@ -225,7 +222,7 @@ export const createBaseStore = <State extends CoreState>({
           )
         },
         getCanonicalUrl: () => {
-          return get().canonicalUrl || getPageUrl()
+          return get().canonicalUrl || props.pageUrl
         },
         logout: () => {
           jwt.removeToken()

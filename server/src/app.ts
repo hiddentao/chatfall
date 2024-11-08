@@ -77,7 +77,7 @@ export const app = new Elysia({
 
     // create our react App component
     const url = new URL(request.url)
-    const app = createElement(App, { path: params["*"], server: url.origin })
+    const app = createElement(App, { path: params["*"], serverUrl: url.origin })
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {

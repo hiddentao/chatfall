@@ -7,13 +7,18 @@ import { ThemeConsumer, ThemeProvider } from "./contexts/theme"
 import { AppRouter } from "./pages/AppRouter"
 import { createStore } from "./store/server"
 
-export const App = ({ path, server }: { path: string; server?: string }) => {
+export const App = ({
+  path,
+  serverUrl,
+}: { path: string; serverUrl?: string }) => {
   const config = useMemo(
     () => ({
-      server: server ?? `${window.location.protocol}//${window.location.host}`,
+      serverUrl:
+        serverUrl ?? `${window.location.protocol}//${window.location.host}`,
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
     }),
-    [server],
-  ) as Config
+    [serverUrl],
+  ) as Config & { serverUrl: string; pageUrl: string }
 
   return (
     <GlobalProvider store={createStore(config)} config={config}>
