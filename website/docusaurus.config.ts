@@ -76,7 +76,6 @@ const config: Config = {
           position: "left",
           label: "Documentation",
         },
-        { to: "/blog", label: "Blog", position: "left" },
         {
           href: "https://github.com/hiddentao/chatfall",
           label: "GitHub",
@@ -91,8 +90,12 @@ const config: Config = {
           title: "Documentation",
           items: [
             {
-              label: "Getting Started",
-              to: "/docs/intro",
+              label: "Getting started",
+              to: "/docs/category/tutorial",
+            },
+            {
+              label: "Production deployments",
+              to: "/docs/category/production-deployment",
             },
           ],
         },
@@ -100,21 +103,8 @@ const config: Config = {
           title: "Community",
           items: [
             {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/chatfall",
-            },
-            {
-              label: "Twitter",
-              href: "https://twitter.com/chatfall",
-            },
-          ],
-        },
-        {
-          title: "More",
-          items: [
-            {
-              label: "Blog",
-              to: "/blog",
+              label: "Forum",
+              href: "https://github.com/hiddentao/chatfall/discussions",
             },
             {
               label: "GitHub",
@@ -123,7 +113,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Chatfall project. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Chatfall project. Website built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,

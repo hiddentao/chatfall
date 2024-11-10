@@ -25,9 +25,9 @@ Next you need to add the following script tag to your page:
   const rootElement = document.getElementById('root');
   // END
   iframe.srcdoc = `
-    <link rel="stylesheet" href="${serverUrl}/chatfall.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.css" crossorigin="anonymous" />
     <script type="module">
-      import { Chatfall } from '${serverUrl}/chatfall.es.js';
+      import { Chatfall } from 'https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.es.js';
       Chatfall.init({
         serverUrl: '${serverUrl}',
         pageUrl: '${location.href}',
@@ -41,7 +41,8 @@ Next you need to add the following script tag to your page:
 When you load the page the Chatfall comments widget will now be displayed.
 
 :::tip
-By customizing the iframe styling you can fully control the layout and size of the widget.
+We're using the CDN-hosted version of the client above, as this is the recommended approach. However, you can also 
+use the version provided by your server. See the [client library deployment docs](../production-deployment/client) for more details.
 :::
 
 ## Title
