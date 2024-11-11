@@ -25,8 +25,8 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build docs
-        run: bun run build
+      - name: Build
+        run: cd website && bun run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
