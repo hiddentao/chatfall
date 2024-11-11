@@ -4,7 +4,7 @@ import { themes as prismThemes } from "prism-react-renderer"
 
 const config: Config = {
   title: "Chatfall",
-  tagline: "A self-hosted, lightweight commenting system for any website.",
+  tagline: "A self-hosted, lightweight commenting system for your website.",
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
@@ -48,7 +48,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: "img/docusaurus-social-card.jpg",
+    image: "img/chatfall-social-card.png",
     navbar: {
       title: "Chatfall",
       logo: {
