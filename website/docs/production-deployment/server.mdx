@@ -22,7 +22,44 @@ process manager like [PM2](https://pm2.keymetrics.io/) in that case.
 
 Remember to set the correct [environment variables](../environment-variables.mdx).
 
-A better approach is to use [Docker](https://www.docker.com/) to containerize the Chatfall server.
+## Running with Docker 
 
-_TODO: Add Docker instructions here._
+Every release of Chatfall also includes a [Docker](https://www.docker.com/) image hosted at https://github.com/hiddentao/chatfall/pkgs/container/chatfall.
+
+The images are currently built for the following platforms:
+
+* `linux/amd64`
+* `linux/arm64`
+
+To run them you need to specify the exact version of the image you want to use.
+
+For example, assuming you want to run the image `ghcr.io/hiddentao/chatfall:v0.18.0`, you would first migrate your Chatfall database:
+
+```bash
+docker run --rm \
+--env ENC_KEY=<your chatfall encryption key> \
+--env DATABASE_URL="<your postgres database url>" \
+ghcr.io/hiddentao/chatfall:v0.18.0 migrate-db
+```
+
+Then you would run the server:
+
+```bash
+docker run --rm \
+-p 3000:3000 \
+--name chatfall \
+--env ENC_KEY=<your chatfall encryption key> \
+--env DATABASE_URL="<your postgres database url>" \
+--env MAILGUN_API_KEY=<your mailgun api key> \
+--env MAILGUN_SENDER=<your mailgun sender email> \
+ghcr.io/hiddentao/chatfall:v0.18.0 server
+```
+
+This starts the Chatfall server on port 3000 - access it at http://localhost:3000.
+
+You can then shut down the server later on by running:
+
+```bash
+docker stop chatfall
+```
 

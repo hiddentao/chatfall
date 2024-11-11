@@ -1,6 +1,8 @@
 ---
 sidebar_position: 1
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Basic setup
 
@@ -12,7 +14,26 @@ You must first of all decide where comments will be displayed, for example:
 <div id="root" />
 ```
 
-Next you need to add the following script tag to your page:
+Determine what version of the client library you want to use by checking your server version:
+
+<Tabs>
+<TabItem value="binary" label="Binary">
+
+```bash
+./chatfall server --version
+```
+
+</TabItem>
+<TabItem value="bun" label="Bun">
+
+```bash
+bun chatfall-server.js server --version
+```
+
+</TabItem>
+</Tabs>
+
+Now you can add the following script tag to your page:
 
 ```html
 <script>
@@ -23,11 +44,12 @@ Next you need to add the following script tag to your page:
   iframe.style.border = 'none';
   const serverUrl = 'http://localhost:3000';   // URL to your Chatfall server
   const rootElement = document.getElementById('root');
+  const version = '0.18.0'; // replace with the version of the Chatfall server you are running
   // END
   iframe.srcdoc = `
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chatfall/client@${version}/dist/chatfall.css" crossorigin="anonymous" />
     <script type="module">
-      import { Chatfall } from 'https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.es.js';
+      import { Chatfall } from 'https://cdn.jsdelivr.net/npm/@chatfall/client@${version}/dist/chatfall.es.js';
       Chatfall.init({
         serverUrl: '${serverUrl}',
         pageUrl: '${location.href}',
@@ -42,8 +64,8 @@ When you load the page the Chatfall comments widget will now be displayed. You c
 controlling the iframe's style attributes.
 
 :::tip
-We're using the CDN-hosted version of the client above, as this is the recommended approach. However, you can also 
-use the version provided by your server. See the [client library deployment docs](../production-deployment/client) for more details.
+We are using the CDN-hosted version of the client above, as this is the recommended approach. However, you can also 
+use the library provided by your server. See the [client library deployment docs](../production-deployment/client) for more details.
 :::
 
 ## Title
