@@ -6,6 +6,8 @@ on:
       - closed
 
 permissions:
+  pages: write
+  id-token: write
   contents: write
   pull-requests: write
 
@@ -47,6 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.*
+          
 
   publish-npm:
     needs: create-github-release
@@ -76,3 +79,35 @@ jobs:
         run: |
           npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
           bun run publish-npm
+
+  publish-docs:
+    needs: create-github-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build docs
+        run: bun run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
