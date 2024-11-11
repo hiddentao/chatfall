@@ -1,6 +1,6 @@
-name: Test
+name: Build and deploy docs
 
-on: push
+on: [workflow_dispatch]
 
 permissions:
   pages: write

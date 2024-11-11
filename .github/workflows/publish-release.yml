@@ -88,7 +88,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -98,8 +97,8 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Build docs
-        run: bun run build
+      - name: Build
+        run: cd website && bun run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
