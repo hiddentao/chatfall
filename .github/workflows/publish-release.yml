@@ -9,7 +9,12 @@ permissions:
   pages: write
   id-token: write
   contents: write
+  packages: write
   pull-requests: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   create-github-release:
@@ -50,6 +55,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./client/dist/chatfall.* ./server/dist-bin/chatfall-* ./server/dist/chatfall-server.*
           
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}        
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: ./server
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.release.outputs.tag_name }}
+          labels: ${{ steps.meta.outputs.labels }}
+
 
   publish-npm:
     needs: create-github-release
@@ -80,6 +107,7 @@ jobs:
           npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
           bun run publish-npm
 
+          
   publish-docs:
     needs: create-github-release
     runs-on: ubuntu-latest
@@ -88,6 +116,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -96,6 +125,9 @@ jobs:
           
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+
+      - name: Syncing package.json versions
+        run: bun run update-versions
 
       - name: Build
         run: cd website && bun run build
