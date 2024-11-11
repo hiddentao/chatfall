@@ -26,7 +26,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build
-        run: cd website && bun i && bun run build
+        run: cd website && bun run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

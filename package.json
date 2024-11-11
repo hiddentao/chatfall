@@ -3,7 +3,8 @@
   "version": "0.17.0",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "website"
   ],
   "scripts": {
     "prepare": "husky",
