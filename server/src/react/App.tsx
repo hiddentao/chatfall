@@ -7,14 +7,20 @@ import { ThemeConsumer, ThemeProvider } from "./contexts/theme"
 import { AppRouter } from "./pages/AppRouter"
 import { createStore } from "./store/server"
 
+export interface ClientEnv {
+  NODE_ENV: string
+}
+
 export const App = ({
   path,
   serverUrl,
-}: { path: string; serverUrl?: string }) => {
+  envClient,
+}: { path: string; serverUrl: string; envClient: ClientEnv }) => {
+  const isDev = useMemo(() => envClient.NODE_ENV === "development", [envClient])
+
   const config = useMemo(
     () => ({
-      serverUrl:
-        serverUrl ?? `${window.location.protocol}//${window.location.host}`,
+      serverUrl,
       pageUrl: typeof window !== "undefined" ? window.location.href : "",
     }),
     [serverUrl],
@@ -35,7 +41,7 @@ export const App = ({
                   content="width=device-width, initial-scale=1"
                 />
                 <link rel="stylesheet" href="/frontend.css" />
-                {
+                {isDev && (
                   <script
                     type="text/javascript"
                     dangerouslySetInnerHTML={{
@@ -55,7 +61,7 @@ setInterval(checkForRebuild, 2000);
           `,
                     }}
                   />
-                }
+                )}
               </head>
               <body>
                 <AppRouter path={path} config={config} />

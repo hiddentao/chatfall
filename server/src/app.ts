@@ -9,7 +9,7 @@ import { Cron } from "cron-async"
 import { createElement } from "react"
 import { createApi } from "./api"
 import { db } from "./db"
-import { env, isProd } from "./env"
+import { env, envClient, isProd } from "./env"
 import { verifyJwt } from "./lib/jwt"
 import { createLog, createRequestLogger } from "./lib/logger"
 import { Mailer } from "./lib/mailer"
@@ -77,11 +77,18 @@ export const app = new Elysia({
 
     // create our react App component
     const url = new URL(request.url)
-    const app = createElement(App, { path: params["*"], serverUrl: url.origin })
+    const app = createElement(App, {
+      path: params["*"],
+      serverUrl: url.origin,
+      envClient: envClient,
+    })
 
     // render the app component to a readable stream
     const stream = await renderToReadableStream(app, {
       bootstrapModules: ["/frontend.js"],
+      bootstrapScriptContent: `
+        window.__ENV = ${JSON.stringify(envClient)};
+      `,
     })
 
     // output the stream as the response

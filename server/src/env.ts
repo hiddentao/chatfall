@@ -1,5 +1,6 @@
 import { type Static, type TSchema, Type } from "@sinclair/typebox"
 import { Value } from "@sinclair/typebox/value"
+import _ from "lodash"
 import { LogLevel } from "./lib/logger/types"
 
 function parseEnv<T extends TSchema>(schema: T, env: unknown): Static<T> {
@@ -36,3 +37,5 @@ const EnvDTO = Type.Object({
 
 export const isProd = process.env.NODE_ENV === "production"
 export const env = parseEnv(EnvDTO, process.env)
+// env vars for the client
+export const envClient = _.pick(env, ["NODE_ENV"])
