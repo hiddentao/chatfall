@@ -11,7 +11,7 @@
     "check": "bun run scripts/check.ts",
     "build": "bun run scripts/build.ts",
     "update-versions": "bun run scripts/update-versions.ts",
-    "publish-npm": "bun run scripts/publish-npm.ts"    
+    "publish-npm": "bun run scripts/publish-npm.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
@@ -21,12 +21,14 @@
     "release-please": "^16.14.3"
   },
   "trustedDependencies": [
-    "husky",
     "@biomejs/biome",
+    "@chatfall/server",
+    "core-js",
+    "core-js-pure",
     "esbuild",
+    "husky",
     "keccak",
     "secp256k1",
-    "core-js",
     "websocket"
   ],
   "dependencies": {
