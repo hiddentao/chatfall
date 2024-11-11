@@ -24,20 +24,25 @@ Remember to set the correct [environment variables](../environment-variables.mdx
 
 ## Running with Docker 
 
-Every release of Chatfall also includes a [Docker](https://www.docker.com/) iamge hosted at https://github.com/hiddentao/chatfall/pkgs/container/chatfall.
+Every release of Chatfall also includes a [Docker](https://www.docker.com/) image hosted at https://github.com/hiddentao/chatfall/pkgs/container/chatfall.
 
-To run the Chatfall server using Docker, first ensure you have Docker installed.
+The images are currently built for the following platforms:
 
-Then migrate your database to the latest version:
+* `linux/amd64`
+* `linux/arm64`
+
+To run them you need to specify the exact version of the image you want to use.
+
+For example, assuming you want to run the image `ghcr.io/hiddentao/chatfall:v0.18.0`, you would first migrate your Chatfall database:
 
 ```bash
 docker run --rm \
 --env ENC_KEY=<your chatfall encryption key> \
 --env DATABASE_URL="<your postgres database url>" \
-ghcr.io/hiddentao/chatfall:latest migrate-db
+ghcr.io/hiddentao/chatfall:v0.18.0 migrate-db
 ```
 
-Now you can run the Chatfall server:
+Then you would run the server:
 
 ```bash
 docker run --rm \
@@ -47,12 +52,12 @@ docker run --rm \
 --env DATABASE_URL="<your postgres database url>" \
 --env MAILGUN_API_KEY=<your mailgun api key> \
 --env MAILGUN_SENDER=<your mailgun sender email> \
-ghcr.io/hiddentao/chatfall:latest server
+ghcr.io/hiddentao/chatfall:v0.18.0 server
 ```
 
-This will start the Chatfall server on port 3000 - access it at http://localhost:3000.
+This starts the Chatfall server on port 3000 - access it at http://localhost:3000.
 
-You can shut down the server by running:
+You can then shut down the server later on by running:
 
 ```bash
 docker stop chatfall
