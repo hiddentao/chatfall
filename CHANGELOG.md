@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.18.0](https://github.com/hiddentao/chatfall/compare/v0.17.0...v0.18.0) (2024-11-11)
+
+
+### Features
+
+* docker builds ([#45](https://github.com/hiddentao/chatfall/issues/45)) ([3223848](https://github.com/hiddentao/chatfall/commit/3223848936277bd363f7b1e11b3b1825311e80a6))
+* show 404 error page for bad paths ([#42](https://github.com/hiddentao/chatfall/issues/42)) ([e5f6fb4](https://github.com/hiddentao/chatfall/commit/e5f6fb457a82c2485fb202cc86653b8be043f7c1))
+* website + documentation ([1dccc78](https://github.com/hiddentao/chatfall/commit/1dccc7804e9969b734be16fe810fb96a88c9fda3))
+
+
+### Miscellaneous
+
+* update repo url ([95a5407](https://github.com/hiddentao/chatfall/commit/95a5407be79ef47be14c773c358aeab8ec0f3edd))
+
 ## [0.17.0](https://github.com/hiddentao/chatfall/compare/v0.16.1...v0.17.0) (2024-10-25)
 
 
