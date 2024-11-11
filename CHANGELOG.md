@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.0](https://github.com/hiddentao/chatfall/compare/v0.18.0...v0.19.0) (2024-11-11)
+
+
+### Features
+
+* multi-platform docker builds ([#47](https://github.com/hiddentao/chatfall/issues/47)) ([c9e3c9a](https://github.com/hiddentao/chatfall/commit/c9e3c9a5b45e7b6c7a77d8feb0d138d75e2f715f))
+
 ## [0.18.0](https://github.com/hiddentao/chatfall/compare/v0.17.0...v0.18.0) (2024-11-11)
 
 
