@@ -1,6 +1,6 @@
 name: Build and publish Docker image
 
-on: push
+on: [workflow_dispatch]
 
 permissions:
   contents: write
