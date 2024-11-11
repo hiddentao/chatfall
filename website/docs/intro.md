@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Introduction
 
-**Chatfall** is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
+**Chatfall** is a self-hosted, light-weight commenting system for easily adding comments to any webpage. 
 
 It is built using [Bun](https://bun.sh), [ElysiaJS](https://elysiajs.com/), [React](https://react.dev/) and [PostgreSQL](https://www.postgresql.org/) and has a whole host of features, including:
 
@@ -34,4 +34,4 @@ Chatfall comes as a full-stack solution, with both a server-side and client-side
     * To be embedded into webpages where comments are needed. Designed to load and render quickly.
     * Distributed as a JS and companion CSS file available on the Github releases page but also via the [@chatfall/client NPM package](https://www.npmjs.com/package/@chatfall/client).
 
-The best way to discover what Chatfall has to offer is to follow the instructions in the [Tutorial](./tutorial/setup-the-server.mdx) to get it up and running locally.
+The best way to discover what Chatfall has to offer is to follow the instructions in the [Tutorial](./category/tutorial) to get it up and running locally.

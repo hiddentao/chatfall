@@ -4,7 +4,7 @@ import { themes as prismThemes } from "prism-react-renderer"
 
 const config: Config = {
   title: "Chatfall",
-  tagline: "A lightweight, embeddable commenting platform for any website.",
+  tagline: "A self-hosted, lightweight commenting system for any website.",
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
@@ -34,24 +34,10 @@ const config: Config = {
       "classic",
       {
         docs: {
-          sidebarPath: "./sidebars.ts",
+          sidebarPath: "./src/sidebars.ts",
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/hiddentao/chatfall/tree/main/website/",
-        },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ["rss", "atom"],
-            xslt: true,
-          },
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/hiddentao/chatfall/tree/main/website/",
-          // Useful options to enforce blogging best practices
-          onInlineTags: "warn",
-          onInlineAuthors: "warn",
-          onUntruncatedBlogPosts: "warn",
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -118,9 +104,58 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["bash"],
+      additionalLanguages: ["bash", "javascript"],
     },
   } satisfies Preset.ThemeConfig,
+
+  headTags: [
+    {
+      tagName: "link",
+      attributes: {
+        rel: "icon",
+        type: "image/png",
+        href: "/img/favicon-96x96.png",
+        sizes: "96x96",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "/img/favicon.svg",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "shortcut icon",
+        href: "/img/favicon.ico",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "apple-touch-icon",
+        href: "/img/apple-touch-icon.png",
+        sizes: "180x180",
+      },
+    },
+    {
+      tagName: "meta",
+      attributes: {
+        name: "apple-mobile-web-app-title",
+        content: "Chatfall",
+      },
+    },
+    {
+      tagName: "link",
+      attributes: {
+        rel: "manifest",
+        href: "/site.webmanifest",
+      },
+    },
+  ],
 }
 
 export default config
