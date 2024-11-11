@@ -1,0 +1,99 @@
+---
+sidebar_position: 1
+---
+
+# Basic setup
+
+Once you have setup the server you can embed the commenting widget in your webpage.
+
+You must first of all decide where comments will be displayed, for example:
+
+```html
+<div id="root" />
+```
+
+Next you need to add the following script tag to your page:
+
+```html
+<script>
+  const iframe = document.createElement('iframe');
+  // BEGIN: edit these values to match your needs
+  iframe.width = '100%';
+  iframe.height = '100%';
+  iframe.style.border = 'none';
+  const serverUrl = 'http://localhost:3000';   // URL to your Chatfall server
+  const rootElement = document.getElementById('root');
+  // END
+  iframe.srcdoc = `
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.css" crossorigin="anonymous" />
+    <script type="module">
+      import { Chatfall } from 'https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.es.js';
+      Chatfall.init({
+        serverUrl: '${serverUrl}',
+        pageUrl: '${location.href}',
+      });
+    <\/script>
+  `;
+  rootElement.appendChild(iframe)
+</script>
+```
+
+When you load the page the Chatfall comments widget will now be displayed. You can customize the widget's position and layout within your page by 
+controlling the iframe's style attributes.
+
+:::tip
+We're using the CDN-hosted version of the client above, as this is the recommended approach. However, you can also 
+use the version provided by your server. See the [client library deployment docs](../production-deployment/client) for more details.
+:::
+
+## Title
+
+You can customize the title of the widget using the `title` option:
+
+```javascript
+Chatfall.init({
+  title: 'Discussion', // default is 'Comments'
+});
+```
+
+## Custom root element
+
+If you are embedding the widget without using an `iframe` then you may 
+wish to specify a custom root element using the `rootElement` option:
+
+```html
+<head>
+  <link rel="stylesheet" href="http://mychatfallserver.com/chatfall.css" crossorigin="anonymous"  />
+</head>
+<body>
+  <p>Some content before the comments</p>
+  <div id="comments_div" />
+  <p>Some content after the comments</p>
+  <script type="module">
+    import { Chatfall } from 'http://mychatfallserver.com/chatfall.es.js';
+    Chatfall.init({
+      serverUrl: 'http://mychatfallserver.com',
+      rootElement: document.getElementById('comments_div'),
+    });
+    </script>
+  </body>
+```
+
+## Initial sort mode
+
+By default comments are displayed in the newest first sort mode. You can change this by setting the `initialSort` option:
+
+```javascript
+Chatfall.init({
+  initialSort: 'of', // oldest first
+});
+```
+
+The supported sort modes are:
+
+* `nf` - Newest first _(default)_
+* `of` - Oldest first
+* `hs` - Highest score
+* `ls` - Lowest score
+* `mr` - Most replies
+* `lr` - Least replies  

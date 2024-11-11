@@ -39,5 +39,5 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: release-please-manifest.json
-          repo-url: chatfall/chatfall
+          repo-url: hiddentao/chatfall
           skip-github-release: true

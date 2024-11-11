@@ -1,0 +1,28 @@
+---
+sidebar_position: 1
+---
+
+# Server
+
+One of the main goals of Chatfall is to be easily deployable.
+
+To this end, every Chatfall release includes a single binary executable with **zero dependencies**!
+
+On Github, every release will have the following assets:
+
+* `chatfall-server.js` - Node.js script to run using [Bun](https://bun.sh).
+* `chatfall-linux-arm64` - Binary executable for Linux ARM architectures.
+* `chatfall-linux-x64` - Binary executable for Linux x64/Intel/AMD architectures.
+* `chatfall-macos-arm64` - Binary executable for Mac OS ARM architectures.
+* `chatfall-macos-x64` - Binary executable for Mac OS x64/Intel/AMD architectures.
+* `chatfall-windows-x64.exe` - Binary executable for Windows x64/Intel/AMD architectures.
+
+You can run these binaries manually as shown in the [tutorial](../tutorial/start-the-server.mdx), though we recommend using a 
+process manager like [PM2](https://pm2.keymetrics.io/) in that case. 
+
+Remember to set the correct [environment variables](../environment-variables.mdx).
+
+A better approach is to use [Docker](https://www.docker.com/) to containerize the Chatfall server.
+
+_TODO: Add Docker instructions here._
+

@@ -1,6 +1,7 @@
 {
   "name": "@chatfall/client",
   "version": "0.0.0",
+  "description": "A self-hosted, lightweight commenting system for your website.",
   "type": "module",
   "exports": {
     ".": "./src/exports.ts"

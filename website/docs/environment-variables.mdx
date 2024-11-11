@@ -1,0 +1,54 @@
+---
+sidebar_position: 3
+---
+
+# Environment variables
+
+Server-side configuration is done partially through environment variables. These variables must be set _before_ running the server. 
+
+* `DATABASE_URL` - **REQUIRED**. The PostgreSQL database connection URL.
+* `ENC_KEY` - **REQUIRED**. The encryption key for authentication tokens. Must be a hex string of atleast length `48`.
+* `NODE_ENV` - The environment in which the server is running. Must be either `development` or `production`. Defaults to `development`.
+* `PORT` - The port at which the server listens for connections. Defaults to `3000`.
+* `HOSTNAME` - The hostname at which the server is available. Defaults to `localhost`.
+* `MAILGUN_API_KEY` - The Mailgun API key. If not set then email notifications will not be sent but will instead be logged to the console at the `debug` level.
+* `MAILGUN_SENDER` - The Mailgun sender email address. Defaults to empty string and only relevant if `MAILGUN_API_KEY` is also set.
+* `LOG_LEVEL` - The log level - one of `trace`, `debug`, `info`, `warn` or `error`. Defaults to `info`.
+
+When running the server in production you will should set `NODE_ENV` to `production` and also set the `MAILGUN_API_KEY` and `MAILGUN_SENDER` variables, otherwise 
+users will not be able to sign up or login.
+
+:::tip
+You can see the full list of variables and their various options in [env.ts](https://github.com/hiddentao/chatfall/blob/main/server/src/env.ts).
+:::
+
+## Setting environment variables
+
+Environment variables can be set in a number of ways depending on the operating system you are using.
+
+### Unix-like systems (Linux, MacOS)
+
+On Unix-like systems you can set the environment variables in your shell before running the server. For example:
+
+```bash
+$ export ENC_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+$ export DATABASE_URL=postgres://username:password@localhost:5432/chatfall
+$ ./chatfall-linux-x64 server
+```
+
+You can also set the environment variables inline as follows:
+
+```bash
+ENC_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef DATABASE_URL=postgres://username:password@localhost:5432/chatfall ./chatfall-linux-x64 server
+```
+
+### Windows
+
+On Windows you can set the environment variables in the command prompt before running the server. For example:
+
+```bash
+> set ENC_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+> set DATABASE_URL=postgres://username:password@localhost:5432/chatfall
+> ./chatfall-windows-x64.exe server
+```
+

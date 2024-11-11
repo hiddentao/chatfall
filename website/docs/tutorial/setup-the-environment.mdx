@@ -1,0 +1,135 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Setup the environment
+
+For the purposes of this tutorial you will be running Chatfall on your local development machine. Let's get started by first setting up a development database to hold all the user and comments data needed by Chatfall.
+
+## Download the binary
+
+The Chatfall server code is distributed as a single binary executable with no dependencies. If you look at the [latest Github release](https://github.com/hiddentao/chatfall/releases/latest) you will see the following assets:
+
+* `chatfall-server.js` - Node.js script to run using [Bun](https://bun.sh).
+* `chatfall-linux-arm64` - Binary executable for Linux ARM architectures.
+* `chatfall-linux-x64` - Binary executable for Linux x64/Intel/AMD architectures.
+* `chatfall-macos-arm64` - Binary executable for Mac OS ARM architectures.
+* `chatfall-macos-x64` - Binary executable for Mac OS x64/Intel/AMD architectures.
+* `chatfall-windows-x64.exe` - Binary executable for Windows x64/Intel/AMD architectures.
+
+Download the binary appropriate for your platform. Rename it to `chatfall` to and make it executable, e.g:
+
+```bash
+mv chatfall-macos-arm64 chatfall
+chmod +x chatfall
+```
+
+_Note that you can also choose to download `chatfall-server.js` and run it on any platform using the [Bun](https://bun.sh) package manager: `bun chatfall-server.js ...`_
+
+Once you've downloaded your binary of choice you can see the available commands by running it with the `--help` option:
+
+```bas./chatfall --help
+
+Usage: chatfall [options] [command]
+
+Chatfall commenting server
+
+Options:
+  -V, --version   output the version number
+  -h, --help      display help for command
+
+Commands:
+  server          Start the Chatfall server
+  migrate-db      Setup and/or upgrade your database to the
+                  latest table schema
+  help [command]  display help for command
+```
+
+You can get further help on any given command by running that command with the `--help` option, e.g:
+
+```bash
+./chatfall migrate-db --help
+```
+
+But before we can run the server we need to setup the database and configure the environment variables the server is expecting.
+
+## Encryption key
+
+When users wish to comment they first have to authenticate themselves to Chatfall using their email address. The server returns a [JWT](https://jwt.io/) token which then gets stored client-side so that the user doesn't need to login again the next time they visit the page. 
+
+This token gets encrypted server-side to prevent spoofing and tampering. The encryption key used for this encryption must be set as an environment variable and must be unique to your Chatfall instance. We recommend using a 512-character hexadecimal string. You can obtain one using https://www.browserling.com/tools/random-hex. Once you have it set the following:
+
+
+```bash
+export ENC_KEY="your 512-character hex string here"
+```
+
+## Dummy emails 
+
+Chatfall relies on [Mailgun](https://mailgun.com) for sending out its login verification emails. 
+
+However, if the mailer environment variables are not set then emails will simply be logged out to the shell. For the purposes of this tutorial we will do just that.
+
+To see email contents in the shell/terminal we need to set the logging level to `debug`:
+
+```bash
+export LOG_LEVEL=debug
+```
+
+## Production mode
+
+The `NODE_ENV` environment variable should be set to `production`:
+  
+```bash
+export NODE_ENV=production
+```
+
+## PostgreSQL database
+
+Chatfall requires a PostgreSQL database to store all of its data. The easiest way to get one setup is to use one of the existing cloud hosted providers such as:
+
+* [Neon](https://neon.tech/)
+* [Heroku](https://www.heroku.com/postgres)
+* [Digital Ocean](https://www.digitalocean.com/products/managed-databases)
+* [Supabase](https://supabase.com/)
+
+For the purposes of this tutorial we will use [Neon](https://neon.tech), but feel free to use your own existing setup.
+
+Once you've setup your database you should have obtained a connection string URL that looks like the following:
+
+```
+postgresql://username:password@hostname:port/chatfall?sslmode=require
+```
+
+Let's set this as an environment variable:
+
+```bash
+export DATABASE_URL="postgresql://username:password@hostname:port/chatfall?sslmode=require"
+```
+
+At this point we can setup the database tables using the `migrate-db` CLI command:
+
+<Tabs>
+<TabItem value="binary" label="Binary">
+
+```bash
+./chatfall migrate-db
+```
+
+</TabItem>
+<TabItem value="bun" label="Bun">
+
+```bash
+bun chatfall-server.js migrate-db
+```
+
+</TabItem>
+</Tabs>
+
+
+You can and should run this command whenever you download a new version of the Chatfall server binary. This will ensure that your database schema is always up-to-date.
+
+

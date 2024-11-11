@@ -1,0 +1,8 @@
+{
+  "label": "Comments widget",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "The Chatfall client-side widget is the principle means of adding Chatfall comments to a webpage."
+  }
+}

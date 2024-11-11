@@ -3,7 +3,8 @@
   "version": "0.17.0",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "website"
   ],
   "scripts": {
     "prepare": "husky",
@@ -20,12 +21,14 @@
     "release-please": "^16.14.3"
   },
   "trustedDependencies": [
-    "husky",
     "@biomejs/biome",
+    "@chatfall/server",
+    "core-js",
+    "core-js-pure",
     "esbuild",
+    "husky",
     "keccak",
     "secp256k1",
-    "core-js",
     "websocket"
   ],
   "dependencies": {
@@ -34,6 +37,9 @@
   "packageManager": "bun@1.1.18",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chatfall/chatfall.git"
-  }
+    "url": "https://github.com/hiddentao/chatfall.git"
+  },
+  "resolutions": {
+    "sha3": "2.0.0"
+  }  
 }

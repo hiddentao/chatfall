@@ -25,6 +25,7 @@ import {
 } from "./utils"
 
 export const createCommentRoutes = (ctx: GlobalContext) => {
+  const log = ctx.log.create("comments")
   const { db } = ctx
 
   return new Elysia({ prefix: "/comments" })
@@ -143,14 +144,21 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
           }
 
           // check that comment doesn't contain blacklisted words
-          const blacklistedWords = ctx.settings.getSetting(
-            Setting.BlacklistedWords,
+          const spamPhrases = ctx.settings.getSetting(Setting.SpamPhrases)
+          let shouldModerate = ctx.settings.getSetting(
+            Setting.ModerateAllComments,
           )
-          const commentToCheck = comment.toLowerCase()
-          if (blacklistedWords?.length) {
-            for (const word of blacklistedWords) {
-              if (commentToCheck.includes(word)) {
-                throw new Error(`Blacklisted word detected: ${word}`)
+          if (!shouldModerate) {
+            const commentToCheck = comment.toLowerCase()
+            if (spamPhrases?.length) {
+              for (const phrase of spamPhrases) {
+                if (commentToCheck.includes(phrase.toLowerCase())) {
+                  log.debug(
+                    `Spam phrase detected: ${phrase} in comment: ${comment}`,
+                  )
+                  shouldModerate = true
+                  break
+                }
               }
             }
           }
@@ -266,7 +274,7 @@ export const createCommentRoutes = (ctx: GlobalContext) => {
                 path,
                 createdAt,
                 updatedAt: dateNow(),
-                status: ctx.settings.getSetting(Setting.ModerateAllComments)
+                status: shouldModerate
                   ? CommentStatus.Moderation
                   : CommentStatus.Visible,
               })

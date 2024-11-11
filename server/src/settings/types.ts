@@ -2,7 +2,7 @@ export enum Setting {
   ModerateAllComments = "moderateAllComments",
   CommentsPerPage = "commentsPerPage",
   UserNextCommentDelaySeconds = "userNextCommentDelaySeconds",
-  BlacklistedWords = "blacklistedWords",
+  SpamPhrases = "spamPhrases",
   BlacklistedEmails = "blacklistedEmails",
   BlacklistedDomains = "blacklistedDomains",
 }
@@ -11,7 +11,7 @@ export enum Setting {
 export type Settings = {
   [Setting.CommentsPerPage]: number
   [Setting.UserNextCommentDelaySeconds]: number
-  [Setting.BlacklistedWords]: string[]
+  [Setting.SpamPhrases]: string[]
   [Setting.BlacklistedEmails]: string[]
   [Setting.BlacklistedDomains]: string[]
   [Setting.ModerateAllComments]: boolean

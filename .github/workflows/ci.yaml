@@ -28,4 +28,6 @@ jobs:
 
       - name: Install Dependencies
         run: bun install --frozen-lockfile
-          
+
+      - name: Build
+        run: bun run build

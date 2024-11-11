@@ -6,7 +6,12 @@ import { createStore } from "./store/client"
 import { Config, ThemeMode, ThemeNames } from "./types"
 import { updateCSSVariables } from "./utils/ui"
 
-export const createApp = (config: Config) => {
+type CreateAppProps = Config & {
+  pageUrl: string
+  serverUrl: string
+}
+
+export const createApp = (config: CreateAppProps) => {
   const store = createStore(config)
 
   // override theme variables

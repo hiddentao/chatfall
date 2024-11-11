@@ -14,6 +14,7 @@ async function runBuild(directory: string) {
 async function buildAll() {
   await runBuild("client")
   await runBuild("server")
+  await runBuild("website")
 }
 
 buildAll()

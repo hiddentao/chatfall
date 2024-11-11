@@ -7,13 +7,24 @@ import { ThemeConsumer, ThemeProvider } from "./contexts/theme"
 import { AppRouter } from "./pages/AppRouter"
 import { createStore } from "./store/server"
 
-export const App = ({ path, server }: { path: string; server?: string }) => {
+export interface ClientEnv {
+  NODE_ENV: string
+}
+
+export const App = ({
+  path,
+  serverUrl,
+  envClient,
+}: { path: string; serverUrl: string; envClient: ClientEnv }) => {
+  const isDev = useMemo(() => envClient.NODE_ENV === "development", [envClient])
+
   const config = useMemo(
     () => ({
-      server: server ?? `${window.location.protocol}//${window.location.host}`,
+      serverUrl,
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
     }),
-    [server],
-  ) as Config
+    [serverUrl],
+  ) as Config & { serverUrl: string; pageUrl: string }
 
   return (
     <GlobalProvider store={createStore(config)} config={config}>
@@ -30,7 +41,7 @@ export const App = ({ path, server }: { path: string; server?: string }) => {
                   content="width=device-width, initial-scale=1"
                 />
                 <link rel="stylesheet" href="/frontend.css" />
-                {
+                {isDev && (
                   <script
                     type="text/javascript"
                     dangerouslySetInnerHTML={{
@@ -50,7 +61,7 @@ setInterval(checkForRebuild, 2000);
           `,
                     }}
                   />
-                }
+                )}
               </head>
               <body>
                 <AppRouter path={path} config={config} />

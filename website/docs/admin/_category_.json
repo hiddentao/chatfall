@@ -1,0 +1,8 @@
+{
+  "label": "Admin interface",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Once the server is up and running you can access the admin interface to update runtime settings as well as manage users and comments."
+  }
+}

@@ -1,0 +1,36 @@
+---
+sidebar_position: 2
+---
+
+# Client
+
+The latest version of the Chatfall client library is always available via NPM at: [@chatfall/client](https://www.npmjs.com/package/@chatfall/client).
+
+This package includes both the CSS and JavaScript code needed to use the Chatfall comments widget and can be loaded via CDN using:
+
+* https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.css
+* https://cdn.jsdelivr.net/npm/@chatfall/client@latest/dist/chatfall.es.js
+
+In the [basic setup](../widget/basic-setup.mdx) docs we use the latest version of the Chatfall client. However, you can also 
+load a specific version of the client library by changing the version number in the URLs above.
+
+For example, to load version 1.0.0 of the client library you would use the following URLs:
+
+* https://cdn.jsdelivr.net/npm/@chatfall/client@1.0.0/dist/chatfall.css
+* https://cdn.jsdelivr.net/npm/@chatfall/client@1.0.0/dist/chatfall.es.js
+
+:::warning
+It is important that the version of the client library matches the version of the server you are running.
+
+To check you the server version, you can run:
+
+```bash
+chatfall --version
+```
+:::
+
+Alternatively, you can use the client library provided by your Chatfall server to avoid any issues related to versioning. Taking the [tutorial server](../tutorial/start-the-server.mdx) as an example, the URLs would be:
+
+* http://localhost:3000/chatfall.css
+* http://localhost:3000/chatfall.es.js
+
