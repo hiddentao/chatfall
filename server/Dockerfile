@@ -13,7 +13,7 @@ COPY dist-bin/chatfall-* /app
 
 # only want the binary for the current platform
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-      cp /app/chatfall-linux-amd64 /app/chatfall; \
+      cp /app/chatfall-linux-x64 /app/chatfall; \
     else \
       cp /app/chatfall-linux-arm64 /app/chatfall; \
     fi
