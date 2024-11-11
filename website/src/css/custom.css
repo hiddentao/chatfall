@@ -5,14 +5,15 @@
  */
 
 /* You can override the default Infima variables here. */
+
 :root {
-  --ifm-color-primary: #415A77;
-  --ifm-color-primary-dark: #334660;
-  --ifm-color-primary-darker: #2e3f57;
-  --ifm-color-primary-darkest: #253245;
-  --ifm-color-primary-light: #4f6e90;
-  --ifm-color-primary-lighter: #577698;
-  --ifm-color-primary-lightest: #7394b8;
+  --ifm-color-primary: #f77f00;
+  --ifm-color-primary-dark: #e07300;
+  --ifm-color-primary-darker: #d26b00;
+  --ifm-color-primary-darkest: #b35900;
+  --ifm-color-primary-light: #ff8b00;
+  --ifm-color-primary-lighter: #ff9700;
+  --ifm-color-primary-lightest: #ffb100;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --logo-background-color: #fff;
@@ -31,6 +32,13 @@
   --logo-background-color: #000;
 }
 
+.hero--primary {
+  --ifm-hero-background-color: #415A77;
+}
+[data-theme='dark'] .hero--primary {
+  --ifm-hero-background-color: #66CCCC;
+}
+
 .homepage_logo {
   background-color: var(--logo-background-color);
   border-radius: 256px;
@@ -44,4 +52,15 @@
     width: 256px;
     height: 256px;
   }
+}
+
+a.footer__link-item, a.footer__link-item:link, a.footer__link-item:visited {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ifm-color-primary);
+}
+
+a.footer__link-item:hover, a.footer__link-item:active {
+  background-color: var(--ifm-color-primary);
+  color: #fff;
 }
