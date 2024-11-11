@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  publish-docs:
+  publish-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
