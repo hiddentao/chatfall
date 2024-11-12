@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.3](https://github.com/hiddentao/chatfall/compare/v1.1.2...v1.1.3) (2024-11-12)
+
+
+### Miscellaneous
+
+* better db url string support ([05cd6d4](https://github.com/hiddentao/chatfall/commit/05cd6d4971f780a42c4d2b4b628fdc2470257183))
+* instructions for mailer, better db url string support ([69e5f63](https://github.com/hiddentao/chatfall/commit/69e5f632bf1539190aeb919c476e090c3f6c3477))
+
 ## [1.1.2](https://github.com/hiddentao/chatfall/compare/v1.1.1...v1.1.2) (2024-11-12)
 
 
