@@ -1,6 +1,6 @@
 # Chatfall
 
-![Chatfall Screenshot](screenshot.png)
+![Chatfall Screenshot](client/screenshot.png)
 
 Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 

@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 For the purposes of this tutorial you will be running Chatfall on your local development machine. Let's get started by first setting up a development database to hold all the user and comments data needed by Chatfall.
 
-## Download the binary
+## Download the server binary
 
 The Chatfall server code is distributed as a single binary executable with no dependencies. If you look at the [latest Github release](https://github.com/hiddentao/chatfall/releases/latest) you will see the following assets:
 
@@ -55,6 +55,10 @@ You can get further help on any given command by running that command with the `
 ```
 
 But before we can run the server we need to setup the database and configure the environment variables the server is expecting.
+
+:::tip
+You can run the Chatfall server using the pre-built Docker image if you don't want to manually download the server binary. See the [production deployment](/docs/production-deployment/server) guide for more details.
+:::
 
 ## Encryption key
 
