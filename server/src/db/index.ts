@@ -5,6 +5,9 @@ import * as schema from "./schema"
 
 const client = new Client({
   connectionString: env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 })
 client.connect().catch((err) => {
   console.error("Error connecting to database", err)
