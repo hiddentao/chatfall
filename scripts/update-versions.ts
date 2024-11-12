@@ -6,6 +6,7 @@ async function updateVersions() {
   const rootDir = path.join(__dirname, "..")
   const clientDir = path.join(rootDir, "client")
   const serverDir = path.join(rootDir, "server")
+  const websiteDir = path.join(rootDir, "website")
 
   try {
     const rootPackageJson = JSON.parse(
@@ -19,7 +20,7 @@ async function updateVersions() {
       ),
     )
 
-    for (const dir of [clientDir, serverDir]) {
+    for (const dir of [clientDir, serverDir, websiteDir]) {
       const packageJsonPath = path.join(dir, "package.json")
       const packageJson = JSON.parse(
         await fs.readFile(packageJsonPath, "utf-8"),
