@@ -8,7 +8,6 @@ const mailgun = new Mailgun(formData)
 
 export type MailerSendParams = {
   to: string | string[]
-  replyTo?: string
   subject: string
   text?: string
   html?: string
@@ -17,6 +16,7 @@ export type MailerSendParams = {
 export class Mailer {
   private log: LogInterface
   private fromAddress?: string
+  private replyToAddress?: string
   private domain?: string
   private mailClient?: IMailgunClient
 
@@ -24,10 +24,12 @@ export class Mailer {
     log: LogInterface
     apiKey?: string
     fromAddress?: string
+    replyToAddress?: string
   }) {
-    const { log, apiKey, fromAddress } = params
+    const { log, apiKey, fromAddress, replyToAddress } = params
 
     this.fromAddress = fromAddress
+    this.replyToAddress = replyToAddress
     this.domain = fromAddress?.split("@")[1]
     this.log = log.create("mailer")
     if (apiKey) {
@@ -39,13 +41,13 @@ export class Mailer {
   }
 
   async send(params: MailerSendParams) {
-    const { to, replyTo, subject, text, html = "" } = params
+    const { to, subject, text, html = "" } = params
 
     this.log.info(`Sending email to ${to} with subject: ${subject}`)
 
     this.log.debug(`
 to: ${to}
-replyTo: ${replyTo}
+reply-to: ${this.replyToAddress}
 subject: ${subject}
 text: ${text}
 html: ${html}
@@ -53,14 +55,11 @@ html: ${html}
 
     const attrs: any = {
       from: this.fromAddress,
+      "h:Reply-To": this.replyToAddress,
       to: Array.isArray(to) ? to : [to],
       subject,
       text,
       html: html || text,
-    }
-
-    if (replyTo) {
-      attrs.replyTo = replyTo
     }
 
     try {

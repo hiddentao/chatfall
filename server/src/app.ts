@@ -28,6 +28,7 @@ const mailer = new Mailer({
   log: log.create("mailer"),
   apiKey: env.MAILGUN_API_KEY,
   fromAddress: env.MAILGUN_SENDER,
+  replyToAddress: env.MAILGUN_REPLY_TO,
 })
 
 const cron = new Cron()

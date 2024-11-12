@@ -13,6 +13,7 @@ Server-side configuration is done partially through environment variables. These
 * `HOSTNAME` - The hostname at which the server is available. Defaults to `localhost`.
 * `MAILGUN_API_KEY` - The Mailgun API key. If not set then email notifications will not be sent but will instead be logged to the console at the `debug` level.
 * `MAILGUN_SENDER` - The Mailgun sender email address. Defaults to empty string and only relevant if `MAILGUN_API_KEY` is also set.
+* `MAILGUN_REPLY_TO` - The Mailgun reply-to email address. Defaults to empty string and only relevant if `MAILGUN_API_KEY` is also set.
 * `LOG_LEVEL` - The log level - one of `trace`, `debug`, `info`, `warn` or `error`. Defaults to `info`.
 
 When running the server in production you will should set `NODE_ENV` to `production` and also set the `MAILGUN_API_KEY` and `MAILGUN_SENDER` variables, otherwise 

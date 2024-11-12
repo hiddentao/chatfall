@@ -3,12 +3,26 @@ import { Client } from "pg"
 import { env } from "../env"
 import * as schema from "./schema"
 
-const client = new Client({
-  connectionString: env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-})
+const sanitizedConnectionOptions = (connStr: string) => {
+  // if sslmode=require exists then remove it, but also set rejectUnauthorized to false
+  const sslMode = connStr.match(/sslmode=require/)
+  if (sslMode) {
+    connStr = connStr.replace(/sslmode=require/, "")
+    return {
+      connectionString: connStr,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    }
+  } else {
+    return {
+      connectionString: connStr,
+    }
+  }
+}
+
+const client = new Client(sanitizedConnectionOptions(env.DATABASE_URL))
+
 client.connect().catch((err) => {
   console.error("Error connecting to database", err)
   process.exit(1)

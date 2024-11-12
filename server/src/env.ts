@@ -31,6 +31,7 @@ const EnvDTO = Type.Object({
   DATABASE_URL: Type.String(),
   MAILGUN_API_KEY: Type.Optional(Type.String({ default: "" })),
   MAILGUN_SENDER: Type.Optional(Type.String({ default: "" })),
+  MAILGUN_REPLY_TO: Type.Optional(Type.String({ default: "" })),
   LOG_LEVEL: Type.Enum(LogLevel, { default: "info" }),
   ENC_KEY: Type.String({ minLength: 48 }),
 })

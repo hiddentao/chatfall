@@ -1,0 +1,19 @@
+---
+sidebar_position: 3
+---
+
+# Sending emails
+
+Chatfall uses [Mailgun](https://www.mailgun.com/) to send emails.
+
+To set it up, you need to create a Mailgun account and then add your domain. We recommend creating a subdomain for this purpose, e.g `mailgun.chatfall.com`.
+
+Once you have done that and created a [sending API key](https://help.mailgun.com/hc/en-us/articles/203380100-Where-can-I-find-my-API-keys-and-SMTP-credentials), you can set the following environment variables:
+
+* `MAILGUN_API_KEY` - Your Mailgun API key.
+* `MAILGUN_SENDER` - The sender address, e.g `bot@mailgun.chatfall.com`.
+* `MAILGUN_REPLY_TO` - The reply-to address, e.g `team@chatfall.com`.
+
+:::warning
+For now, only the Mailgun US region is supported, so please add your domain in that region.
+:::
