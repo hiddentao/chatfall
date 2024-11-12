@@ -163,6 +163,8 @@ const config: Config = {
   customFields: {
     version,
   },
+
+  plugins: [require.resolve("docusaurus-lunr-search")],
 }
 
 export default config
