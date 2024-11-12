@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/hiddentao/chatfall/compare/v0.19.0...v0.20.0) (2024-11-12)
+
+
+### Features
+
+* add README and LICENSE for client pkg ([3fed7ee](https://github.com/hiddentao/chatfall/commit/3fed7ee6e9b333c43d63702dc91e6a1c3ca769d6))
+
 ## [0.19.0](https://github.com/hiddentao/chatfall/compare/v0.18.0...v0.19.0) (2024-11-11)
 
 
