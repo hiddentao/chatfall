@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/hiddentao/chatfall/compare/v1.0.0...v1.1.0) (2024-11-12)
+
+
+### Features
+
+* docs search capability ([d947851](https://github.com/hiddentao/chatfall/commit/d9478512dcd29be428ebb6058034ad08f84cb9c9))
+* dynamic version tag in docs based on package json ([ec9bb36](https://github.com/hiddentao/chatfall/commit/ec9bb366b6a3ecce4ec43eb365a9e24bd3ede183))
+
 ## [1.0.0](https://github.com/hiddentao/chatfall/compare/v0.19.0...v1.0.0) (2024-11-12)
 
 
