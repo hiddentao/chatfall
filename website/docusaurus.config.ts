@@ -1,6 +1,7 @@
 import type * as Preset from "@docusaurus/preset-classic"
 import type { Config } from "@docusaurus/types"
 import { themes as prismThemes } from "prism-react-renderer"
+import { version } from "./package.json"
 
 const config: Config = {
   title: "Chatfall",
@@ -158,6 +159,10 @@ const config: Config = {
       },
     },
   ],
+
+  customFields: {
+    version,
+  },
 }
 
 export default config

@@ -3,6 +3,7 @@ sidebar_position: 1
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import { Version } from '@site/src/components/Version'
 
 # Basic setup
 
@@ -33,7 +34,7 @@ bun chatfall-server.js server --version
 </TabItem>
 </Tabs>
 
-Now you can add the following script tag to your page:
+Now you can add the following script tag to your page _(replace `VERSION` with your chosen version, e.g "<Version/>")_:
 
 ```html
 <script>
@@ -44,7 +45,7 @@ Now you can add the following script tag to your page:
   iframe.style.border = 'none';
   const serverUrl = 'http://localhost:3000';   // URL to your Chatfall server
   const rootElement = document.getElementById('root');
-  const version = '0.18.0'; // replace with the version of the Chatfall server you are running
+  const version = 'VERSION'; // replace with the version of the Chatfall server you are running
   // END
   iframe.srcdoc = `
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@chatfall/client@${version}/dist/chatfall.css" crossorigin="anonymous" />
