@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.2](https://github.com/hiddentao/chatfall/compare/v1.1.1...v1.1.2) (2024-11-12)
+
+
+### Bug Fixes
+
+* correct version string in docs ([a2649a7](https://github.com/hiddentao/chatfall/commit/a2649a7ca35c6963cff0001b480d91f153544e6a))
+
+
+### Miscellaneous
+
+* allow for insecure db ssl connections ([b79a04c](https://github.com/hiddentao/chatfall/commit/b79a04c9a9b017c43785364f70ea9d13512cd292))
+
 ## [1.1.1](https://github.com/hiddentao/chatfall/compare/v1.1.0...v1.1.1) (2024-11-12)
 
 
