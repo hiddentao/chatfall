@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1](https://github.com/hiddentao/chatfall/compare/v1.1.0...v1.1.1) (2024-11-12)
+
+
+### Bug Fixes
+
+* docs package json version sync for build ([b01978a](https://github.com/hiddentao/chatfall/commit/b01978a876dbec43c631b7a03d0c3a753883e9cd))
+
+
+### Miscellaneous
+
+* ensure website package json version is in sync with others ([0aa601d](https://github.com/hiddentao/chatfall/commit/0aa601d4f3c4eae8bbd31158cbeeda042cf48254))
+
 ## [1.1.0](https://github.com/hiddentao/chatfall/compare/v1.0.0...v1.1.0) (2024-11-12)
 
 
