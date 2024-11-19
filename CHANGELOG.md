@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/hiddentao/chatfall/compare/v1.1.3...v1.1.4) (2024-11-19)
+
+
+### Miscellaneous
+
+* live demo link ([797ed33](https://github.com/hiddentao/chatfall/commit/797ed3352b443f27a7fe08d8f6b7d5e8c3c4e4b6))
+
 ## [1.1.3](https://github.com/hiddentao/chatfall/compare/v1.1.2...v1.1.3) (2024-11-12)
 
 
