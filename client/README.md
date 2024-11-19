@@ -2,6 +2,8 @@
 
 ![Chatfall Screenshot](screenshot.png)
 
+[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)
+
 Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 
 This package contains _only_ the client widget for embedding into your website. 

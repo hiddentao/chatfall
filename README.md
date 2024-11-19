@@ -22,6 +22,8 @@ It is built using [ElysiaJS](https://elysiajs.com/), [React](https://react.dev/)
 
 Chatfall is a distributed as a **single binary executable** - yes, you read that correctly! Bundled using [bun](https://bun.sh), it makes deploying and hosting Chatfall super easy.
 
+[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)
+
 ## Documentation
 
 Please refer to https://chatfall.com or the [`website/docs/`](https://github.com/hiddentao/chatfall/tree/website/website/docs) folder in this repository for the full documentation.

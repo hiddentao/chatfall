@@ -25,6 +25,12 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
+            to="https://chatfall-9mb69.ondigitalocean.app/test.html"
+          >
+            Live Demo
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
             to="/docs/intro"
           >
             Get Started
