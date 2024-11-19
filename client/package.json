@@ -12,7 +12,8 @@
     "LICENSE.md",
     "package.json",
     "src",
-    "dist"
+    "dist",
+    "screenshot.png"
   ],
   "scripts": {
     "dev": "bunx --bun vite",

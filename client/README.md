@@ -2,7 +2,7 @@
 
 ![Chatfall Screenshot](screenshot.png)
 
-[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)
+**[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)**
 
 Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 

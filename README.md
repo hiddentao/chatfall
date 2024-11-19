@@ -2,6 +2,8 @@
 
 ![Chatfall Screenshot](client/screenshot.png)
 
+**[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)**
+
 Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 
 It is built using [ElysiaJS](https://elysiajs.com/), [React](https://react.dev/) and [PostgreSQL](https://www.postgresql.org/) and has a whole host of features, including:
@@ -21,8 +23,6 @@ It is built using [ElysiaJS](https://elysiajs.com/), [React](https://react.dev/)
   * Set banned words.
 
 Chatfall is a distributed as a **single binary executable** - yes, you read that correctly! Bundled using [bun](https://bun.sh), it makes deploying and hosting Chatfall super easy.
-
-[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)
 
 ## Documentation
 
