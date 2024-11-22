@@ -1,6 +1,6 @@
 # @chatfall/client
 
-![Chatfall Screenshot](screenshot.png)
+![Chatfall Screenshot](https://cdn.jsdelivr.net/npm/@chatfall/client@latest/screenshot.png)
 
 **[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)**
 
