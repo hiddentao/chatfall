@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.5](https://github.com/hiddentao/chatfall/compare/v1.1.4...v1.1.5) (2024-11-19)
+
+
+### Bug Fixes
+
+* screenshot not showing in client package readme ([3306a41](https://github.com/hiddentao/chatfall/commit/3306a412db86d26a46913da7e07fbbebb7122efd))
+
 ## [1.1.4](https://github.com/hiddentao/chatfall/compare/v1.1.3...v1.1.4) (2024-11-19)
 
 
