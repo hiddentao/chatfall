@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/hiddentao/chatfall/compare/v1.1.5...v1.1.6) (2024-11-22)
+
+
+### Bug Fixes
+
+* url to screenshot in client pkg README ([d852904](https://github.com/hiddentao/chatfall/commit/d8529042e8710f6b2139b0c89eb336317c02871b))
+
 ## [1.1.5](https://github.com/hiddentao/chatfall/compare/v1.1.4...v1.1.5) (2024-11-19)
 
 
