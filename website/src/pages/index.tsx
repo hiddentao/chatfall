@@ -1,4 +1,5 @@
 import Link from "@docusaurus/Link"
+import useBaseUrl from "@docusaurus/useBaseUrl"
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 import HomepageFeatures from "@site/src/components/HomepageFeatures"
 import Heading from "@theme/Heading"
@@ -10,11 +11,12 @@ import styles from "./index.module.css"
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext()
+  const logoUrl = useBaseUrl("/img/logo.svg")
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
         <img
-          src="/img/logo.svg"
+          src={logoUrl}
           alt={`${siteConfig.title} Logo`}
           className="homepage_logo"
         />

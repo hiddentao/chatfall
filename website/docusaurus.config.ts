@@ -3,16 +3,18 @@ import type { Config } from "@docusaurus/types"
 import { themes as prismThemes } from "prism-react-renderer"
 import { version } from "./package.json"
 
+const baseUrl = "/chatfall/"
+
 const config: Config = {
   title: "Chatfall",
   tagline: "A self-hosted, lightweight commenting system for your website.",
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://chatfall.com",
+  url: "https://hiddentao.github.io",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/",
+  baseUrl,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -117,7 +119,7 @@ const config: Config = {
       attributes: {
         rel: "icon",
         type: "image/png",
-        href: "/img/favicon-96x96.png",
+        href: `${baseUrl}img/favicon-96x96.png`,
         sizes: "96x96",
       },
     },
@@ -126,21 +128,21 @@ const config: Config = {
       attributes: {
         rel: "icon",
         type: "image/svg+xml",
-        href: "/img/favicon.svg",
+        href: `${baseUrl}img/favicon.svg`,
       },
     },
     {
       tagName: "link",
       attributes: {
         rel: "shortcut icon",
-        href: "/img/favicon.ico",
+        href: `${baseUrl}img/favicon.ico`,
       },
     },
     {
       tagName: "link",
       attributes: {
         rel: "apple-touch-icon",
-        href: "/img/apple-touch-icon.png",
+        href: `${baseUrl}img/apple-touch-icon.png`,
         sizes: "180x180",
       },
     },
@@ -155,7 +157,7 @@ const config: Config = {
       tagName: "link",
       attributes: {
         rel: "manifest",
-        href: "/site.webmanifest",
+        href: `${baseUrl}site.webmanifest`,
       },
     },
   ],

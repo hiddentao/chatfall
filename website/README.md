@@ -2,40 +2,36 @@
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
+It is published at https://hiddentao.github.io/chatfall/.
+
 ### Installation
 
+Run this in the repository root folder:
+
 ```
-$ yarn
+$ bun install
 ```
 
 ### Local Development
 
 ```
-$ yarn start
+$ bun run start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+This command starts a local development server at http://localhost:3001/chatfall/. Most changes are reflected live without having to restart the server.
 
 ### Build
 
 ```
-$ yarn build
+$ bun run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+This command generates static content into the `build` directory. To preview the build locally:
+
+```
+$ bun run serve
+```
 
 ### Deployment
 
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+The website is deployed to GitHub Pages by the [`publish-docs`](../.github/workflows/publish-docs.yaml) GitHub Actions workflow. It runs when changes to the `website/` folder are pushed to `main`, when a new release is published, and when started manually from the Actions tab.
