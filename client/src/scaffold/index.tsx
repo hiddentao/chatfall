@@ -3,9 +3,7 @@ import ReactDOM from "react-dom/client"
 import { createApp } from "../App"
 import { Config } from "../types"
 
-export type ChatfallProps = Config & {
-  rootElement: HTMLElement
-}
+export type ChatfallProps = Config
 
 export const Chatfall = {
   init: (props: ChatfallProps) => {

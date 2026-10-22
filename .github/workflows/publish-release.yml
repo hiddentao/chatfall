@@ -81,7 +81,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
-          cache-to: type=gha,mode=max          
+          cache-to: type=gha,mode=max,ignore-error=true          
 
 
   publish-npm:
@@ -93,6 +93,14 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+
+      # npm trusted publishing (OIDC) needs npm 11.5.1+ and Node 22.14.0+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -109,9 +117,7 @@ jobs:
         run: bun run build
 
       - name: Publish Client NPM package
-        run: |
-          npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-          bun run publish-npm
+        run: bun run publish-npm
 
           
   publish-docs:
