@@ -39,6 +39,26 @@ We recommend loading this package at runtime via a CDN instead of bundling it in
 </script>
 ```
 
+### Installing from NPM
+
+You can also install the package and bundle it into your app. It is a single pre-built bundle (React included) with TypeScript type definitions:
+
+```shell
+npm install @chatfall/client
+```
+
+```js
+import { Chatfall } from "@chatfall/client"
+import "@chatfall/client/chatfall.css"
+
+Chatfall.init({
+  serverUrl: "http://localhost:3000", // URL to your Chatfall server
+  rootElement: document.getElementById("comments"),
+})
+```
+
+The CSS also styles the page's `html` and `body` elements, so load the widget in its own page or iframe (as in the CDN example above). Use the same package version as your Chatfall server.
+
 Read the [official documentation](https://hiddentao.github.io/chatfall/docs/widget/basic-setup) for usage instructions.
 
 ## License

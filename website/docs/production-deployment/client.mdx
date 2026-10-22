@@ -28,3 +28,23 @@ Alternatively, you can use the client library provided by your Chatfall server t
 * http://localhost:3000/chatfall.css
 * http://localhost:3000/chatfall.es.js
 
+## Installing from NPM
+
+You can also install the package and bundle it into your app. It is a single pre-built bundle (React included) with TypeScript type definitions:
+
+```bash
+npm install @chatfall/client
+```
+
+```js
+import { Chatfall } from "@chatfall/client"
+import "@chatfall/client/chatfall.css"
+
+Chatfall.init({
+  serverUrl: "http://localhost:3000", // URL to your Chatfall server
+  rootElement: document.getElementById("comments"),
+})
+```
+
+The CSS also styles the page's `html` and `body` elements, so load the widget in its own page or iframe, as shown in the [basic setup](../widget/basic-setup) guide.
+
