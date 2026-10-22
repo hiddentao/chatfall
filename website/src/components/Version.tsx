@@ -2,7 +2,17 @@
 
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext"
 
-export function Version() {
+function useVersion() {
   const { siteConfig } = useDocusaurusContext()
-  return `v${siteConfig.customFields.version as string}`
+  return siteConfig.customFields.version as string
+}
+
+// Release tags and Docker image tags use the "v" prefix, NPM versions do not
+export function Version({ prefix = "v" }: { prefix?: string }) {
+  return `${prefix}${useVersion()}`
+}
+
+export function CdnLink({ file }: { file: string }) {
+  const url = `https://cdn.jsdelivr.net/npm/@chatfall/client@${useVersion()}/dist/${file}`
+  return <a href={url}>{url}</a>
 }
