@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.8](https://github.com/hiddentao/chatfall/compare/v1.1.7...v1.1.8) (2026-10-22)
+
+
+### Bug Fixes
+
+* publish client via npm trusted publishing and make it installable ([#60](https://github.com/hiddentao/chatfall/issues/60)) ([064b970](https://github.com/hiddentao/chatfall/commit/064b970b83b415815a6cc8070c0a9bafea4b0e06))
+
 ## [1.1.7](https://github.com/hiddentao/chatfall/compare/v1.1.6...v1.1.7) (2026-10-22)
 
 
