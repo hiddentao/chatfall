@@ -2,7 +2,7 @@
 
 ![Chatfall Screenshot](client/screenshot.png)
 
-**[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)**
+**[Live demo](https://chatfall-9mb69.ondigitalocean.app/test.html)** | **[Documentation](https://hiddentao.github.io/chatfall/)**
 
 Chatfall is a fully-featured self-hosted commenting system for easily adding comments to any webpage. 
 
@@ -26,7 +26,7 @@ Chatfall is a distributed as a **single binary executable** - yes, you read that
 
 ## Documentation
 
-Please refer to https://chatfall.com or the [`website/docs/`](https://github.com/hiddentao/chatfall/tree/website/website/docs) folder in this repository for the full documentation.
+Please refer to https://hiddentao.github.io/chatfall/ or the [`website/docs/`](https://github.com/hiddentao/chatfall/tree/main/website/docs) folder in this repository for the full documentation.
 
 ## Acknowledgements
 

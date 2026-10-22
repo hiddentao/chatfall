@@ -39,7 +39,7 @@ We recommend loading this package at runtime via a CDN instead of bundling it in
 </script>
 ```
 
-Read the [official documentation](https://chatfall.com/docs/widget/basic-setup) for usage instructions.
+Read the [official documentation](https://hiddentao.github.io/chatfall/docs/widget/basic-setup) for usage instructions.
 
 ## License
 

@@ -1,12 +1,22 @@
 name: Build and deploy docs
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "website/**"
+      - ".github/workflows/publish-docs.yaml"
 
 permissions:
   pages: write
   id-token: write
   contents: write
   pull-requests: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   publish-docs:
@@ -24,6 +34,9 @@ jobs:
           
       - name: Install Dependencies
         run: bun install --frozen-lockfile
+
+      - name: Syncing package.json versions
+        run: bun run update-versions
 
       - name: Build
         run: cd website && bun run build
