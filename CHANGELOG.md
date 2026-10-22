@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.7](https://github.com/hiddentao/chatfall/compare/v1.1.6...v1.1.7) (2026-10-22)
+
+
+### Bug Fixes
+
+* host docs on GitHub Pages instead of chatfall.com ([#58](https://github.com/hiddentao/chatfall/issues/58)) ([dfa4665](https://github.com/hiddentao/chatfall/commit/dfa4665df89f1445780c52628d5aa0ea514363c6))
+
 ## [1.1.6](https://github.com/hiddentao/chatfall/compare/v1.1.5...v1.1.6) (2024-11-22)
 
 
